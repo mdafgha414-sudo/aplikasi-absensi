@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# 1. Install system dependencies & Node.js (untuk build aset)
+# 1. Install system dependencies, Node.js, dan upgrade npm
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -11,13 +11,14 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest
 
 # 2. Install PHP extensions (yang dibutuhkan Laravel & MySQL)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql zip exif pcntl gd
 
-# 3. Bersihkan cache apt
+# 3. Bersihkan cache apt agar image lebih ringan
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 4. Set working directory
@@ -26,7 +27,7 @@ WORKDIR /var/www/html
 # 5. Copy file proyek
 COPY . .
 
-# 6. Install Composer & dependencies PHP
+# 6. Install Composer & dependencies PHP (Production mode)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
@@ -37,7 +38,7 @@ RUN npm install && npm run build
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 9. Entrypoint Script (Perintah yang dijalankan saat server menyala)
+# 9. Entrypoint Script (Perintah otomatis saat server menyala)
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
