@@ -54,7 +54,7 @@ php artisan view:cache\n\
 php artisan migrate --force\n\
 \n\
 # Jalankan server Laravel\n\
-exec php artisan serve --host=0.0.0.0 --port=${PORT:-80}' > /usr/local/bin/entrypoint.sh \
+exec php artisan serve --host=0.0.0.0 --port=8080' > /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/entrypoint.sh
 
 # 10. Jalankan script
