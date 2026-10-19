@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# 1. Install system dependencies, Node.js, dan upgrade npm
+# 1. Install system dependencies, Node.js, dan upgrade npm ke versi 11 (kompatibel dengan Node 20)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
-    && npm install -g npm@latest
+    && npm install -g npm@11
 
 # 2. Install PHP extensions (yang dibutuhkan Laravel & MySQL)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
