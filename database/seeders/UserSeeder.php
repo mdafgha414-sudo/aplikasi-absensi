@@ -28,5 +28,11 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'role' => 'user', // <-- Pastikan ini ada
         ]);
+        User::create([
+            'name' => 'Nadea Noervita',
+            'email' => 'nadea@gmail.com',
+            'password' => Hash::make('123456'),
+            'role' => 'user', // <-- Pastikan ini ada
+        ]);
     }
 }
