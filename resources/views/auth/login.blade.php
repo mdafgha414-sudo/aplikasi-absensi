@@ -1,75 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- CSS Tambahan untuk Perbaikan Focus Ring dan Desain Input Group -->
-<style>
-    /* Mengatur kontainer input group agar berpenampilan rapi dan mulus */
-    .custom-input-group {
-        border: 1px solid #ced4da;
-        border-radius: 0.5rem;
-        background-color: #f8f9fa;
-        transition: all 0.2s ease-in-out;
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-    }
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card p-4">
+            <h3 class="text-center mb-4">Login Sistem</h3>
 
-    /* Memindahkan efek garis biru focus ke seluruh wadah input group */
-    .custom-input-group:focus-within {
-        background-color: #ffffff;
-        border-color: #86b7fe;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-
-    /* Hilangkan border bawaan pada input di dalam group */
-    .custom-input-group .form-control {
-        border: none;
-        background: transparent;
-        box-shadow: none !important;
-    }
-
-    /* Styling ikon dan tombol toggle di dalam input group */
-    .custom-input-group .input-icon {
-        padding-left: 0.85rem;
-        display: flex;
-        align-items: center;
-        color: #6c757d;
-    }
-
-    .custom-input-group .btn-toggle-eye {
-        border: none;
-        background: transparent;
-        padding-right: 0.85rem;
-        padding-left: 0.5rem;
-        display: flex;
-        align-items: center;
-        color: #6c757d;
-        cursor: pointer;
-    }
-
-    .custom-input-group .btn-toggle-eye:hover {
-        color: #0d6efd;
-    }
-</style>
-
-<div class="container">
-    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-        <div class="col-md-5 col-lg-4">
-            
-            <!-- Kartu Login -->
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-body p-4 p-md-5">
-                    
-                    <h3 class="text-center fw-bold text-primary mb-2">Login Sistem Absensi</h3>
-                    <p class="text-center text-muted mb-4 small">Silakan masuk ke akun Anda</p>
-
-                    <!-- Alert Pesan Error Laravel -->
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                            {{ $errors->first() }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    {{ $errors->first() }}
+                </div>
+            @endif
 
                     <form action="/login" method="POST">
                         @csrf
