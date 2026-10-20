@@ -4,7 +4,7 @@
 <div class="row justify-content-center mt-5">
     <div class="col-md-4">
         <div class="card p-4">
-            <h3 class="text-center mb-4">Login Sistem</h3>
+            <h3 class="text-center mb-4">Login Sistem Absensi</h3>
 
             @if ($errors->any())
                 <div class="alert alert-danger">
