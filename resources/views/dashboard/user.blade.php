@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -355,6 +354,7 @@
 
         <div class="ud-menu-grid">
 
+            {{-- MENU 1: ABSENSI --}}
             <a href="{{ url('/absensi') }}"
                class="ud-menu-card">
 
@@ -377,6 +377,7 @@
                 <i class="bi bi-arrow-up-right ud-menu-arrow"></i>
             </a>
 
+            {{-- MENU 2: RIWAYAT ABSENSI --}}
             <a href="{{ url('/absensi/riwayat') }}"
                class="ud-menu-card">
 
@@ -397,6 +398,29 @@
                 </span>
 
                 <i class="bi bi-arrow-up-right ud-menu-arrow"></i>
+            </a>
+
+            {{-- MENU 3: JURNAL HARIAN (BARU) --}}
+            <a href="{{ url('/jurnal') }}"
+               class="ud-menu-card">
+
+                <div class="ud-menu-icon" style="background: #e6fcf5; color: #0ca678;">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+
+                <h5>Jurnal Harian PKL</h5>
+
+                <p>
+                    Catat kegiatan dan kendala yang kamu
+                    alami selama PKL hari ini.
+                </p>
+
+                <span class="ud-menu-link" style="color: #0ca678;">
+                    Buka jurnal
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+
+                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #0ca678;"></i>
             </a>
 
         </div>
@@ -445,10 +469,10 @@
                 </div>
 
                 <div>
-                    <strong>Periksa riwayatmu</strong>
+                    <strong>Isi jurnal harian</strong>
                     <small>
-                        Pastikan catatan absensi sudah
-                        tersimpan dengan benar.
+                        Catat kegiatan dan kendalamu di menu
+                        Jurnal Harian PKL.
                     </small>
                 </div>
             </div>

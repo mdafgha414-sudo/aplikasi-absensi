@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AdminController; // Tambahkan use ini di atas
+use App\Http\Controllers\GuruController; // <-- Tambahkan baris ini
+use App\Http\Controllers\JurnalController; // Tambahkan ini di atas
 
 // Redirect halaman utama ke login
 Route::get('/', function () {
@@ -42,3 +44,15 @@ Route::post('/admin/tambah-user', [AdminController::class, 'storeUser'])->middle
 Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->middleware(['auth', 'isAdmin']);
 Route::put('/admin/edit-user/{id}', [AdminController::class, 'updateUser'])->middleware(['auth', 'isAdmin']);
 Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser'])->middleware(['auth', 'isAdmin']);
+
+   // --- TAMBAHKAN ROUTE GURU DI SINI ---
+    Route::get('/guru/dashboard', function () {
+        return view('dashboard.user_guru');
+    });
+    
+    Route::get('/guru/jurnal', [GuruController::class, 'index']);
+    Route::post('/guru/nilai/{id}', [GuruController::class, 'beriNilai']);
+
+      // Route Jurnal Siswa
+    Route::get('/jurnal', [JurnalController::class, 'index']);
+    Route::post('/jurnal', [JurnalController::class, 'store']);
