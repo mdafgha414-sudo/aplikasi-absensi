@@ -1,95 +1,508 @@
+
 @extends('layouts.app')
 
 @section('content')
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card p-4">
-            <h3 class="text-center mb-4">Login Sistem</h3>
+<style>
+    .login-page {
+        min-height: calc(100vh - 60px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 35px 20px;
+        background:
+            radial-gradient(circle at 90% 10%, #dbeafe 0, transparent 30%),
+            #f4f7ff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    {{ $errors->first() }}
+    .login-layout {
+        width: 100%;
+        max-width: 1050px;
+        min-height: 570px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        overflow: hidden;
+        border-radius: 26px;
+        background: white;
+        box-shadow: 0 25px 70px rgba(30, 64, 175, .12);
+    }
+
+    .login-brand {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 45px;
+        color: white;
+        background: linear-gradient(145deg, #60a5fa, #2563eb 55%, #1e40af);
+    }
+
+    .login-brand::before,
+    .login-brand::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .login-brand::before {
+        width: 320px;
+        height: 320px;
+        top: -170px;
+        right: -130px;
+        background: rgba(255,255,255,.10);
+    }
+
+    .login-brand::after {
+        width: 260px;
+        height: 260px;
+        bottom: -130px;
+        left: -100px;
+        background: rgba(147,197,253,.16);
+    }
+
+    .brand-content,
+    .brand-bottom {
+        position: relative;
+        z-index: 1;
+    }
+
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        font-size: 23px;
+        font-weight: 800;
+    }
+
+    .brand-logo-icon {
+        width: 49px;
+        height: 49px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255,255,255,.3);
+        border-radius: 15px;
+        background: rgba(255,255,255,.17);
+        font-size: 25px;
+    }
+
+    .brand-title {
+        margin-top: 65px;
+        font-size: clamp(29px, 3vw, 38px);
+        line-height: 1.3;
+        font-weight: 800;
+        letter-spacing: -1.2px;
+    }
+
+    .brand-description {
+        margin-top: 18px;
+        color: #dbeafe;
+        font-size: 14px;
+        line-height: 1.9;
+    }
+
+    .brand-illustration {
+        margin-top: 35px;
+        padding: 28px 15px;
+        text-align: center;
+        border-radius: 22px;
+        background: rgba(255,255,255,.13);
+        border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .brand-illustration i {
+        font-size: 83px;
+        line-height: 1.4;
+    }
+
+    .brand-illustration p {
+        margin: 12px 0 0;
+        color: #eff6ff;
+        font-size: 12px;
+    }
+
+    .brand-bottom {
+        margin-top: 35px;
+        color: #dbeafe;
+        font-size: 11px;
+    }
+
+    .login-form-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 45px;
+        background: #fff;
+    }
+
+    .login-form-content {
+        width: 100%;
+        max-width: 365px;
+    }
+
+    .login-heading {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-icon {
+        width: 64px;
+        height: 64px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        color: white;
+        font-size: 29px;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        box-shadow: 0 8px 20px rgba(37,99,235,.22);
+    }
+
+    .login-heading h2 {
+        margin-bottom: 9px;
+        color: #172554;
+        font-size: 27px;
+        font-weight: 800;
+        letter-spacing: -.8px;
+    }
+
+    .login-heading p {
+        margin: 0;
+        color: #8491aa;
+        font-size: 12px;
+    }
+
+    .login-label {
+        display: block;
+        margin-bottom: 9px;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .login-input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        padding: 0 14px;
+        border: 1px solid #dbe4f2;
+        border-radius: 12px;
+        background: #fff;
+        transition: .2s;
+    }
+
+    .login-input-wrap:focus-within {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59,130,246,.10);
+    }
+
+    .login-input-wrap > i {
+        flex-shrink: 0;
+        color: #7890b5;
+        font-size: 17px;
+    }
+
+    .login-input-wrap .form-control {
+        min-width: 0;
+        height: 49px;
+        padding: 8px 0;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        font-size: 13px;
+    }
+
+    .login-input-wrap .form-control:focus {
+        box-shadow: none;
+    }
+
+    .login-input-wrap .form-control::placeholder {
+        color: #a3aec2;
+    }
+
+    .btn-toggle-eye {
+        display: grid;
+        flex-shrink: 0;
+        place-items: center;
+        padding: 8px 0 8px 8px;
+        border: 0;
+        background: transparent;
+        color: #7890b5;
+        cursor: pointer;
+    }
+
+    .btn-login {
+        width: 100%;
+        min-height: 51px;
+        margin-top: 8px;
+        border: none;
+        border-radius: 12px;
+        color: white;
+        background: linear-gradient(110deg, #3b82f6, #1d4ed8);
+        box-shadow: 0 8px 18px rgba(37,99,235,.20);
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s;
+    }
+
+    .btn-login:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(37,99,235,.25);
+    }
+
+    .login-help {
+        margin-top: 25px;
+        color: #94a3b8;
+        font-size: 11px;
+        line-height: 1.9;
+        text-align: center;
+    }
+
+    .login-help a {
+        color: #2563eb;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .login-footer {
+        margin-top: 20px;
+        text-align: center;
+        color: #a0abc0;
+        font-size: 10px;
+    }
+
+    .mobile-brand {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .login-page {
+            min-height: 100vh;
+            padding: 20px 14px;
+        }
+
+        .login-layout {
+            max-width: 460px;
+            min-height: auto;
+            grid-template-columns: 1fr;
+            border-radius: 22px;
+        }
+
+        .login-brand {
+            display: none;
+        }
+
+        .login-form-panel {
+            padding: 30px 24px;
+        }
+
+        .login-form-content {
+            max-width: 390px;
+        }
+
+        .mobile-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            color: #2563eb;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .mobile-brand i {
+            font-size: 27px;
+        }
+
+        .login-heading {
+            margin-bottom: 25px;
+        }
+
+        .login-heading h2 {
+            font-size: 25px;
+        }
+
+        .login-footer {
+            margin-top: 18px;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .login-form-panel {
+            padding: 25px 17px;
+        }
+    }
+</style>
+
+<div class="login-page">
+    <div class="login-layout">
+
+        <!-- PANEL BRANDING DESKTOP -->
+        <aside class="login-brand">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <div class="brand-logo-icon">
+                        <i class="bi bi-calendar2-check"></i>
+                    </div>
+                    <span>Absensi App</span>
                 </div>
-            @endif
 
-                    <form action="/login" method="POST">
-                        @csrf
-                        
-                        <!-- Input Email dengan Ikon Amplop -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold text-secondary small">Alamat Email</label>
-                            <div class="custom-input-group">
-                                <span class="input-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
-                                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
-                                    </svg>
-                                </span>
-                                <input type="email" name="email" 
-                                    class="form-control py-2" 
-                                    placeholder="Masukan Email Anda" 
-                                    value="{{ old('email') }}" required autofocus>
-                            </div>
-                        </div>
+                <h1 class="brand-title">
+                    Kelola Kehadiran,<br>
+                    Lebih Mudah &amp; Efisien.
+                </h1>
 
-                        <!-- Input Password dengan Ikon Kunci & Tombol Mata -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold text-secondary small mb-1">Kata Sandi</label>
-                            <div class="custom-input-group">
-                                <span class="input-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
-                                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
-                                    </svg>
-                                </span>
-                                <input type="password" name="password" id="password"
-                                    class="form-control py-2" 
-                                    placeholder="******" required>
-                                <button type="button" class="btn-toggle-eye" id="togglePassword" aria-label="Lihat Password">
-                                    <!-- Ikon Mata (Eye) -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16" id="eyeIcon">
-                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                <p class="brand-description">
+                    Sistem absensi digital yang membantu
+                    pengelolaan kehadiran menjadi lebih praktis,
+                    cepat, dan terorganisir.
+                </p>
 
-                        <!-- Tombol Submit -->
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm">
-                            Masuk Sekarang
-                        </button>
-                    </form>
-
-                </div>
-
-                <!-- Footer Kartu -->
-                <div class="card-footer bg-light border-0 text-center py-3 rounded-bottom-4">
-                    <span class="text-muted small">© {{ date('Y') }} Sistem Absensi Digital</span>
+                <div class="brand-illustration">
+                    <i class="bi bi-calendar2-week"></i>
+                    <p>
+                        <i class="bi bi-check-circle-fill"></i>
+                        Kehadiran tercatat, pekerjaan lebih teratur.
+                    </p>
                 </div>
             </div>
 
-        </div>
+            <div class="brand-bottom">
+                &copy; {{ date('Y') }} Sistem Absensi Digital
+            </div>
+        </aside>
+
+        <!-- FORM LOGIN -->
+        <main class="login-form-panel">
+            <div class="login-form-content">
+
+                <div class="mobile-brand">
+                    <i class="bi bi-calendar2-check"></i>
+                    <span>Absensi App</span>
+                </div>
+
+                <div class="login-heading">
+                    <div class="login-icon">
+                        <i class="bi bi-person-lock"></i>
+                    </div>
+                    <h2>Login Sistem</h2>
+                    <p>Silakan masuk untuk melanjutkan</p>
+                </div>
+
+                @if ($errors->any())
+                    <div class="alert alert-danger rounded-3 small py-2" role="alert">
+                        <i class="bi bi-exclamation-circle me-1"></i>
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
+                <form action="{{ url('/login') }}" method="POST">
+                    @csrf
+
+                    <div class="mb-4">
+                        <label for="email" class="login-label">
+                            Alamat Email
+                        </label>
+
+                        <div class="login-input-wrap">
+                            <i class="bi bi-envelope"></i>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                placeholder="Masukkan email Anda"
+                                value="{{ old('email') }}"
+                                autocomplete="username"
+                                required
+                                autofocus
+                            >
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="login-label">
+                            Kata Sandi
+                        </label>
+
+                        <div class="login-input-wrap">
+                            <i class="bi bi-lock"></i>
+
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                class="form-control"
+                                placeholder="Masukkan kata sandi"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="btn-toggle-eye"
+                                id="togglePassword"
+                                aria-label="Tampilkan kata sandi"
+                                aria-pressed="false"
+                            >
+                                <i class="bi bi-eye-slash" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        <i class="bi bi-arrow-right-circle me-2"></i>
+                        Masuk ke Sistem
+                    </button>
+                </form>
+
+                <div class="login-help">
+                    Butuh bantuan untuk masuk?<br>
+                    Hubungi administrator sistem.
+                </div>
+
+                <div class="login-footer">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    &copy; {{ date('Y') }} Sistem Absensi Digital
+                </div>
+            </div>
+        </main>
+
     </div>
 </div>
 
-<!-- JavaScript untuk Toggle Lihat/Sembunyikan Password -->
 <script>
-    const togglePassword = document.querySelector('#togglePassword');
-    const passwordInput = document.querySelector('#password');
-    const eyeIcon = document.querySelector('#eyeIcon');
+    document.addEventListener('DOMContentLoaded', function () {
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
 
-    togglePassword.addEventListener('click', function () {
-        const isPassword = passwordInput.getAttribute('type') === 'password';
-        
-        // Ubah tipe input antara 'password' dan 'text'
-        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-        
-        // Ganti ikon mata terbuka / mata tercoret
-        if (isPassword) {
-            // Ikon Mata Tercoret (Eye Slash)
-            eyeIcon.innerHTML = `<path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a8 8 0 0 0-2.79.512l1.06 1.06A7 7 0 0 1 8 3.5c4.478 0 8.268 2.943 9.542 7a10 10 0 0 1-1.563 3.029l1.06 1.06zM11.225 10.5l1.06 1.06a4.5 4.5 0 0 0-4.475-4.475l1.06 1.06a2.5 2.5 0 0 1 2.355 2.355zM12.458 12.458a11 11 0 0 1-1.465 1.755C9.879 15.332 8.119 16.5 6 16.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 0 12s3-5.5 8-5.5a8 8 0 0 1 1.79.205l1.06 1.06C9.12 6.668 7.36 5.5 5.5 5.5s-3.879 1.168-5.168 2.457A13 13 0 0 0 0 12c.086.13.195.288.335.48a10 10 0 0 0 1.465 1.755l1.06-1.06A8 8 0 0 1 2.458 12c.112-.39.23-.783.355-1.173l-1.06-1.06zM8 12.5a2.5 2.5 0 0 1-2.355-2.355l1.06-1.06A4.5 4.5 0 0 0 12.5 8v-.008L12.5 8a4.5 4.5 0 0 0-4.5-4.5h-.008l-.008.008zm1.326 1.326l1.06 1.06A4.5 4.5 0 0 0 12.5 8v-.008L12.5 8a4.5 4.5 0 0 0-4.5-4.5h-.008l-.008.008z"/>`;
-        } else {
-            // Ikon Mata Terbuka (Eye)
-            eyeIcon.innerHTML = `<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>`;
+        if (togglePassword && passwordInput && eyeIcon) {
+            togglePassword.addEventListener('click', function () {
+                const showPassword = passwordInput.type === 'password';
+
+                passwordInput.type = showPassword ? 'text' : 'password';
+
+                eyeIcon.className = showPassword
+                    ? 'bi bi-eye'
+                    : 'bi bi-eye-slash';
+
+                togglePassword.setAttribute(
+                    'aria-label',
+                    showPassword
+                        ? 'Sembunyikan kata sandi'
+                        : 'Tampilkan kata sandi'
+                );
+
+                togglePassword.setAttribute(
+                    'aria-pressed',
+                    showPassword ? 'true' : 'false'
+                );
+            });
         }
     });
 </script>
