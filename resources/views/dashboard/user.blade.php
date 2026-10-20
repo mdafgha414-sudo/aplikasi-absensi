@@ -3,6 +3,10 @@
 
 @section('content')
 
+{{-- Bootstrap Icons --}}
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <style>
     .user-dashboard {
         max-width: 1150px;
@@ -95,7 +99,7 @@
         top: 50%;
         transform: translateY(-50%);
         font-size: 105px;
-        opacity: .9;
+        opacity: .85;
         z-index: 1;
     }
 
@@ -151,10 +155,12 @@
 
     .ud-blue {
         background: #e8efff;
+        color: #3658d4;
     }
 
     .ud-purple {
         background: #f0e9ff;
+        color: #7547d8;
     }
 
     .ud-menu-card h5 {
@@ -201,7 +207,7 @@
 
     .ud-panel h5 {
         font-weight: 800;
-        margin-bottom: 17px;
+        margin-bottom: 20px;
     }
 
     .ud-step {
@@ -220,12 +226,12 @@
         flex-shrink: 0;
         align-items: center;
         justify-content: center;
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         border-radius: 11px;
         background: #edf1ff;
         color: #4965d6;
-        font-weight: bold;
+        font-size: 18px;
     }
 
     .ud-step strong {
@@ -245,8 +251,16 @@
     }
 
     .ud-reminder-icon {
-        font-size: 32px;
-        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 54px;
+        height: 54px;
+        background: white;
+        color: #6655d9;
+        border-radius: 16px;
+        font-size: 28px;
+        margin-bottom: 16px;
     }
 
     .ud-reminder p {
@@ -261,6 +275,12 @@
         color: #96a1b4;
         font-size: 12px;
         padding: 10px 0 20px;
+    }
+
+    .ud-icon {
+        display: inline-block;
+        line-height: 1;
+        vertical-align: middle;
     }
 
     @media (max-width: 700px) {
@@ -300,11 +320,12 @@
     <section class="ud-welcome">
         <div class="ud-welcome-content">
             <span class="ud-eyebrow">
-                ✨ PERSONAL DASHBOARD
+                <i class="bi bi-grid-1x2-fill ud-icon"></i>
+                PERSONAL DASHBOARD
             </span>
 
             <h2>
-                Halo, {{ Auth::user()->name }}! 👋
+                Halo, {{ Auth::user()->name }}!
             </h2>
 
             <p>
@@ -315,11 +336,13 @@
 
             <a href="{{ url('/absensi') }}"
                class="ud-primary-btn">
-                📝 &nbsp; Isi Absen Sekarang &nbsp; →
+                <i class="bi bi-pencil-square ud-icon"></i>
+                Isi Absen Sekarang
+                <i class="bi bi-arrow-right ud-icon"></i>
             </a>
         </div>
 
-        <div class="ud-hero-icon">📋</div>
+        <i class="bi bi-clipboard2-check ud-hero-icon"></i>
     </section>
 
     {{-- MENU UTAMA --}}
@@ -334,8 +357,9 @@
 
             <a href="{{ url('/absensi') }}"
                class="ud-menu-card">
+
                 <div class="ud-menu-icon ud-blue">
-                    📝
+                    <i class="bi bi-calendar2-check"></i>
                 </div>
 
                 <h5>Isi Absensi</h5>
@@ -346,16 +370,18 @@
                 </p>
 
                 <span class="ud-menu-link">
-                    Buka halaman absensi →
+                    Buka halaman absensi
+                    <i class="bi bi-arrow-right"></i>
                 </span>
 
-                <span class="ud-menu-arrow">↗</span>
+                <i class="bi bi-arrow-up-right ud-menu-arrow"></i>
             </a>
 
             <a href="{{ url('/absensi/riwayat') }}"
                class="ud-menu-card">
+
                 <div class="ud-menu-icon ud-purple">
-                    📊
+                    <i class="bi bi-clock-history"></i>
                 </div>
 
                 <h5>Riwayat Absensi</h5>
@@ -366,10 +392,11 @@
                 </p>
 
                 <span class="ud-menu-link">
-                    Lihat riwayat →
+                    Lihat riwayat
+                    <i class="bi bi-arrow-right"></i>
                 </span>
 
-                <span class="ud-menu-arrow">↗</span>
+                <i class="bi bi-arrow-up-right ud-menu-arrow"></i>
             </a>
 
         </div>
@@ -379,10 +406,16 @@
     <div class="ud-bottom-grid">
 
         <section class="ud-panel">
-            <h5>💡 Panduan Absensi</h5>
+            <h5>
+                <i class="bi bi-list-check" style="color:#4965d6"></i>
+                Panduan Absensi
+            </h5>
 
             <div class="ud-step">
-                <div class="ud-step-number">1</div>
+                <div class="ud-step-number">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                </div>
+
                 <div>
                     <strong>Isi absensi masuk</strong>
                     <small>
@@ -393,7 +426,10 @@
             </div>
 
             <div class="ud-step">
-                <div class="ud-step-number">2</div>
+                <div class="ud-step-number">
+                    <i class="bi bi-box-arrow-right"></i>
+                </div>
+
                 <div>
                     <strong>Isi absensi pulang</strong>
                     <small>
@@ -404,7 +440,10 @@
             </div>
 
             <div class="ud-step">
-                <div class="ud-step-number">3</div>
+                <div class="ud-step-number">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+
                 <div>
                     <strong>Periksa riwayatmu</strong>
                     <small>
@@ -416,9 +455,11 @@
         </section>
 
         <section class="ud-panel ud-reminder">
-            <div class="ud-reminder-icon">🌟</div>
+            <div class="ud-reminder-icon">
+                <i class="bi bi-lightbulb"></i>
+            </div>
 
-            <h5>Semangat Hari Ini!</h5>
+            <h5>Pengingat Hari Ini</h5>
 
             <p>
                 Disiplin dimulai dari kebiasaan kecil.
@@ -430,14 +471,17 @@
             <hr style="border-color:#dce4f6;">
 
             <p>
-                📅 {{ now()->translatedFormat('l, d F Y') }}
+                <i class="bi bi-calendar3"></i>
+                {{ now()->translatedFormat('l, d F Y') }}
             </p>
         </section>
 
     </div>
 
     <div class="ud-footer">
-        © {{ now()->year }} Absensi App · Sistem Pencatatan Kehadiran
+        <i class="bi bi-shield-check"></i>
+        © {{ now()->year }} Absensi App
+        · Sistem Pencatatan Kehadiran
     </div>
 
 </div>
