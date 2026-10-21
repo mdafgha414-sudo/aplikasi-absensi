@@ -242,6 +242,128 @@
 
     {{-- Judul --}}
     <div class="mb-3">
+        
+{{-- ==========================================
+     JAM REALTIME - DI ATAS RINGKASAN KEHADIRAN
+========================================== --}}
+
+<style>
+    .realtime-clock-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 22px;
+        margin-bottom: 22px;
+        background: #ffffff;
+        border: 1px solid #e8eaff;
+        border-radius: 16px;
+        box-shadow: 0 5px 18px rgba(61, 69, 150, 0.06);
+    }
+
+    .realtime-clock-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 54px;
+        height: 54px;
+        flex-shrink: 0;
+        color: #5b4be8;
+        background: #efedff;
+        border-radius: 14px;
+        font-size: 27px;
+    }
+
+    .realtime-clock-label {
+        color: #7b8197;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .realtime-clock-time {
+        color: #20284b;
+        font-size: clamp(25px, 3vw, 32px);
+        font-weight: 800;
+        line-height: 1.2;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .realtime-clock-date {
+        margin-top: 6px;
+        color: #777f98;
+        font-size: 12px;
+    }
+
+    @media (max-width: 576px) {
+        .realtime-clock-card {
+            padding: 15px;
+            gap: 12px;
+        }
+
+        .realtime-clock-icon {
+            width: 46px;
+            height: 46px;
+            font-size: 23px;
+        }
+    }
+</style>
+
+<div class="realtime-clock-card">
+    <div class="realtime-clock-icon">🕒</div>
+
+    <div>
+        <div class="realtime-clock-label">WAKTU SEKARANG</div>
+
+        <div id="realtimeClockTime" class="realtime-clock-time">
+            --:--:--
+        </div>
+
+        <div id="realtimeClockDate" class="realtime-clock-date">
+            Memuat tanggal...
+        </div>
+    </div>
+</div>
+
+<script>
+    (() => {
+        function updateRealtimeClock() {
+            const now = new Date();
+
+            const timeElement =
+                document.getElementById('realtimeClockTime');
+
+            const dateElement =
+                document.getElementById('realtimeClockDate');
+
+            if (!timeElement || !dateElement) return;
+
+            timeElement.textContent = new Intl.DateTimeFormat('id-ID', {
+                timeZone: 'Asia/Jakarta',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).format(now);
+
+            dateElement.textContent = new Intl.DateTimeFormat('id-ID', {
+                timeZone: 'Asia/Jakarta',
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).format(now);
+        }
+
+        updateRealtimeClock();
+        setInterval(updateRealtimeClock, 1000);
+    })();
+</script>
+
+{{-- ==========================================
+     AKHIR JAM REALTIME
+========================================== --}}
+
         <h5 class="section-title mb-1">Ringkasan Kehadiran</h5>
         <p class="section-desc">
             Berikut informasi absensi kamu hari ini.
@@ -319,6 +441,128 @@
     {{-- Tombol aksi --}}
     <div class="action-card">
         <h5 class="section-title mb-2">Aksi Absensi</h5>
+
+        
+{{-- FORM ALASAN KETERLAMBATAN --}}
+<div class="late-reason-card">
+    <h3>📝 Alasan Keterlambatan</h3>
+    <p>Jelaskan alasan kamu terlambat. Kamu bisa mengubahnya kapan saja.</p>
+
+    @if (session('success'))
+        <p class="reason-success">{{ session('success') }}</p>
+    @endif
+
+    @if ($errors->has('alasan'))
+        <p class="reason-error">{{ $errors->first('alasan') }}</p>
+    @endif
+
+    <form action="{{ route('absensi.alasan.simpan') }}" method="POST">
+        @csrf
+
+        <label for="alasan">Pilih alasan atau tulis sendiri</label>
+
+        <select id="pilihanAlasan" class="reason-input"
+                onchange="pilihAlasanIni(this)">
+            <option value="">-- Pilih alasan --</option>
+            <option value="Terjebak kemacetan">Terjebak kemacetan</option>
+            <option value="Kendala kendaraan">Kendala kendaraan</option>
+            <option value="Kendala transportasi umum">Kendala transportasi umum</option>
+            <option value="Cuaca buruk">Cuaca buruk</option>
+            <option value="Urusan keluarga">Urusan keluarga</option>
+            <option value="Alasan lainnya">Alasan lainnya</option>
+        </select>
+
+        <textarea
+            id="alasan"
+            name="alasan"
+            class="reason-input"
+            rows="4"
+            maxlength="1000"
+            required
+            placeholder="Tulis alasan keterlambatan kamu..."
+        >{{ old('alasan', $alasanTerlambatHariIni ?? '') }}</textarea>
+
+        <button type="submit" class="reason-save-btn">
+            Simpan / Perbarui Alasan
+        </button>
+    </form>
+</div>
+
+<style>
+    .late-reason-card {
+        margin: 18px 0;
+        padding: 22px;
+        background: #fff;
+        border: 1px solid #e8eaff;
+        border-radius: 16px;
+        box-shadow: 0 5px 18px rgba(61,69,150,.06);
+    }
+
+    .late-reason-card h3 {
+        color: #252b50;
+        font-size: 17px;
+        margin-bottom: 8px;
+    }
+
+    .late-reason-card p {
+        color: #7b8197;
+        font-size: 13px;
+        margin-bottom: 14px;
+    }
+
+    .reason-input {
+        display: block;
+        width: 100%;
+        margin: 8px 0 14px;
+        padding: 12px 14px;
+        color: #252b50;
+        background: #fafbff;
+        border: 1px solid #dfe3f3;
+        border-radius: 10px;
+        font: inherit;
+    }
+
+    .reason-input:focus {
+        outline: 2px solid #c9c2ff;
+        border-color: #7860ed;
+    }
+
+    .reason-save-btn {
+        width: 100%;
+        padding: 12px 16px;
+        color: #fff;
+        background: linear-gradient(100deg, #5145e5, #8955f6);
+        border: 0;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .reason-success {
+        padding: 10px;
+        color: #16764b !important;
+        background: #e8f8ef;
+        border-radius: 8px;
+    }
+
+    .reason-error {
+        color: #c62828 !important;
+    }
+</style>
+
+<script>
+    function pilihAlasanIni(select) {
+        const textarea = document.getElementById('alasan');
+
+        if (select.value && select.value !== 'Alasan lainnya') {
+            textarea.value = select.value;
+        } else if (select.value === 'Alasan lainnya') {
+            textarea.value = '';
+            textarea.focus();
+        }
+    }
+</script>
+
 
         <p class="section-desc mb-4">
             @if (!$absenHariIni)

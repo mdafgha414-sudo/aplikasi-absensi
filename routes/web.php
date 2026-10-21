@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AlasanKeterlambatanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AdminController; // Tambahkan use ini di atas
@@ -61,3 +62,7 @@ Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser'])
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 // Route untuk memproses data register
 Route::post('/register', [AuthController::class, 'register']);
+Route::post(
+    '/absensi/alasan-terlambat',
+    [AlasanKeterlambatanController::class, 'simpan']
+)->middleware('auth')->name('absensi.alasan.simpan');
