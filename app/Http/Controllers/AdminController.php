@@ -16,21 +16,13 @@ class AdminController extends Controller
         $semuaAbsensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
 
         // Ambil SEMUA user (Siswa DAN Guru) agar ditampilkan di tabel
-        // Kita urutkan berdasarkan role (guru dulu), lalu nama
         $semuaPengguna = User::orderBy('role', 'asc')->orderBy('name', 'asc')->paginate(10);
 
         // Hitung total user (Siswa + Guru)
         $totalUser = User::count();
 
-        // Kirim SEMUA variabel ke view dalam satu return
-        // CATATAN: Variabel di view mungkin masih memanggil $semuaKaryawan. 
-        // Jika error, ganti nama variabel di view menjadi $semuaPengguna.
-        return view('dashboard.admin', [
-            'semuaAbsensi' => $semuaAbsensi,
-            'semuaPengguna' => $semuaPengguna,
-            'semuaKaryawan' => $semuaPengguna, // Tetap di- passing agar view lama tidak error
-            'totalUser' => $totalUser
-        ]);
+        // Kirim variabel ke view
+        return view('dashboard.admin', compact('semuaAbsensi', 'semuaPengguna', 'totalUser'));
     }
 
     // 2. Fungsi untuk menampilkan form tambah user
@@ -42,7 +34,6 @@ class AdminController extends Controller
     // 3. Fungsi untuk menyimpan user baru ke database
     public function storeUser(Request $request)
     {
-        // Validasi input, pastikan role hanya boleh 'user' atau 'guru'
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -67,7 +58,7 @@ class AdminController extends Controller
         return view('dashboard.edit_user', compact('pengguna'));
     }
 
-    // 5. Menyimpan perubahan data
+    // 5. Menyimpan perubahan data (Termasuk Role)
     public function updateUser(Request $request, $id)
     {
         $pengguna = User::findOrFail($id);
@@ -75,11 +66,13 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$id, 
+            'role' => 'required|in:user,guru', // Tambahkan validasi role
         ]);
 
         $pengguna->update([
             'name' => $request->name,
             'email' => $request->email,
+            'role' => $request->role, // Tambahkan update role
         ]);
 
         return redirect('/admin/dashboard')->with('success', 'Data pengguna berhasil diperbarui!');
