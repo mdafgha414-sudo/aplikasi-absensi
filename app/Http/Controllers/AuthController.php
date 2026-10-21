@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -33,7 +35,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->intended('/admin/dashboard');
             } 
-            // Jika Guru (Pastikan berada di dalam blok if Auth::attempt)
+            // Jika Guru
             elseif (Auth::user()->role === 'guru') {
                 return redirect()->intended('/guru/dashboard');
             }
@@ -55,5 +57,40 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
+    }
+
+    // ==========================================
+    // FITUR BARU: REGISTER (SIGN UP)
+    // ==========================================
+
+    // 4. Menampilkan halaman form register
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    // 5. Memproses data register
+    public function register(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed', // 'confirmed' artinya harus ada input password_confirmation
+        ]);
+
+        // Simpan user baru ke database
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'user', // Default role untuk pendaftar baru adalah 'user' (Siswa)
+        ]);
+
+        // Otomatis login setelah berhasil daftar
+        Auth::login($user);
+
+        // Arahkan ke dashboard user
+        return redirect('/dashboard')->with('success', 'Akun berhasil dibuat! Selamat datang.');
     }
 }

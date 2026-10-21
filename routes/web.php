@@ -56,3 +56,8 @@ Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser'])
       // Route Jurnal Siswa
     Route::get('/jurnal', [JurnalController::class, 'index']);
     Route::post('/jurnal', [JurnalController::class, 'store']);
+
+    // Route untuk menampilkan form register
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+// Route untuk memproses data register
+Route::post('/register', [AuthController::class, 'register']);
