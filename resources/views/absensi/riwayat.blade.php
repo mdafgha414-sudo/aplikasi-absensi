@@ -303,7 +303,7 @@
 
     {{-- Banner halaman --}}
     <div class="history-banner">
-        <a href="/absensi" class="back-link">
+        <a href="/dashboard" class="back-link">
             <i class="bi bi-arrow-left me-2"></i>
             Kembali ke Dashboard
         </a>
