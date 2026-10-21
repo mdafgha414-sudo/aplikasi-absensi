@@ -15,14 +15,22 @@ class AdminController extends Controller
         // Ambil semua data absensi
         $semuaAbsensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
 
-        // Ambil semua karyawan (role user)
-        $semuaKaryawan = User::where('role', 'user')->orderBy('name', 'asc')->paginate(10);
+        // Ambil SEMUA user (Siswa DAN Guru) agar ditampilkan di tabel
+        // Kita urutkan berdasarkan role (guru dulu), lalu nama
+        $semuaPengguna = User::orderBy('role', 'asc')->orderBy('name', 'asc')->paginate(10);
 
-        // Hitung total user
-        $totalUser = User::where('role', 'user')->count();
+        // Hitung total user (Siswa + Guru)
+        $totalUser = User::count();
 
         // Kirim SEMUA variabel ke view dalam satu return
-        return view('dashboard.admin', compact('semuaAbsensi', 'semuaKaryawan', 'totalUser'));
+        // CATATAN: Variabel di view mungkin masih memanggil $semuaKaryawan. 
+        // Jika error, ganti nama variabel di view menjadi $semuaPengguna.
+        return view('dashboard.admin', [
+            'semuaAbsensi' => $semuaAbsensi,
+            'semuaPengguna' => $semuaPengguna,
+            'semuaKaryawan' => $semuaPengguna, // Tetap di- passing agar view lama tidak error
+            'totalUser' => $totalUser
+        ]);
     }
 
     // 2. Fungsi untuk menampilkan form tambah user
@@ -34,54 +42,55 @@ class AdminController extends Controller
     // 3. Fungsi untuk menyimpan user baru ke database
     public function storeUser(Request $request)
     {
+        // Validasi input, pastikan role hanya boleh 'user' atau 'guru'
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'role' => 'required|in:user,guru', 
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user',
+            'role' => $request->role, 
         ]);
 
-        // TAMBAHKAN INI: Agar setelah simpan, kembali ke dashboard
-        return redirect('/admin/dashboard')->with('success', 'Karyawan baru berhasil ditambahkan!');
+        return redirect('/admin/dashboard')->with('success', 'Pengguna baru berhasil ditambahkan!');
     }
 
     // 4. Menampilkan form edit
     public function editUser($id)
     {
-        $karyawan = User::findOrFail($id);
-        return view('dashboard.edit_user', compact('karyawan'));
+        $pengguna = User::findOrFail($id);
+        return view('dashboard.edit_user', compact('pengguna'));
     }
 
     // 5. Menyimpan perubahan data
     public function updateUser(Request $request, $id)
     {
-        $karyawan = User::findOrFail($id);
+        $pengguna = User::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$id, 
         ]);
 
-        $karyawan->update([
+        $pengguna->update([
             'name' => $request->name,
             'email' => $request->email,
         ]);
 
-        return redirect('/admin/dashboard')->with('success', 'Data karyawan berhasil diperbarui!');
+        return redirect('/admin/dashboard')->with('success', 'Data pengguna berhasil diperbarui!');
     }
 
     // 6. Menghapus data
     public function destroyUser($id)
     {
-        $karyawan = User::findOrFail($id);
-        $karyawan->delete();
+        $pengguna = User::findOrFail($id);
+        $pengguna->delete();
 
-        return redirect('/admin/dashboard')->with('success', 'Karyawan berhasil dihapus!');
+        return redirect('/admin/dashboard')->with('success', 'Pengguna berhasil dihapus!');
     }
 }

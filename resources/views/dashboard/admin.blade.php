@@ -1,5 +1,3 @@
-
-
 @extends('layouts.app')
 
 @section('content')
@@ -271,7 +269,7 @@
     background: #fafdff;
 }
 
-/* AVATAR KARYAWAN */
+/* AVATAR PENGGUNA */
 .employee-avatar {
     display: inline-flex;
     align-items: center;
@@ -476,13 +474,13 @@
             <h2 class="page-title mb-1">Dashboard Admin</h2>
 
             <p class="page-subtitle mb-0">
-                Kelola data karyawan dan pantau laporan absensi.
+                Kelola data pengguna dan pantau laporan absensi.
             </p>
         </div>
 
         <div class="d-flex align-items-center gap-2 text-muted small">
             <i class="bi bi-shield-check text-primary fs-5"></i>
-            <span>Sistem Manajemen Karyawan</span>
+            <span>Sistem Manajemen Pengguna</span>
         </div>
     </div>
 
@@ -504,7 +502,7 @@
                     </span>
                 </div>
 
-                <p class="stat-label">Total Karyawan</p>
+                <p class="stat-label">Total Pengguna</p>
 
                 <h3 class="stat-value">
                     {{ $totalUser }}
@@ -528,16 +526,16 @@
         <li class="nav-item" role="presentation">
             <button
                 class="nav-link active"
-                id="karyawan-tab"
+                id="pengguna-tab"
                 data-bs-toggle="tab"
-                data-bs-target="#karyawan"
+                data-bs-target="#pengguna"
                 type="button"
                 role="tab"
-                aria-controls="karyawan"
+                aria-controls="pengguna"
                 aria-selected="true">
 
                 <i class="bi bi-people-fill me-2"></i>
-                Manajemen Karyawan
+                Manajemen Pengguna
             </button>
         </li>
 
@@ -562,12 +560,12 @@
     {{-- KONTEN TAB --}}
     <div class="tab-content" id="adminTabContent">
 
-        {{-- TAB 1: MANAJEMEN KARYAWAN --}}
+        {{-- TAB 1: MANAJEMEN PENGGUNA --}}
         <div
             class="tab-pane fade show active"
-            id="karyawan"
+            id="pengguna"
             role="tabpanel"
-            aria-labelledby="karyawan-tab">
+            aria-labelledby="pengguna-tab">
 
             <div class="admin-panel">
 
@@ -575,11 +573,11 @@
                     <div>
                         <h5 class="admin-panel-title">
                             <i class="bi bi-person-lines-fill text-primary me-2"></i>
-                            Daftar Karyawan
+                            Daftar Pengguna
                         </h5>
 
                         <p class="admin-panel-description">
-                            Informasi dan pengelolaan data karyawan.
+                            Informasi dan pengelolaan data Siswa & Guru.
                         </p>
                     </div>
 
@@ -587,7 +585,7 @@
                        class="btn-add-employee">
 
                         <i class="bi bi-person-plus-fill"></i>
-                        Tambah Karyawan
+                        Tambah Pengguna
                     </a>
                 </div>
 
@@ -614,8 +612,9 @@
                             <thead>
                                 <tr>
                                     <th width="70">No.</th>
-                                    <th>Nama Karyawan</th>
+                                    <th>Nama Pengguna</th>
                                     <th>Email</th>
+                                    <th>Role</th>
                                     <th class="text-center" style="min-width:190px;">
                                         Aksi
                                     </th>
@@ -623,27 +622,28 @@
                             </thead>
 
                             <tbody>
-                                @forelse ($semuaKaryawan as $index => $karyawan)
+                                {{-- Menggunakan variabel $semuaPengguna dari Controller --}}
+                                @forelse ($semuaPengguna as $index => $pengguna)
 
                                     <tr>
                                         <td class="table-number">
-                                            {{ $semuaKaryawan->firstItem() + $index }}
+                                            {{ $semuaPengguna->firstItem() + $index }}
                                         </td>
 
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
 
                                                 <div class="employee-avatar">
-                                                    {{ strtoupper(substr($karyawan->name, 0, 1)) }}
+                                                    {{ strtoupper(substr($pengguna->name, 0, 1)) }}
                                                 </div>
 
                                                 <div>
                                                     <div class="employee-name">
-                                                        {{ $karyawan->name }}
+                                                        {{ $pengguna->name }}
                                                     </div>
 
                                                     <div class="employee-email">
-                                                        ID Karyawan #{{ $karyawan->id }}
+                                                        ID Pengguna #{{ $pengguna->id }}
                                                     </div>
                                                 </div>
 
@@ -653,15 +653,24 @@
                                         <td>
                                             <span>
                                                 <i class="bi bi-envelope me-2 text-muted"></i>
-                                                {{ $karyawan->email }}
+                                                {{ $pengguna->email }}
                                             </span>
+                                        </td>
+
+                                        <td>
+                                            {{-- Menampilkan Role --}}
+                                            @if($pengguna->role == 'guru')
+                                                <span class="badge rounded-pill" style="background-color: #e0f2fe; color: #0369a1;">Guru</span>
+                                            @else
+                                                <span class="badge rounded-pill" style="background-color: #f1f5f9; color: #475569;">Siswa</span>
+                                            @endif
                                         </td>
 
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-2 flex-wrap">
 
                                                 <a
-                                                    href="{{ url('/admin/edit-user/' . $karyawan->id) }}"
+                                                    href="{{ url('/admin/edit-user/' . $pengguna->id) }}"
                                                     class="btn btn-outline-warning btn-action">
 
                                                     <i class="bi bi-pencil-square"></i>
@@ -669,10 +678,10 @@
                                                 </a>
 
                                                 <form
-                                                    action="{{ url('/admin/hapus-user/' . $karyawan->id) }}"
+                                                    action="{{ url('/admin/hapus-user/' . $pengguna->id) }}"
                                                     method="POST"
                                                     class="d-inline"
-                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus karyawan ini?');">
+                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
 
                                                     @csrf
                                                     @method('DELETE')
@@ -694,18 +703,18 @@
                                 @empty
 
                                     <tr>
-                                        <td colspan="4" class="empty-state">
+                                        <td colspan="5" class="empty-state">
 
                                             <div class="empty-state-icon">
                                                 <i class="bi bi-people"></i>
                                             </div>
 
                                             <div class="empty-state-title">
-                                                Belum Ada Karyawan
+                                                Belum Ada Pengguna
                                             </div>
 
                                             <p class="empty-state-text">
-                                                Data karyawan yang terdaftar akan muncul di sini.
+                                                Data pengguna yang terdaftar akan muncul di sini.
                                             </p>
 
                                         </td>
@@ -717,10 +726,10 @@
                         </table>
                     </div>
 
-                    {{-- PAGINATION KARYAWAN --}}
-                    @if($semuaKaryawan->hasPages())
+                    {{-- PAGINATION PENGGUNA --}}
+                    @if($semuaPengguna->hasPages())
                         <div class="admin-pagination">
-                            {{ $semuaKaryawan->links() }}
+                            {{ $semuaPengguna->links() }}
                         </div>
                     @endif
 
@@ -745,7 +754,7 @@
                         </h5>
 
                         <p class="admin-panel-description">
-                            Pantau waktu masuk, waktu pulang, dan status kehadiran karyawan.
+                            Pantau waktu masuk, waktu pulang, dan status kehadiran pengguna.
                         </p>
                     </div>
 
@@ -763,7 +772,7 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Nama Karyawan</th>
+                                    <th>Nama Pengguna</th>
                                     <th>Tanggal</th>
                                     <th>Jam Masuk</th>
                                     <th>Jam Pulang</th>
@@ -861,7 +870,7 @@
                                             </div>
 
                                             <p class="empty-state-text">
-                                                Data kehadiran karyawan akan muncul di sini.
+                                                Data kehadiran pengguna akan muncul di sini.
                                             </p>
 
                                         </td>
