@@ -11,6 +11,18 @@
         </div>
     </div>
 
+    <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{{ route('guru.export.excel') }}"
+       class="btn btn-success">
+        Ekspor Excel
+    </a>
+
+    <a href="{{ route('guru.export.pdf') }}"
+       class="btn btn-danger">
+        Ekspor PDF
+    </a>
+</div>
+
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
             <h5 class="mb-0 fw-bold">Laporan Jurnal Siswa</h5>
