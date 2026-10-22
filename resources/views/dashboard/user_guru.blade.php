@@ -1,20 +1,85 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card border-0 shadow-sm rounded-4 text-center p-5">
-            <h3 class="mb-2 fw-bold">Dashboard Guru Pembimbing</h3>
-            <p class="text-muted">Selamat datang, <strong>{{ Auth::user()->name }}</strong>! Anda login sebagai Guru.</p>
-            
-            <hr class="my-4">
+<div class="container-fluid py-3">
+    <!-- Banner Sambutan -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 p-lg-5">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <span class="badge bg-white text-primary mb-2 px-3 py-2 rounded-pill fw-bold">
+                            Portal Guru Pembimbing
+                        </span>
+                        <h2 class="fw-bold mb-2 display-6">Selamat Datang, {{ Auth::user()->name }}!</h2>
+                        <p class="mb-0 opacity-75">
+                            Kelola dan berikan penilaian jurnal kegiatan siswa bimbingan Anda dengan mudah di sini.
+                        </p>
+                    </div>
+                    <!-- Ikon Banner Kanan -->
+                    <div class="d-none d-md-flex align-items-center justify-content-center bg-white bg-opacity-10 rounded-4 p-3 me-2" style="width: 90px; height: 90px;">
+                        <i class="bi bi-journal-check display-4 text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <div class="d-grid gap-3">
-                <a href="/guru/jurnal" class="btn btn-success btn-lg w-100 rounded-3 py-3">
-                    <i class="bi bi-journal-check me-2"></i> Lihat & Nilai Jurnal Siswa
-                </a>
+    <!-- Section Menu Utama -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold mb-4 text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-grid-fill text-primary"></i> Menu Utama
+                </h5>
+
+                <div class="row g-3">
+                    <!-- Card Menu: Lihat & Nilai Jurnal -->
+                    <div class="col-md-6 col-lg-4">
+                        <a href="/guru/jurnal" class="text-decoration-none card-menu-link">
+                            <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-success text-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                        <i class="bi bi-journal-check fs-3"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <h6 class="fw-bold text-dark mb-1 text-truncate">Lihat & Nilai Jurnal</h6>
+                                        <p class="text-muted small mb-0 text-truncate-2">Periksa kiriman jurnal harian siswa dan berikan nilai.</p>
+                                    </div>
+                                    <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Tambahkan menu guru lainnya di bawah ini jika diperlukan nanti -->
+
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Styling khusus tampilan menu */
+    .transition-all {
+        transition: all 0.25s ease-in-out;
+    }
+    .card-menu-hover {
+        background-color: #f8f9fa;
+        border-color: #e9ecef !important;
+    }
+    .card-menu-link:hover .card-menu-hover {
+        background-color: #ffffff !important;
+        border-color: #198754 !important;
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    }
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
 @endsection
