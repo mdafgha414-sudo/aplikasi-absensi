@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Absensi; 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 
 class AbsensiController extends Controller
@@ -23,7 +24,7 @@ class AbsensiController extends Controller
         return view('absensi.index', compact('absenHariIni'));
     }
 
-    // 2. Proses Absen Masuk (UNTUK MEMPROSES DATA)
+      // 2. Proses Absen Masuk (UNTUK MEMPROSES DATA)
     public function masuk()
     {
         $hariIni = Carbon::today()->toDateString();
@@ -33,8 +34,13 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah absen masuk hari ini!');
         }
 
-        // Tentukan Jam Masuk Kantor (Misal: 08:00)
-        $jamMasukKantor = Carbon::createFromTime(8, 0, 0);
+        // --- BAGIAN YANG DIUBAH ---
+        // Ambil jam masuk dari database settings
+        $setting = Setting::where('key', 'jam_masuk')->first();
+        $jam = $setting ? $setting->value : '08:00'; // Default 08:00 jika kosong
+        $jamMasukKantor = Carbon::createFromTimeString($jam);
+        // --------------------------
+
         $waktuSekarang = Carbon::now();
 
         // Cek apakah telat
@@ -51,36 +57,5 @@ class AbsensiController extends Controller
         ]);
 
         return back()->with('success', 'Absen masuk berhasil! Status Anda: ' . $statusAbsen);
-    }
-
-    // 3. Proses Absen Pulang
-    public function pulang()
-    {
-        $hariIni = Carbon::today()->toDateString();
-        
-        $absen = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
-
-        // Cek apakah sudah absen masuk
-        if (!$absen) {
-            return back()->with('error', 'Anda belum absen masuk hari ini!');
-        }
-
-        // Cek apakah sudah absen pulang
-        if ($absen->jam_pulang) {
-            return back()->with('error', 'Anda sudah absen pulang hari ini!');
-        }
-    
-        $absen->update([
-            'jam_pulang' => Carbon::now()->toTimeString(),
-        ]);
-
-        return back()->with('success', 'Absen pulang berhasil!');
-    }
-
-    // 4. Halaman Riwayat Absen
-    public function riwayat()
-    {
-        $riwayat = Absensi::where('user_id', Auth::id())->orderBy('tanggal', 'desc')->get();
-        return view('absensi.riwayat', compact('riwayat'));
     }
 }

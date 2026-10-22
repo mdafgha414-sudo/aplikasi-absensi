@@ -194,7 +194,7 @@
 
             <!-- Bagian Bawah Sidebar -->
             <li class="menu-label mt-4">Pengaturan</li>
-            <li><a href="#"><i class="bi bi-gear"></i> Pengaturan</a></li>
+            <li><a href="/admin/setting" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             
             <li>
                 <form action="/logout" method="POST">
