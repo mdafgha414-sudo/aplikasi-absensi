@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlasanKeterlambatanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\GuruExportController; // untuk export Excel dan PDF
 use App\Http\Controllers\AdminController; // Tambahkan use ini di atas
 use App\Http\Controllers\GuruController; // <-- Tambahkan baris ini
 use App\Http\Controllers\JurnalController; // Tambahkan ini di atas
@@ -66,3 +67,11 @@ Route::post(
     '/absensi/alasan-terlambat',
     [AlasanKeterlambatanController::class, 'simpan']
 )->middleware('auth')->name('absensi.alasan.simpan');
+// Route untuk menampilkan form edit profil
+Route::middleware(['auth'])->prefix('guru')->name('guru.')->group(function () {
+    Route::get('/export/excel', [GuruExportController::class, 'excel'])
+        ->name('export.excel');
+
+    Route::get('/export/pdf', [GuruExportController::class, 'pdf'])
+        ->name('export.pdf');
+});
