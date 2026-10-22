@@ -14,14 +14,15 @@
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
                     <h5 class="mb-0 fw-bold">Jurnal Harian PKL</h5>
-                    <p class="text-muted small mb-0">Tanggal: {{ \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}</p>
+                    <p class="text-muted small mb-0">Hari ini: {{ \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}</p>
                 </div>
                 <div class="card-body">
                     @if($jurnalHariIni)
                         <div class="alert alert-info border-0">
-                            <i class="bi bi-check-circle-fill me-2"></i> Anda sudah mengisi jurnal hari ini. Terima kasih!
+                            <i class="bi bi-check-circle-fill me-2"></i> Anda sudah mengisi jurnal untuk hari ini. Terima kasih!
                         </div>
                         <div class="p-3 bg-light rounded-3">
+                            <strong>Tanggal Jurnal:</strong> {{ \Carbon\Carbon::parse($jurnalHariIni->tanggal)->translatedFormat('d F Y') }} <br><br>
                             <strong>Kegiatan:</strong> <br>
                             <p>{{ $jurnalHariIni->kegiatan }}</p>
                             <strong>Kendala:</strong> <br>
@@ -30,6 +31,14 @@
                     @else
                         <form action="/jurnal" method="POST">
                             @csrf
+                            
+                            <!-- FITUR KALENDER (PILIH TANGGAL) -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Pilih Tanggal Jurnal</label>
+                                <input type="date" name="tanggal" class="form-control" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" required>
+                                <div class="form-text">Anda bisa memilih tanggal hari ini atau tanggal sebelumnya jika belum mengisi.</div>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Apa saja kegiatan Anda hari ini?</label>
                                 <textarea name="kegiatan" class="form-control" rows="4" placeholder="Contoh: Membuat desain UI untuk halaman login..." required></textarea>
@@ -39,7 +48,7 @@
                                 <textarea name="kendala" class="form-control" rows="2" placeholder="Contoh: Kesulitan menghubungkan database..."></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 py-2">
-                                <i class="bi bi-send me-2"></i> Simpan Jurnal Hari Ini
+                                <i class="bi bi-send me-2"></i> Simpan Jurnal
                             </button>
                         </form>
                     @endif
