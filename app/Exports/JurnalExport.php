@@ -58,7 +58,7 @@ class JurnalExport implements
 {
     return [
         $jurnal->tanggal,
-        $jurnal->user?->name ?? '-',
+        optional($jurnal->user)->name ?? '-',
         $jurnal->kegiatan ?? '-',
         $jurnal->kendala ?? '-',
 
