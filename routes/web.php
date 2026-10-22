@@ -38,6 +38,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/absensi/pulang', [AbsensiController::class, 'pulang']);
     Route::get('/absensi/riwayat', [AbsensiController::class, 'riwayat']);
     
+
+    Route::get('/absensi/riwayat', [
+        AbsensiController::class,
+        'riwayat'
+        ])->name('absensi.riwayat');
+
     // Route Alasan Terlambat (Dipindahkan ke dalam grup auth)
     Route::post('/absensi/alasan-terlambat', [AlasanKeterlambatanController::class, 'simpan'])
         ->name('absensi.alasan.simpan');

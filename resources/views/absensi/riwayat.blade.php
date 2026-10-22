@@ -401,19 +401,28 @@
                 </thead>
 
                 <tbody>
+                    {{-- =================================================
+                        MENAMPILKAN DATA RIWAYAT ABSENSI
+                        $riwayat dikirim dari AbsensiController.
+                        ================================================= --}}
                     @forelse ($riwayat as $r)
+
                         <tr>
+                            {{-- Nomor urut data --}}
                             <td>{{ $loop->iteration }}</td>
 
+                            {{-- Tanggal dan nama hari --}}
                             <td>
                                 <div class="date-main">
                                     {{ \Carbon\Carbon::parse($r->tanggal)->translatedFormat('d M Y') }}
                                 </div>
+
                                 <div class="date-day">
                                     {{ \Carbon\Carbon::parse($r->tanggal)->translatedFormat('l') }}
                                 </div>
                             </td>
 
+                            {{-- Jam masuk --}}
                             <td>
                                 @if ($r->jam_masuk)
                                     <span class="time-value time-in">
@@ -425,6 +434,7 @@
                                 @endif
                             </td>
 
+                            {{-- Jam pulang --}}
                             <td>
                                 @if ($r->jam_pulang)
                                     <span class="time-value time-out">
@@ -438,6 +448,7 @@
                                 @endif
                             </td>
 
+                            {{-- Status kehadiran --}}
                             <td>
                                 @if ($r->status == 'Telat')
                                     <span class="status-badge badge-late">
@@ -452,6 +463,10 @@
                                 @endif
                             </td>
                         </tr>
+
+                    {{-- =================================================
+                        TAMPILAN JIKA BELUM ADA RIWAYAT ABSENSI
+                        ================================================= --}}
                     @empty
                         <tr>
                             <td colspan="5">
@@ -470,8 +485,8 @@
                                     </p>
 
                                     <a href="/absensi"
-                                       class="btn btn-sm text-white rounded-pill px-4"
-                                       style="background:#6555e8;">
+                                    class="btn btn-sm text-white rounded-pill px-4"
+                                    style="background:#6555e8;">
                                         <i class="bi bi-fingerprint me-1"></i>
                                         Absen Sekarang
                                     </a>
