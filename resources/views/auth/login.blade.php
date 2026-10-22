@@ -348,7 +348,7 @@
                     <div class="brand-logo-icon">
                         <i class="bi bi-calendar2-check"></i>
                     </div>
-                    <span>Absensi App</span>
+                    <span>Timetrix</span>
                 </div>
 
                 <h1 class="brand-title">
@@ -365,7 +365,7 @@
                 <div class="brand-illustration">
                     <i class="bi bi-calendar2-week"></i>
                     <p>
-                        <i class="bi bi-check-circle-fill"></i>
+                        <i class="bi bi-check-circle-fill width-20"></i>
                         Kehadiran tercatat, pekerjaan lebih teratur.
                     </p>
                 </div>
@@ -382,7 +382,7 @@
 
                 <div class="mobile-brand">
                     <i class="bi bi-calendar2-check"></i>
-                    <span>Absensi App</span>
+                    <span>Timetrix</span>
                 </div>
 
                 <div class="login-heading">

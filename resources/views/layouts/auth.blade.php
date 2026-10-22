@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Absensi App</title>
+    <title>Login - Timetrix</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -89,7 +89,7 @@
         <div class="container">
             <a class="navbar-brand" href="/">
                 <!-- Icon SVG Bootstrap Icons -->
-                <i class="bi bi-clipboard-check-fill"></i> Absensi App
+                <i class="bi bi-clipboard-check-fill"></i> Timetrix
             </a>
             <div class="d-flex gap-2">
                 <a href="/login" class="btn btn-signin">Sign In</a>

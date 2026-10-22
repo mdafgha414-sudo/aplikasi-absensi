@@ -328,7 +328,7 @@
             </h2>
 
             <p>
-                Selamat datang kembali di Absensi App.
+                Selamat datang kembali di Timetrix.
                 Yuk, tetap disiplin dan jangan lupa mencatat
                 kehadiranmu hari ini!
             </p>
@@ -504,7 +504,7 @@
 
     <div class="ud-footer">
         <i class="bi bi-shield-check"></i>
-        © {{ now()->year }} Absensi App
+        © {{ now()->year }} Timetrix
         · Sistem Pencatatan Kehadiran
     </div>
 
