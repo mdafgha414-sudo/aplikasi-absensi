@@ -9,7 +9,7 @@
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
                         <span class="badge bg-white text-primary mb-2 px-3 py-2 rounded-pill fw-bold">
-                            Portal Guru Pembimbing
+                            Teacher Workspace
                         </span>
                         <h2 class="fw-bold mb-2 display-6">Selamat Datang, {{ Auth::user()->name }}!</h2>
                         <p class="mb-0 opacity-75">
