@@ -4,30 +4,40 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Jurnal;
+use App\Models\Izin;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class JurnalController extends Controller
 {
-    // 1. Tampilkan form & daftar jurnal milik siswa yang login
+    // Tampilkan jurnal hari ini, riwayat jurnal, dan riwayat izin
     public function index()
     {
         $hariIni = Carbon::today()->toDateString();
-        
-        // Cek apakah siswa sudah isi jurnal hari ini
-        $jurnalHariIni = Jurnal::where('user_id', Auth::id())
-                               ->where('tanggal', $hariIni)
-                               ->first();
-                               
-        // Ambil semua riwayat jurnal siswa ini
-        $riwayatJurnal = Jurnal::where('user_id', Auth::id())
-                               ->orderBy('tanggal', 'desc')
-                               ->get();
 
-        return view('jurnal.index', compact('jurnalHariIni', 'riwayatJurnal'));
+        // Jurnal hari ini
+        $jurnalHariIni = Jurnal::where('user_id', Auth::id())
+            ->where('tanggal', $hariIni)
+            ->first();
+
+        // Riwayat jurnal siswa
+        $riwayatJurnal = Jurnal::where('user_id', Auth::id())
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        // Riwayat pengajuan izin siswa
+        $riwayatIzin = Izin::where('user_id', Auth::id())
+            ->orderBy('tanggal_izin', 'desc')
+            ->get();
+
+        return view('jurnal.index', compact(
+            'jurnalHariIni',
+            'riwayatJurnal',
+            'riwayatIzin'
+        ));
     }
 
-    // 2. Simpan jurnal baru ke database
+    // Simpan jurnal baru
     public function store(Request $request)
     {
         $request->validate([
@@ -42,6 +52,9 @@ class JurnalController extends Controller
             'kendala' => $request->kendala,
         ]);
 
-        return back()->with('success', 'Jurnal hari ini berhasil disimpan!');
+        return back()->with(
+            'success',
+            'Jurnal hari ini berhasil disimpan!'
+        );
     }
 }
