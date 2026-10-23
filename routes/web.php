@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
     Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
 
-    // --- FITUR IZIN ---
+    // --- FITUR IZIN (Siswa) ---
     Route::get('/izin', [IzinController::class, 'index'])->name('izin.index');
     Route::post('/izin', [IzinController::class, 'store'])->name('izin.store');
 
@@ -61,9 +61,15 @@ Route::middleware('auth')->group(function () {
     Route::prefix('guru')->name('guru.')->group(function () {
         Route::get('/dashboard', function () {
             return view('dashboard.user_guru');
-        });
-        Route::get('/jurnal', [GuruController::class, 'index']);
-        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai']);
+        })->name('dashboard');
+
+        // Jurnal
+        Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
+        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
+
+        // Izin (TAMBAHKAN INI)
+        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
+        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
         // Export
         Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');

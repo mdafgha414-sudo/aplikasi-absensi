@@ -34,8 +34,8 @@
                 </h5>
 
                 <div class="row g-3">
-                    <!-- Card Menu: Lihat & Nilai Jurnal (Kolom 1) -->
-                    <div class="col-md-6">
+                    <!-- Card 1: Lihat & Nilai Jurnal -->
+                    <div class="col-md-4">
                         <a href="/guru/jurnal" class="text-decoration-none card-menu-link">
                             <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
                                 <div class="d-flex align-items-center gap-3">
@@ -43,8 +43,8 @@
                                         <i class="bi bi-journal-check fs-3"></i>
                                     </div>
                                     <div class="overflow-hidden">
-                                        <h6 class="fw-bold text-dark mb-1 text-truncate">Lihat & Nilai Jurnal</h6>
-                                        <p class="text-muted small mb-0 text-truncate-2">Periksa kiriman jurnal harian siswa dan berikan nilai.</p>
+                                        <h6 class="fw-bold text-dark mb-1">Lihat & Nilai Jurnal</h6>
+                                        <p class="text-muted small mb-0 text-truncate-2">Periksa jurnal siswa dan berikan nilai.</p>
                                     </div>
                                     <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
                                 </div>
@@ -52,8 +52,8 @@
                         </a>
                     </div>
 
-                    <!-- Card Menu: Laporan Absensi (Kolom 2 - Berjajar di sampingnya) -->
-                    <div class="col-md-6">
+                    <!-- Card 2: Laporan Absensi -->
+                    <div class="col-md-4">
                         <a href="/guru/laporan-absensi" class="text-decoration-none card-menu-link">
                             <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
                                 <div class="d-flex align-items-center gap-3">
@@ -61,8 +61,26 @@
                                         <i class="bi bi-calendar-check fs-3"></i>
                                     </div>
                                     <div class="overflow-hidden">
-                                        <h6 class="fw-bold text-dark mb-1 text-truncate">Laporan Absensi</h6>
-                                        <p class="text-muted small mb-0 text-truncate-2">Pantau waktu masuk, waktu pulang, dan status kehadiran.</p>
+                                        <h6 class="fw-bold text-dark mb-1">Laporan Absensi</h6>
+                                        <p class="text-muted small mb-0 text-truncate-2">Pantau kehadiran dan status siswa.</p>
+                                    </div>
+                                    <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Card 3: Daftar Izin Siswa (BARU) -->
+                    <div class="col-md-4">
+                        <a href="/guru/izin" class="text-decoration-none card-menu-link">
+                            <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-warning text-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                        <i class="bi bi-envelope-paper fs-3"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <h6 class="fw-bold text-dark mb-1">Daftar Izin Siswa</h6>
+                                        <p class="text-muted small mb-0 text-truncate-2">Lihat dan setujui pengajuan izin.</p>
                                     </div>
                                     <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
                                 </div>
