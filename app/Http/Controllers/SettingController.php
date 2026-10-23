@@ -27,6 +27,11 @@ class SettingController extends Controller
             ['value' => $request->jam_masuk]
         );
 
+        return back()->with(
+            'success',
+            'Pengaturan berhasil diperbarui!'
+        );
+
         return back()->with('success', 'Pengaturan berhasil diperbarui!');
     }
 }
