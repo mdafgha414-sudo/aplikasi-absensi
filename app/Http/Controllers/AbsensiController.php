@@ -47,11 +47,13 @@ class AbsensiController extends Controller
             );
         }
 
-        // Ambil pengaturan jam masuk dari database.
-        $setting = Setting::where('key', 'jam_masuk')->first();
-
-        // Gunakan pukul 08:00 jika pengaturan belum tersedia.
-        $jam = $setting ? $setting->value : '08:00';
+        // Ambil pengaturan jam masuk dari database (aman jika tabel belum ada)
+        try {
+            $setting = Setting::where('key', 'jam_masuk')->first();
+            $jam = $setting ? $setting->value : '08:00';
+        } catch (\Exception $e) {
+            $jam = '08:00';
+        }
 
         $jamMasukKantor = Carbon::createFromTimeString($jam);
         $waktuSekarang = Carbon::now();
@@ -79,7 +81,36 @@ class AbsensiController extends Controller
     }
 
     // =====================================================
-    // 3. RIWAYAT ABSENSI
+    // 3. PROSES ABSEN PULANG (YANG SEBELUMNYA HILANG)
+    // Mencatat jam pulang untuk absensi hari ini.
+    // =====================================================
+    public function pulang()
+    {
+        $hariIni = Carbon::today()->toDateString();
+
+        // Cari data absensi masuk milik user hari ini
+        $absen = Absensi::where('user_id', Auth::id())
+            ->where('tanggal', $hariIni)
+            ->first();
+
+        if (!$absen) {
+            return back()->with('error', 'Anda belum melakukan absen masuk hari ini!');
+        }
+
+        if ($absen->jam_pulang) {
+            return back()->with('error', 'Anda sudah melakukan absen pulang hari ini!');
+        }
+
+        // Update jam pulang dengan waktu sekarang
+        $absen->update([
+            'jam_pulang' => Carbon::now()->toTimeString(),
+        ]);
+
+        return back()->with('success', 'Absen pulang berhasil dicatat. Hati-hati di jalan!');
+    }
+
+    // =====================================================
+    // 4. RIWAYAT ABSENSI
     // Menampilkan riwayat absensi milik user yang login.
     // =====================================================
     public function riwayat()

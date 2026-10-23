@@ -1,233 +1,168 @@
-
-@extends('layouts.app')
+@extends('layouts.app') {{-- Sesuaikan dengan nama layout Anda --}}
 
 @section('content')
-<div class="container py-4">
+<div class="container-fluid px-4 py-3">
 
-    {{-- HEADER --}}
-    <div class="mb-4">
-        <h3 class="fw-bold mb-1">
-            <i class="bi bi-calendar-check text-primary me-2"></i>
-            Pengajuan Izin & Sakit
-        </h3>
-        <p class="text-muted mb-0">
-            Ajukan izin ketidakhadiran selama kegiatan PKL.
-        </p>
+    <!-- 1. Header Banner Modern -->
+    <div class="card border-0 rounded-4 shadow-sm text-white mb-4 position-relative overflow-hidden" 
+         style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    
+                    <h2 class="fw-bold mb-2">Pengajuan Izin & Sakit</h2>
+                    <p class="mb-0 text-white-50 fs-6">
+                        Ajukan izin ketidakhadiran Anda selama kegiatan PKL dengan mengisi formulir di bawah ini secara lengkap.
+                    </p>
+                </div>
+                <div class="col-md-4 text-center text-md-end d-none d-md-block">
+                    <i class="bi bi-envelope-paper-fill display-1 text-white opacity-25"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
-    {{-- PESAN SUKSES --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    {{-- PESAN ERROR --}}
-    @if($errors->any())
-        <div class="alert alert-danger rounded-3 shadow-sm">
-            <strong>Pengajuan belum berhasil.</strong>
-            <ul class="mb-0 mt-2">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    {{-- FORM PENGAJUAN IZIN --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-white border-0 pt-4 px-4">
-            <h5 class="fw-bold mb-1">Formulir Pengajuan</h5>
-            <p class="text-muted small mb-0">
-                Isi data dengan benar sebelum mengirim pengajuan.
-            </p>
-        </div>
-
-        <div class="card-body p-4">
-            <form action="{{ route('izin.store') }}"
-                  method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-
-                <div class="row g-3">
-                    {{-- JENIS IZIN --}}
-                    <div class="col-md-6">
-                        <label for="jenis_izin" class="form-label fw-semibold">
-                            Jenis Izin <span class="text-danger">*</span>
-                        </label>
-
-                        <select
-                            name="jenis_izin"
-                            id="jenis_izin"
-                            class="form-select @error('jenis_izin') is-invalid @enderror"
-                            required>
-                            <option value="">Pilih jenis izin</option>
-                            <option value="Izin" @selected(old('jenis_izin') == 'Izin')>
-                                Izin
-                            </option>
-                            <option value="Sakit" @selected(old('jenis_izin') == 'Sakit')>
-                                Sakit
-                            </option>
-                            <option value="Keperluan Keluarga"
-                                @selected(old('jenis_izin') == 'Keperluan Keluarga')>
-                                Keperluan Keluarga
-                            </option>
-                        </select>
-
-                        @error('jenis_izin')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+    <!-- 2. Main Card Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3 me-3">
+                            <i class="bi bi-pencil-square fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark">Formulir Pengajuan</h5>
+                            <p class="text-muted small mb-0">Isi data dengan benar sebelum mengirim pengajuan izin Anda.</p>
+                        </div>
                     </div>
 
-                    {{-- TANGGAL IZIN --}}
-                    <div class="col-md-6">
-                        <label for="tanggal_izin" class="form-label fw-semibold">
-                            Tanggal Izin <span class="text-danger">*</span>
-                        </label>
+                    <form action="{{ route('izin.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
 
-                        <input
-                            type="date"
-                            name="tanggal_izin"
-                            id="tanggal_izin"
-                            class="form-control @error('tanggal_izin') is-invalid @enderror"
-                            min="{{ date('Y-m-d') }}"
-                            value="{{ old('tanggal_izin') }}"
-                            required>
+                        <!-- Field: Jenis Izin & Tanggal -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="jenis_izin" class="form-label fw-semibold text-secondary">
+                                    Jenis Izin <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-tag"></i>
+                                    </span>
+                                    <select name="jenis_izin" id="jenis_izin" class="form-select bg-light border-start-0 ps-0" required>
+                                        <option value="" disabled selected>Pilih jenis izin...</option>
+                                        <option value="Izin">Izin (Kepentingan/Urusan)</option>
+                                        <option value="Sakit">Sakit (Memerlukan Surat Dokter)</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                        @error('tanggal_izin')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- ALASAN --}}
-                    <div class="col-12">
-                        <label for="alasan" class="form-label fw-semibold">
-                            Alasan Izin <span class="text-danger">*</span>
-                        </label>
-
-                        <textarea
-                            name="alasan"
-                            id="alasan"
-                            rows="4"
-                            maxlength="500"
-                            class="form-control @error('alasan') is-invalid @enderror"
-                            placeholder="Jelaskan alasan pengajuan izin kamu..."
-                            required>{{ old('alasan') }}</textarea>
-
-                        <div class="form-text">Maksimal 500 karakter.</div>
-
-                        @error('alasan')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- LAMPIRAN --}}
-                    <div class="col-12">
-                        <label for="lampiran" class="form-label fw-semibold">
-                            Lampiran <span class="text-muted fw-normal">(Opsional)</span>
-                        </label>
-
-                        <input
-                            type="file"
-                            name="lampiran"
-                            id="lampiran"
-                            class="form-control @error('lampiran') is-invalid @enderror"
-                            accept=".pdf,.jpg,.jpeg,.png">
-
-                        <div class="form-text">
-                            Format PDF, JPG, JPEG, atau PNG. Maksimal 2 MB.
+                            <div class="col-md-6">
+                                <label for="tanggal_izin" class="form-label fw-semibold text-secondary">
+                                    Tanggal Izin <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-calendar3"></i>
+                                    </span>
+                                    <input type="date" name="tanggal_izin" id="tanggal_izin" class="form-control bg-light border-start-0 ps-0" required>
+                                </div>
+                            </div>
                         </div>
 
-                        @error('lampiran')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                        <!-- Field: Alasan Izin -->
+                        <div class="mb-4">
+                            <label for="alasan" class="form-label fw-semibold text-secondary">
+                                Alasan Izin <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="alasan" id="alasan" rows="4" maxlength="500" class="form-control bg-light p-3" 
+                                      placeholder="Jelaskan alasan detail pengajuan izin kamu di sini..." required></textarea>
+                            <div class="d-flex justify-content-between mt-1">
+                                <span class="text-muted small">Berikan alasan yang meyakinkan & jelas.</span>
+                                <span class="text-muted small"><span id="charCount">0</span>/500 karakter</span>
+                            </div>
+                        </div>
 
-                    {{-- TOMBOL KIRIM --}}
-                    <div class="col-12 mt-4">
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
-                            <i class="bi bi-send me-2"></i>
-                            Ajukan Izin
-                        </button>
-                    </div>
+                        <!-- Field: Upload Lampiran Custom -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary">
+                                Lampiran / Surat Dokter <span class="text-muted fw-normal">(Opsional)</span>
+                            </label>
+                            <div class="border border-2 border-dashed rounded-4 p-4 text-center bg-light position-relative" id="dropArea">
+                                <i class="bi bi-cloud-arrow-up display-5 text-primary mb-2"></i>
+                                <p class="fw-semibold mb-1 text-dark">Klik atau seret file ke sini untuk mengunggah</p>
+                                <p class="text-muted small mb-0">Format yang didukung: JPG, PNG, PDF (Maksimal 2MB)</p>
+                                <input type="file" name="lampiran" id="lampiran" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer">
+                            </div>
+                            <div id="fileInfo" class="mt-2 text-success small fw-semibold d-none">
+                                <i class="bi bi-check-circle me-1"></i> File terpilih: <span id="fileName"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Action -->
+                        <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+                            <button type="reset" class="btn btn-light rounded-3 px-4 fw-medium text-secondary">
+                                Batal
+                            </button>
+                            <button type="submit" class="btn btn-primary rounded-3 px-4 py-2 fw-semibold shadow-sm">
+                                <i class="bi bi-send me-1"></i> Kirim Pengajuan
+                            </button>
+                        </div>
+
+                    </form>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- RIWAYAT PENGAJUAN IZIN --}}
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-header bg-white border-0 pt-4 px-4">
-            <h5 class="fw-bold mb-1">
-                <i class="bi bi-clock-history text-primary me-2"></i>
-                Riwayat Pengajuan Izin
-            </h5>
-            <p class="text-muted small mb-0">
-                Daftar pengajuan izin yang pernah kamu kirim.
-            </p>
+            </div>
         </div>
 
-        <div class="card-body p-4">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>No.</th>
-                            <th>Tanggal Pengajuan</th>
-                            <th>Jenis Izin</th>
-                            <th>Tanggal Izin</th>
-                            <th>Alasan</th>
-                            <th>Status</th>
-                            <th>Catatan Guru</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @forelse($riwayatIzin as $index => $izin)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-
-                                <td>
-                                    {{ $izin->created_at?->format('d/m/Y') ?? '-' }}
-                                </td>
-
-                                <td>{{ $izin->jenis_izin }}</td>
-
-                                <td>
-                                    {{ \Carbon\Carbon::parse($izin->tanggal_izin)->format('d/m/Y') }}
-                                </td>
-
-                                <td>{{ $izin->alasan }}</td>
-
-                                <td>
-                                    @if($izin->status === 'Disetujui')
-                                        <span class="badge bg-success">Disetujui</span>
-                                    @elseif($izin->status === 'Ditolak')
-                                        <span class="badge bg-danger">Ditolak</span>
-                                    @else
-                                        <span class="badge bg-warning text-dark">
-                                            {{ $izin->status ?? 'Menunggu' }}
-                                        </span>
-                                    @endif
-                                </td>
-
-                                <td>{{ $izin->catatan_guru ?? '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                    Belum ada pengajuan izin.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+        <!-- 3. Sidebar Widget InformasiTambahan (Opsional) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <h6 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-info-circle text-primary me-2"></i>Ketentuan Pengajuan
+                </h6>
+                <ul class="list-unstyled mb-0 small text-muted">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-check2-circle text-success me-2 fs-6"></i>
+                        <span>Pengajuan izin minimal dilakukan <strong>1 hari sebelum</strong> tanggal ketidakhadiran (kecuali sakit mendadak).</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-check2-circle text-success me-2 fs-6"></i>
+                        <span>Jika sakit lebih dari 2 hari, wajib melampirkan <strong>Surat Keterangan Dokter</strong>.</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="bi bi-check2-circle text-success me-2 fs-6"></i>
+                        <span>Status pengajuan dapat dipantau di menu <strong>Riwayat Absensi</strong>.</span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 
 </div>
+
+<!-- JavaScript Sederhana untuk Penghitung Karakter & Preview File -->
+<script>
+    // Live Character Counter
+    const textarea = document.getElementById('alasan');
+    const charCount = document.getElementById('charCount');
+    textarea.addEventListener('input', () => {
+        charCount.textContent = textarea.value.length;
+    });
+
+    // File Input Name Display
+    const fileInput = document.getElementById('lampiran');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            fileName.textContent = e.target.files[0].name;
+            fileInfo.classList.remove('d-none');
+        } else {
+            fileInfo.classList.add('d-none');
+        }
+    });
+</script>
 @endsection

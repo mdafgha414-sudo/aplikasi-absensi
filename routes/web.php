@@ -71,12 +71,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
+        // 👈 TAMBAHKAN DI SINI (Baris 53)
+        Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
+        
         // Export
         Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');
         Route::get('/export/pdf', [GuruExportController::class, 'pdf'])->name('export.pdf');
     });
 
-});
+}); 
 
 
 // ==========================================
