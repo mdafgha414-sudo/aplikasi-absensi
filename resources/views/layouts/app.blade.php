@@ -20,7 +20,7 @@
         }
 
         body { 
-            background-color: #f1f5f9; /* Background abu-abu kebiruan yang lebih bersih */
+            background-color: #f1f5f9; 
             overflow-x: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -110,27 +110,21 @@
         }
         .btn-toggle-sidebar:hover { background-color: #f8fafc; }
 
-        /* ========================================= */
-        /* --- PERBAIKAN UNTUK MOBILE (OFFCANVAS) --- */
-        /* ========================================= */
+        /* --- RESPONSIF MOBILE (OFFCANVAS) --- */
         @media (max-width: 991px) {
-            /* Di HP, sidebar disembunyikan ke kiri secara default */
             .sidebar {
                 left: calc(-1 * var(--sidebar-width));
             }
             
-            /* Saat tombol diklik (class collapsed dihapus), sidebar meluncur masuk */
             .sidebar.show-mobile {
                 left: 0;
             }
 
-            /* Konten utama di HP tidak memiliki margin kiri */
             .main-content {
                 margin-left: 0;
                 padding: 15px;
             }
 
-            /* Background gelap transparan di belakang sidebar saat terbuka */
             .sidebar-overlay {
                 display: none;
                 position: fixed;
@@ -154,12 +148,10 @@
 </head>
 <body>
 
-    <!-- OVERLAY GELAP (Hanya muncul di HP saat sidebar terbuka) -->
+    <!-- OVERLAY GELAP -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- ========================================== -->
-    <!-- SIDEBAR                                    -->
-    <!-- ========================================== -->
+    <!-- SIDEBAR -->
     @auth
     <nav class="sidebar" id="sidebar">
         <a href="#" class="sidebar-brand">
@@ -186,9 +178,8 @@
             @if(Auth::user()->role === 'guru')
                 <li><a href="/guru/dashboard" class="{{ request()->is('guru/dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
                 <li><a href="/guru/jurnal" class="{{ request()->is('guru/jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
-
-                  <!-- TAMBAHKAN MENU INI -->
-    <li><a href="/guru/izin" class="{{ request()->is('guru/izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
+                <li><a href="{{ route('guru.laporan-absensi') }}" class="{{ request()->routeIs('guru.laporan-absensi*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi</a></li>
+                <li><a href="/guru/izin" class="{{ request()->is('guru/izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
             @endif
 
             <!-- Menu ADMIN -->
@@ -196,7 +187,7 @@
                 <li><a href="/admin/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
             @endif
 
-            <!-- Bagian Bawah Sidebar -->
+            <!-- Bagian Pengaturan -->
             <li class="menu-label mt-4">Pengaturan</li>
             <li><a href="/admin/setting" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             
@@ -212,15 +203,11 @@
     </nav>
     @endauth
 
-    <!-- ========================================== -->
-    <!-- KONTEN UTAMA                               -->
-    <!-- ========================================== -->
+    <!-- KONTEN UTAMA -->
     <div class="main-content" id="main-content">
-        
         <!-- TOPBAR -->
         <div class="topbar">
             <div class="d-flex align-items-center">
-                <!-- TOMBOL HAMBURGER (Hanya muncul jika sudah login) -->
                 @auth
                 <button class="btn-toggle-sidebar me-3" id="toggleSidebar">
                     <i class="bi bi-list"></i>
@@ -239,14 +226,14 @@
             </div>
         </div>
 
-        <!-- Tempat konten dinamis -->
+        <!-- Konten Dinamis -->
         @yield('content') 
     </div>
 
     <!-- Script Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Script JavaScript untuk Toggle Sidebar (Responsive) -->
+    <!-- Script JavaScript Toggle Sidebar -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('toggleSidebar');
@@ -254,21 +241,15 @@
             const mainContent = document.getElementById('main-content');
             const overlay = document.getElementById('sidebarOverlay');
 
-            // Cek lebar layar
-            const isMobile = window.innerWidth < 992;
-
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', function() {
                     if (window.innerWidth < 992) {
-                        // --- LOGIKA UNTUK MOBILE ---
                         sidebar.classList.toggle('show-mobile');
                         overlay.classList.toggle('show');
                     } else {
-                        // --- LOGIKA UNTUK DESKTOP ---
                         sidebar.classList.toggle('collapsed');
                         mainContent.classList.toggle('expanded');
                         
-                        // Simpan status ke localStorage (Hanya untuk desktop)
                         if (sidebar.classList.contains('collapsed')) {
                             localStorage.setItem('sidebarCollapsed', 'true');
                         } else {
@@ -278,7 +259,6 @@
                 });
             }
 
-            // Tutup sidebar jika overlay diklik (di mobile)
             if (overlay) {
                 overlay.addEventListener('click', function() {
                     sidebar.classList.remove('show-mobile');
@@ -286,7 +266,6 @@
                 });
             }
 
-            // Cek status sidebar saat halaman dimuat (khusus desktop)
             if (window.innerWidth >= 992) {
                 const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
                 if (isCollapsed && sidebar) {

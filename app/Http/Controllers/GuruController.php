@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Jurnal;
 use App\Models\User;
-use App\Models\Absensi; // Tambahkan ini untuk memanggil model Absensi
-use App\Models\Izin; // <-- Tambahkan ini untuk memanggil Model Izin
+use App\Models\Absensi;
+use App\Models\Izin;
 use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
@@ -48,11 +48,13 @@ class GuruController extends Controller
         $laporanAbsensi = Absensi::with('user')->latest()->get(); 
 
         return view('guru.laporan-absensi', compact('laporanAbsensi'));
+    } // <-- INI YANG KURANG (Tutup kurung kurawal fungsi laporanAbsensi)
+
     // ==========================================
     // FITUR BARU: MANAJEMEN IZIN SISWA
     // ==========================================
 
-    // 3. Menampilkan daftar pengajuan izin siswa
+    // 4. Menampilkan daftar pengajuan izin siswa
     public function lihatIzin()
     {
         // Ambil semua data izin beserta data user (siswa) yang mengajukan
@@ -62,7 +64,7 @@ class GuruController extends Controller
         return view('dashboard.izin_guru', compact('semuaIzin'));
     }
 
-    // 4. Memproses persetujuan atau penolakan izin
+    // 5. Memproses persetujuan atau penolakan izin
     public function updateIzin(Request $request, $id)
     {
         $request->validate([
