@@ -5,25 +5,26 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Jurnal;
 use App\Models\User;
+<<<<<<< HEAD
+use App\Models\Absensi; 
+use App\Models\Izin; 
+=======
 use App\Models\Absensi;
 use App\Models\Izin;
+>>>>>>> 86fcfa204e8ad1c1889c26b4dff9a59c38ea86be
 use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
 {
-    // 1. Halaman Dashboard Guru (Melihat daftar jurnal siswa)
+    // 1. Halaman Dashboard Guru
     public function index()
     {
-        // Ambil semua jurnal beserta data siswa yang menulisnya
         $semuaJurnal = Jurnal::with('user')->orderBy('tanggal', 'desc')->get();
-
-        // Hitung total siswa
         $totalSiswa = User::where('role', 'user')->count();
-
         return view('dashboard.guru', compact('semuaJurnal', 'totalSiswa'));
     }
 
-    // 2. Fungsi untuk menyimpan penilaian dari guru
+    // 2. Menyimpan penilaian jurnal
     public function beriNilai(Request $request, $id)
     {
         $request->validate([
@@ -32,7 +33,6 @@ class GuruController extends Controller
         ]);
 
         $jurnal = Jurnal::findOrFail($id);
-
         $jurnal->update([
             'nilai' => $request->nilai,
             'catatan_guru' => $request->catatan_guru,
@@ -41,6 +41,9 @@ class GuruController extends Controller
         return back()->with('success', 'Penilaian dan catatan berhasil disimpan!');
     }
 
+<<<<<<< HEAD
+    // 3. Menampilkan daftar pengajuan izin siswa
+=======
     // 3. Tambahan fungsi untuk Laporan Absensi Guru
     public function laporanAbsensi()
     {
@@ -55,16 +58,18 @@ class GuruController extends Controller
     // ==========================================
 
     // 4. Menampilkan daftar pengajuan izin siswa
+>>>>>>> 86fcfa204e8ad1c1889c26b4dff9a59c38ea86be
     public function lihatIzin()
     {
-        // Ambil semua data izin beserta data user (siswa) yang mengajukan
-        // Urutkan dari yang terbaru
         $semuaIzin = Izin::with('user')->orderBy('created_at', 'desc')->get();
-        
         return view('dashboard.izin_guru', compact('semuaIzin'));
     }
 
+<<<<<<< HEAD
+    // 4. Memproses persetujuan/penolakan izin DAN Sinkronisasi ke Absensi
+=======
     // 5. Memproses persetujuan atau penolakan izin
+>>>>>>> 86fcfa204e8ad1c1889c26b4dff9a59c38ea86be
     public function updateIzin(Request $request, $id)
     {
         $request->validate([
@@ -76,6 +81,26 @@ class GuruController extends Controller
         $izin->update([
             'status' => $request->status,
         ]);
+
+        // --- LOGIKA SINKRONISASI KE ABSENSI ---
+        // Jika disetujui, buat catatan absensi otomatis untuk tanggal izin tersebut
+        if ($request->status == 'Disetujui') {
+            
+            // Cek dulu, jangan sampai double input jika guru menekan tombol dua kali
+            $cekAbsen = Absensi::where('user_id', $izin->user_id)
+                               ->where('tanggal', $izin->tanggal_izin)
+                               ->first();
+
+            if (!$cekAbsen) {
+                Absensi::create([
+                    'user_id' => $izin->user_id,
+                    'tanggal' => $izin->tanggal_izin,
+                    'jam_masuk' => null,
+                    'jam_pulang' => null,
+                    'status' => 'Izin', // Status khusus untuk membedakan dengan Telat/Tepat Waktu
+                ]);
+            }
+        }
 
         return back()->with('success', 'Status pengajuan izin berhasil diperbarui menjadi: ' . $request->status);
     }
