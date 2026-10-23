@@ -186,6 +186,9 @@
             @if(Auth::user()->role === 'guru')
                 <li><a href="/guru/dashboard" class="{{ request()->is('guru/dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
                 <li><a href="/guru/jurnal" class="{{ request()->is('guru/jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
+
+                  <!-- TAMBAHKAN MENU INI -->
+    <li><a href="/guru/izin" class="{{ request()->is('guru/izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
             @endif
 
             <!-- Menu ADMIN -->
