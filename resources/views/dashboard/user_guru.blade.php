@@ -34,8 +34,8 @@
                 </h5>
 
                 <div class="row g-3">
-                    <!-- Card Menu: Lihat & Nilai Jurnal -->
-                    <div class="col-md-6 col-lg-4">
+                    <!-- Card Menu: Lihat & Nilai Jurnal (Kolom 1) -->
+                    <div class="col-md-6">
                         <a href="/guru/jurnal" class="text-decoration-none card-menu-link">
                             <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
                                 <div class="d-flex align-items-center gap-3">
@@ -52,7 +52,23 @@
                         </a>
                     </div>
 
-                    <!-- Tambahkan menu guru lainnya di bawah ini jika diperlukan nanti -->
+                    <!-- Card Menu: Laporan Absensi (Kolom 2 - Berjajar di sampingnya) -->
+                    <div class="col-md-6">
+                        <a href="/guru/laporan-absensi" class="text-decoration-none card-menu-link">
+                            <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
+                                        <i class="bi bi-calendar-check fs-3"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <h6 class="fw-bold text-dark mb-1 text-truncate">Laporan Absensi</h6>
+                                        <p class="text-muted small mb-0 text-truncate-2">Pantau waktu masuk, waktu pulang, dan status kehadiran.</p>
+                                    </div>
+                                    <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
                 </div>
             </div>
@@ -71,7 +87,7 @@
     }
     .card-menu-link:hover .card-menu-hover {
         background-color: #ffffff !important;
-        border-color: #198754 !important;
+        border-color: #0d6efd !important;
         transform: translateY(-3px);
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
     }
