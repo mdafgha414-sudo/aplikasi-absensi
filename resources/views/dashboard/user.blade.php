@@ -422,6 +422,29 @@
 
                 <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #0ca678;"></i>
             </a>
+            
+            <!-- TAMBAHKAN KARTU IZIN INI -->
+<a href="{{ url('/izin') }}" class="ud-menu-card">
+    <div class="ud-menu-icon" style="background: #fff1f2; color: #e11d48;">
+        <i class="bi bi-envelope-paper"></i>
+    </div>
+
+    <h5>Pengajuan Izin</h5>
+
+    <p>
+        Ajukan surat izin jika kamu berhalangan hadir
+        atau sakit.
+    </p>
+
+    <span class="ud-menu-link" style="color: #e11d48;">
+        Buka form izin
+        <i class="bi bi-arrow-right"></i>
+    </span>
+
+    <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #e11d48;"></i>
+</a>
+
+
 
         </div>
     </section>

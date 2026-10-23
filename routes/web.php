@@ -4,33 +4,57 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\IzinController;
 
-// Redirect halaman utama ke login
+// Halaman utama
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// Route login
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+// Login
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login');
+
 Route::post('/login', [AuthController::class, 'login']);
 
-// Route dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware('auth');
+// Semua halaman setelah login
+Route::middleware('auth')->group(function () {
 
-// Route jurnal
-Route::get('/jurnal', [JurnalController::class, 'index'])
-    ->middleware('auth');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-Route::post('/jurnal', [JurnalController::class, 'store'])
-    ->middleware('auth');
+    // Isi Absensi
+    Route::get('/absensi', [AbsensiController::class, 'index'])
+        ->name('absensi.index');
 
-// Route pengajuan izin
-Route::post('/izin', [IzinController::class, 'store'])
-    ->middleware('auth')
-    ->name('izin.store');
+    Route::post('/absensi/masuk', [AbsensiController::class, 'masuk'])
+        ->name('absensi.masuk');
 
-// Route logout
-Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/absensi/pulang', [AbsensiController::class, 'pulang'])
+        ->name('absensi.pulang');
+
+    // Riwayat Absensi
+    Route::get('/absensi/riwayat', [AbsensiController::class, 'riwayat'])
+        ->name('absensi.riwayat');
+
+    // Jurnal Harian PKL
+    Route::get('/jurnal', [JurnalController::class, 'index'])
+        ->name('jurnal.index');
+
+    Route::post('/jurnal', [JurnalController::class, 'store'])
+        ->name('jurnal.store');
+
+    // Pengajuan Izin
+    Route::get('/izin', [IzinController::class, 'index'])
+        ->name('izin.index');
+
+    Route::post('/izin', [IzinController::class, 'store'])
+        ->name('izin.store');
+});
+
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');

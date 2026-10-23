@@ -1,11 +1,26 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Izin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // Tambahkan ini
 
 class IzinController extends Controller
 {
+    // 1. FUNGSI UNTUK MENAMPILKAN HALAMAN FORM & RIWAYAT IZIN
+    public function index()
+    {
+        // Ambil riwayat izin milik user yang sedang login
+        $riwayatIzin = Izin::where('user_id', Auth::id())
+                           ->orderBy('created_at', 'desc')
+                           ->get();
+
+        // Arahkan ke view 'resources/views/izin/index.blade.php'
+        return view('izin.index', compact('riwayatIzin'));
+    }
+
+    // 2. FUNGSI UNTUK MENYIMPAN PENGAJUAN IZIN (Kode dari teman Anda)
     public function store(Request $request)
     {
         $data = $request->validate([
