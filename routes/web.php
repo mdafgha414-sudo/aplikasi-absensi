@@ -65,12 +65,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnal', [GuruController::class, 'index']);
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai']);
         
+        // 👈 TAMBAHKAN DI SINI (Baris 53)
+        Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
+        
         // Export
         Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');
         Route::get('/export/pdf', [GuruExportController::class, 'pdf'])->name('export.pdf');
     });
 
-});
+}); 
 
 
 // ==========================================
