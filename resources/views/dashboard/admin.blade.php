@@ -838,20 +838,22 @@
                                         </td>
 
                                         <td>
+                                            {{-- PENAMBAHAN STATUS IZIN DI SINI --}}
                                             @if($absen->status == 'Telat')
-
                                                 <span class="status-badge status-late">
                                                     <i class="bi bi-exclamation-circle-fill"></i>
                                                     Telat
                                                 </span>
-
+                                            @elseif($absen->status == 'Izin')
+                                                <span class="badge bg-info text-dark rounded-pill px-3 py-2">
+                                                    <i class="bi bi-envelope-paper-fill me-1"></i>
+                                                    Izin
+                                                </span>
                                             @else
-
                                                 <span class="status-badge status-success">
                                                     <i class="bi bi-check-circle-fill"></i>
                                                     Tepat Waktu
                                                 </span>
-
                                             @endif
                                         </td>
                                     </tr>
