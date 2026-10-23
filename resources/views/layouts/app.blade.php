@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi App</title>
+    <title>Timetrix</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -11,21 +11,21 @@
     
     <style>
         :root {
-            --sidebar-bg: #2a1b54;
-            --sidebar-hover: #3d2a72;
-            --sidebar-active: #4a3585;
-            --text-muted-light: #a89cc8;
+            /* Warna Baru: Navy Blue Elegan */
+            --sidebar-bg: #1e293b; 
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --text-muted-light: #94a3b8;
             --sidebar-width: 260px;
         }
 
         body { 
-            background-color: #f8f9fa; 
+            background-color: #f1f5f9; /* Background abu-abu kebiruan yang lebih bersih */
             overflow-x: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: all 0.3s ease;
         }
         
-        /* --- STYLING SIDEBAR --- */
+        /* --- STYLING SIDEBAR (Desktop) --- */
         .sidebar {
             height: 100vh;
             width: var(--sidebar-width);
@@ -34,9 +34,10 @@
             left: 0;
             background-color: var(--sidebar-bg);
             padding-top: 20px;
-            z-index: 1000;
+            z-index: 1050;
             transition: all 0.3s ease;
             overflow-y: auto;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
         }
 
         .sidebar.collapsed {
@@ -51,20 +52,23 @@
             display: flex;
             align-items: center;
             text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 15px;
         }
-        .sidebar-brand i { color: #5ce1e6; font-size: 28px; margin-right: 10px; }
-        .sidebar-brand span { font-size: 12px; font-weight: 400; color: var(--text-muted-light); display: block; margin-top: -5px; }
+        .sidebar-brand i { color: #38bdf8; font-size: 28px; margin-right: 12px; }
+        .sidebar-brand span { font-size: 12px; font-weight: 400; color: var(--text-muted-light); display: block; margin-top: -5px; letter-spacing: 0.5px; }
 
         .sidebar-menu { list-style: none; padding: 0 15px; margin: 0; }
-        .sidebar-menu .menu-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted-light); padding: 15px 10px 5px 10px; font-weight: 600; letter-spacing: 1px; }
-        .sidebar-menu li a { display: flex; align-items: center; padding: 12px 15px; color: #e2e1e9; text-decoration: none; font-weight: 500; font-size: 14px; border-radius: 8px; margin-bottom: 5px; transition: all 0.2s; }
+        .sidebar-menu .menu-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted-light); padding: 15px 10px 5px 10px; font-weight: 700; letter-spacing: 1px; }
+        .sidebar-menu li a { display: flex; align-items: center; padding: 12px 15px; color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 14px; border-radius: 8px; margin-bottom: 5px; transition: all 0.2s; }
         .sidebar-menu li a i { margin-right: 12px; font-size: 18px; width: 24px; text-align: center; }
-        .sidebar-menu li a:hover, .sidebar-menu li a.active { background-color: var(--sidebar-active); color: #ffffff; }
+        .sidebar-menu li a:hover { background-color: var(--sidebar-hover); color: #ffffff; }
+        .sidebar-menu li a.active { background-color: var(--sidebar-active); color: #ffffff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
         
-        .logout-btn { color: #ff8a8a !important; }
-        .logout-btn:hover { background-color: rgba(255, 138, 138, 0.1) !important; }
+        .logout-btn { color: #f87171 !important; font-weight: 600 !important; }
+        .logout-btn:hover { background-color: rgba(248, 113, 113, 0.1) !important; }
 
-        /* --- STYLING KONTEN UTAMA --- */
+        /* --- STYLING KONTEN UTAMA (Desktop) --- */
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 30px;
@@ -81,17 +85,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             padding: 15px 25px;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
         }
 
         .btn-toggle-sidebar {
-            background-color: #f4f6f9;
-            border: 1px solid #eaeaea;
-            color: #333;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             border-radius: 8px;
             width: 42px;
             height: 42px;
@@ -100,23 +106,66 @@
             justify-content: center;
             font-size: 20px;
             transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .btn-toggle-sidebar:hover {
-            background-color: #e2e6ea;
+        .btn-toggle-sidebar:hover { background-color: #f8fafc; }
+
+        /* ========================================= */
+        /* --- PERBAIKAN UNTUK MOBILE (OFFCANVAS) --- */
+        /* ========================================= */
+        @media (max-width: 991px) {
+            /* Di HP, sidebar disembunyikan ke kiri secara default */
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+            }
+            
+            /* Saat tombol diklik (class collapsed dihapus), sidebar meluncur masuk */
+            .sidebar.show-mobile {
+                left: 0;
+            }
+
+            /* Konten utama di HP tidak memiliki margin kiri */
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            /* Background gelap transparan di belakang sidebar saat terbuka */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(15, 23, 42, 0.6);
+                z-index: 1040;
+                backdrop-filter: blur(2px);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- OVERLAY GELAP (Hanya muncul di HP saat sidebar terbuka) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- ========================================== -->
-    <!-- SIDEBAR (Hanya muncul jika sudah login)    -->
+    <!-- SIDEBAR                                    -->
     <!-- ========================================== -->
     @auth
     <nav class="sidebar" id="sidebar">
         <a href="#" class="sidebar-brand">
             <i class="bi bi-clipboard-check"></i>
             <div>
-                Absensi App
+                Timetrix
                 <span>Academic Portal</span>
             </div>
         </a>
@@ -146,7 +195,7 @@
 
             <!-- Bagian Bawah Sidebar -->
             <li class="menu-label mt-4">Pengaturan</li>
-            <li><a href="#"><i class="bi bi-gear"></i> Pengaturan</a></li>
+            <li><a href="/admin/setting" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             
             <li>
                 <form action="/logout" method="POST">
@@ -178,7 +227,6 @@
             </div>
             
             <div class="d-flex align-items-center">
-                {{-- PENGECEKAN AGAR TIDAK ERROR SAAT LOGOUT --}}
                 @if(Auth::check())
                     <span class="me-3 fw-bold text-muted d-none d-sm-inline" style="font-size: 14px;">Halo, {{ Auth::user()->name }}</span>
                     <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-weight: bold;">
@@ -195,33 +243,53 @@
     <!-- Script Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Script JavaScript untuk Toggle Sidebar -->
+    <!-- Script JavaScript untuk Toggle Sidebar (Responsive) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('toggleSidebar');
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
+            const overlay = document.getElementById('sidebarOverlay');
 
-            // Cek status sidebar dari localStorage (agar tidak reset saat refresh)
-            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            if (isCollapsed && sidebar) {
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('expanded');
-            }
+            // Cek lebar layar
+            const isMobile = window.innerWidth < 992;
 
-            // Fungsi saat tombol diklik (cek dulu apakah tombolnya ada)
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', function() {
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('expanded');
-
-                    // Simpan status ke localStorage
-                    if (sidebar.classList.contains('collapsed')) {
-                        localStorage.setItem('sidebarCollapsed', 'true');
+                    if (window.innerWidth < 992) {
+                        // --- LOGIKA UNTUK MOBILE ---
+                        sidebar.classList.toggle('show-mobile');
+                        overlay.classList.toggle('show');
                     } else {
-                        localStorage.setItem('sidebarCollapsed', 'false');
+                        // --- LOGIKA UNTUK DESKTOP ---
+                        sidebar.classList.toggle('collapsed');
+                        mainContent.classList.toggle('expanded');
+                        
+                        // Simpan status ke localStorage (Hanya untuk desktop)
+                        if (sidebar.classList.contains('collapsed')) {
+                            localStorage.setItem('sidebarCollapsed', 'true');
+                        } else {
+                            localStorage.setItem('sidebarCollapsed', 'false');
+                        }
                     }
                 });
+            }
+
+            // Tutup sidebar jika overlay diklik (di mobile)
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('show-mobile');
+                    overlay.classList.remove('show');
+                });
+            }
+
+            // Cek status sidebar saat halaman dimuat (khusus desktop)
+            if (window.innerWidth >= 992) {
+                const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+                if (isCollapsed && sidebar) {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('expanded');
+                }
             }
         });
     </script>

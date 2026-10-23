@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -7,54 +6,90 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\IzinController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\GuruExportController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\GuruController;
+use App\Http\Controllers\AlasanKeterlambatanController;
 
-// Halaman utama
+// ==========================================
+// ROUTE PUBLIK (Bisa diakses tanpa login)
+// ==========================================
+
+// Halaman utama redirect ke login
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// Login
-Route::get('/login', [AuthController::class, 'showLogin'])
-    ->name('login');
-
+// Auth (Login & Register)
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
 
-// Semua halaman setelah login
+
+// ==========================================
+// ROUTE UNTUK SEMUA USER YANG SUDAH LOGIN (Auth)
+// ==========================================
 Route::middleware('auth')->group(function () {
 
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Isi Absensi
-    Route::get('/absensi', [AbsensiController::class, 'index'])
-        ->name('absensi.index');
+    // Dashboard (Admin, Guru, Siswa)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::post('/absensi/masuk', [AbsensiController::class, 'masuk'])
-        ->name('absensi.masuk');
+    // --- FITUR ABSENSI ---
+    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
+    Route::post('/absensi/masuk', [AbsensiController::class, 'masuk'])->name('absensi.masuk');
+    Route::post('/absensi/pulang', [AbsensiController::class, 'pulang'])->name('absensi.pulang');
+    Route::get('/absensi/riwayat', [AbsensiController::class, 'riwayat'])->name('absensi.riwayat');
+    
+    // Alasan Terlambat
+    Route::post('/absensi/alasan-terlambat', [AlasanKeterlambatanController::class, 'simpan'])
+        ->name('absensi.alasan.simpan');
 
-    Route::post('/absensi/pulang', [AbsensiController::class, 'pulang'])
-        ->name('absensi.pulang');
+    // --- FITUR JURNAL PKL ---
+    Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
+    Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
 
-    // Riwayat Absensi
-    Route::get('/absensi/riwayat', [AbsensiController::class, 'riwayat'])
-        ->name('absensi.riwayat');
+    // --- FITUR IZIN ---
+    Route::get('/izin', [IzinController::class, 'index'])->name('izin.index');
+    Route::post('/izin', [IzinController::class, 'store'])->name('izin.store');
 
-    // Jurnal Harian PKL
-    Route::get('/jurnal', [JurnalController::class, 'index'])
-        ->name('jurnal.index');
+    // --- FITUR KHUSUS GURU ---
+    Route::prefix('guru')->name('guru.')->group(function () {
+        Route::get('/dashboard', function () {
+            return view('dashboard.user_guru');
+        });
+        Route::get('/jurnal', [GuruController::class, 'index']);
+        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai']);
+        
+        // Export
+        Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');
+        Route::get('/export/pdf', [GuruExportController::class, 'pdf'])->name('export.pdf');
+    });
 
-    Route::post('/jurnal', [JurnalController::class, 'store'])
-        ->name('jurnal.store');
-
-    // Pengajuan Izin
-    Route::get('/izin', [IzinController::class, 'index'])
-        ->name('izin.index');
-
-    Route::post('/izin', [IzinController::class, 'store'])
-        ->name('izin.store');
 });
 
-// Logout
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
+
+// ==========================================
+// ROUTE KHUSUS ADMIN (Auth + isAdmin)
+// ==========================================
+Route::middleware(['auth', 'isAdmin'])->group(function () {
+    
+    // Dashboard Admin
+    Route::get('/admin/dashboard', [AdminController::class, 'index']);
+
+    // Manajemen User
+    Route::get('/admin/tambah-user', [AdminController::class, 'createUser']);
+    Route::post('/admin/tambah-user', [AdminController::class, 'storeUser']);
+    Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser']);
+    Route::put('/admin/edit-user/{id}', [AdminController::class, 'updateUser']);
+    Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser']);
+    
+    // Pengaturan
+    Route::get('/admin/setting', [SettingController::class, 'index']);
+    Route::put('/admin/setting', [SettingController::class, 'update']);
+
+});
