@@ -8,83 +8,114 @@ use App\Models\Setting;
 class SettingController extends Controller
 {
     // ============================================
-    // 1. MENAMPILKAN HALAMAN PENGATURAN ADMIN
+    // 1. MENAMPILKAN PENGATURAN MINGGUAN
     // ============================================
     public function index()
     {
-        // Mengambil semua pengaturan yang tersimpan.
-        $settings = Setting::all();
+        $settings = Setting::pluck('value', 'key')->toArray();
 
-        // Daftar hari untuk pengaturan jam masuk.
         $daftarHari = [
-            'senin',
-            'selasa',
-            'rabu',
-            'kamis',
-            'jumat',
-            'sabtu',
-            'minggu',
+            'senin'  => 'Senin',
+            'selasa' => 'Selasa',
+            'rabu'   => 'Rabu',
+            'kamis'  => 'Kamis',
+            'jumat'  => 'Jumat',
+            'sabtu'  => 'Sabtu',
+            'minggu' => 'Minggu',
         ];
 
-        // Mengambil jam masuk setiap hari dari database.
-        // Jika belum ada, gunakan jam default 08:00.
-        $jadwalJam = [];
+        // Nilai default untuk setiap hari.
+        $default = [
+            'waktu_masuk'     => '07:00',
+            'batas_jam_telat' => '07:15',
+            'jam_pulang'      => '15:00',
+        ];
 
-        foreach ($daftarHari as $hari) {
-            $key = 'jam_masuk_' . $hari;
+        $jadwalMingguan = [];
 
-            $setting = Setting::where('key', $key)->first();
+        foreach ($daftarHari as $hari => $namaHari) {
+            foreach ($default as $jenis => $jamDefault) {
+                $key = $jenis . '_' . $hari;
 
-            $jadwalJam[$hari] = $setting
-                ? substr($setting->value, 0, 5)
-                : '08:00';
+                $jadwalMingguan[$hari][$jenis] =
+                    isset($settings[$key])
+                        ? substr($settings[$key], 0, 5)
+                        : $jamDefault;
+            }
         }
 
-        // Mengirim data ke halaman Blade.
         return view('dashboard.pengaturan', compact(
-            'settings',
-            'jadwalJam'
+            'daftarHari',
+            'jadwalMingguan'
         ));
     }
 
     // ============================================
-    // 2. MENYIMPAN JADWAL JAM MASUK MINGGUAN
+    // 2. MENYIMPAN PENGATURAN 7 HARI
     // ============================================
     public function update(Request $request)
     {
-        // Memastikan seluruh jam menggunakan format HH:MM.
-        $request->validate([
-            'jam_masuk_senin'  => 'required|date_format:H:i',
-            'jam_masuk_selasa' => 'required|date_format:H:i',
-            'jam_masuk_rabu'   => 'required|date_format:H:i',
-            'jam_masuk_kamis'  => 'required|date_format:H:i',
-            'jam_masuk_jumat'  => 'required|date_format:H:i',
-            'jam_masuk_sabtu'  => 'required|date_format:H:i',
-            'jam_masuk_minggu' => 'required|date_format:H:i',
-        ]);
-
-        // Menyimpan jam masing-masing hari ke database.
         $daftarHari = [
-            'senin',
-            'selasa',
-            'rabu',
-            'kamis',
-            'jumat',
-            'sabtu',
-            'minggu',
+            'senin', 'selasa', 'rabu', 'kamis',
+            'jumat', 'sabtu', 'minggu',
         ];
 
+        $jenisWaktu = [
+            'waktu_masuk',
+            'batas_jam_telat',
+            'jam_pulang',
+        ];
+
+        // Validasi semua 21 input waktu.
+        $aturan = [];
+
         foreach ($daftarHari as $hari) {
+            foreach ($jenisWaktu as $jenis) {
+                $aturan[$jenis . '_' . $hari] =
+                    'required|date_format:H:i';
+            }
+        }
+
+        $data = $request->validate($aturan);
+
+        // Periksa urutan waktu untuk masing-masing hari.
+        foreach ($daftarHari as $hari) {
+            $masuk = $data['waktu_masuk_' . $hari];
+            $telat = $data['batas_jam_telat_' . $hari];
+            $pulang = $data['jam_pulang_' . $hari];
+
+            if ($telat < $masuk) {
+                return back()
+                    ->withErrors([
+                        'batas_jam_telat_' . $hari =>
+                            'Batas jam telat hari ' . ucfirst($hari) .
+                            ' tidak boleh lebih awal dari waktu masuk.',
+                    ])
+                    ->withInput();
+            }
+
+            if ($pulang < $telat) {
+                return back()
+                    ->withErrors([
+                        'jam_pulang_' . $hari =>
+                            'Jam pulang hari ' . ucfirst($hari) .
+                            ' tidak boleh lebih awal dari batas jam telat.',
+                    ])
+                    ->withInput();
+            }
+        }
+
+        // Simpan setiap pengaturan menggunakan key per hari.
+        foreach ($data as $key => $value) {
             Setting::updateOrCreate(
-                ['key' => 'jam_masuk_' . $hari],
-                ['value' => $request->input('jam_masuk_' . $hari)]
+                ['key' => $key],
+                ['value' => $value]
             );
         }
 
-        // Kembali ke halaman pengaturan dengan pesan sukses.
         return back()->with(
             'success',
-            'Jadwal jam masuk mingguan berhasil disimpan!'
+            'Jadwal absensi untuk 7 hari berhasil disimpan!'
         );
     }
 }
