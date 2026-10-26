@@ -196,10 +196,60 @@
                 <li><a href="/admin/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
             @endif
 
-            <!-- Bagian Pengaturan -->
-            <li class="menu-label mt-4">Pengaturan</li>
-            <li><a href="/admin/setting" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
-            
+            {{-- ==========================================
+                MENU PENGATURAN BERDASARKAN ROLE
+            ========================================== --}}
+
+            @if (Auth::user()->role === 'admin')
+
+                {{-- Pengaturan Admin --}}
+                <li class="menu-label mt-4">Pengaturan</li>
+                <li>
+                    <a href="/admin/setting"
+                    class="{{ request()->is('admin/setting') ? 'active' : '' }}">
+                        <i class="bi bi-gear"></i>
+                        Pengaturan
+                    </a>
+                </li>
+
+            @elseif (Auth::user()->role === 'guru')
+
+                {{-- Pengaturan Guru --}}
+                <li class="menu-label mt-4">Pengaturan</li>
+                <li>
+                    <a href="/guru/dashboard"
+                    class="{{ request()->is('guru/dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-gear"></i>
+                        Pengaturan
+                    </a>
+                </li>
+
+            @elseif (Auth::user()->role === 'user')
+
+                {{-- Pengaturan Murid --}}
+                <li class="menu-label mt-4">Pengaturan</li>
+                <li>
+                    <a href="/dashboard"
+                    class="{{ request()->is('dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-gear"></i>
+                        Pengaturan
+                    </a>
+                </li>
+
+            @elseif (Auth::user()->role === 'pembimbing')
+
+                {{-- Pengaturan Pembimbing PKL --}}
+                <li class="menu-label mt-4">Pengaturan</li>
+                <li>
+                    <a href="/pembimbing/dashboard"
+                    class="{{ request()->is('pembimbing/dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-gear"></i>
+                        Pengaturan
+                    </a>
+                </li>
+
+            @endif
+          
             <li>
                 <form action="/logout" method="POST">
                     @csrf
