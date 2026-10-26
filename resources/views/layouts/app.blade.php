@@ -182,12 +182,14 @@
                 <li><a href="/guru/izin" class="{{ request()->is('guru/izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
             @endif
 
-            <!-- Menu PEMBIMBING PKL (Bisa nilai & approve) -->
-@if(Auth::user()->role === 'pembimbing')
-    <li><a href="/pembimbing/dashboard" class="{{ request()->is('pembimbing/dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
-    <li><a href="/pembimbing/jurnal" class="{{ request()->is('pembimbing/jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
-    <li><a href="/pembimbing/izin" class="{{ request()->is('pembimbing/izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Approve Izin Siswa</a></li>
-@endif
+            <!-- Menu PEMBIMBING PKL -->
+            @if(Auth::user()->role === 'pembimbing')
+                <li><a href="/pembimbing/dashboard" class="{{ request()->is('pembimbing/dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
+                <li><a href="/pembimbing/jurnal" class="{{ request()->is('pembimbing/jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
+                <!-- TAMBAHAN: Menu Laporan Absensi Pembimbing -->
+                <li><a href="{{ route('pembimbing.laporan-absensi') }}" class="{{ request()->routeIs('pembimbing.laporan-absensi*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi</a></li>
+                <li><a href="/pembimbing/izin" class="{{ request()->is('pembimbing/izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Approve Izin Siswa</a></li>
+            @endif
 
             <!-- Menu ADMIN -->
             @if(Auth::user()->role === 'admin')
