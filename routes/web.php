@@ -67,11 +67,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
 
-        // Izin (TAMBAHKAN INI)
+        // Izin & Rekap Kehadiran (Matriks)
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
-        // 👈 TAMBAHKAN DI SINI (Baris 53)
+        // Laporan Absensi
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         
         // Export
