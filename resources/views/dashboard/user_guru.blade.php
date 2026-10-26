@@ -34,7 +34,7 @@
                 </h5>
 
                 <div class="row g-3">
-                    <!-- Card 1: Lihat & Nilai Jurnal -->
+                    <!-- Card 1: Lihat Jurnal Siswa-->
                     <div class="col-md-4">
                         <a href="/guru/jurnal" class="text-decoration-none card-menu-link">
                             <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
@@ -43,7 +43,7 @@
                                         <i class="bi bi-journal-check fs-3"></i>
                                     </div>
                                     <div class="overflow-hidden">
-                                        <h6 class="fw-bold text-dark mb-1">Lihat & Nilai Jurnal</h6>
+                                        <h6 class="fw-bold text-dark mb-1">Lihat Jurnal Siswa</h6>
                                         <p class="text-muted small mb-0 text-truncate-2">Periksa jurnal siswa dan berikan nilai.</p>
                                     </div>
                                     <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
