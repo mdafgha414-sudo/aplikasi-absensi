@@ -364,10 +364,38 @@
      AKHIR JAM REALTIME
 ========================================== --}}
 
-        <h5 class="section-title mb-1">Ringkasan Kehadiran</h5>
-        <p class="section-desc">
-            Berikut informasi absensi kamu hari ini.
-        </p>
+        
+    <h5 class="section-title mb-1">Ringkasan Kehadiran</h5>
+
+    <p class="section-desc">
+        Berikut informasi absensi kamu hari ini.
+    </p>
+
+    <div class="info-box mb-3">
+        <i class="bi bi-clock me-2"></i>
+        Batas jam masuk hari ini:
+        <strong>{{ $jamMasukHariIni }}</strong>
+    </div>
+    ```
+
+    ## Hasil yang akan terlihat
+
+    Misalnya admin mengatur jadwal berikut:
+
+    <box border radius="lg" padding={4} gap={3}>
+    <row align="center" gap={3}>
+        <icon name="calendar-clock" size="2xl" color="#5146e5" />
+        <box flex="1" gap={1}>
+        <text color="secondary" size="sm">Batas jam masuk hari ini</text>
+        <title size="2xl">07:30</title>
+        <text color="secondary" size="sm">Mengikuti jadwal yang disimpan admin</text>
+        </box>
+    </row>
+    </box>
+
+    Jika besok jadwal admin berubah menjadi pukul 08:00, halaman siswa akan otomatis menampilkan **08:00**, selama pengaturan harian tersimpan dengan benar.
+
+    **Catatan:** jam tersebut adalah batas penentuan status tepat waktu atau terlambat, bukan jam aktual siswa melakukan absensi. Jam aktual tetap dicatat saat siswa menekan tombol absen.
     </div>
 
     {{-- Kartu absensi --}}
