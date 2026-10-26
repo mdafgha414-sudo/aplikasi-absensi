@@ -65,12 +65,12 @@ Route::middleware('auth')->group(function () {
 
         // Jurnal
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
-        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai'); // <-- TAMBAHKAN INI
+        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
         
         // Laporan Absensi
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
 
-          // TAMBAHKAN ROUTE IZIN INI UNTUK GURU
+        // Izin Guru
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
@@ -84,6 +84,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', function () {
             return view('dashboard.user_pembimbing');
         })->name('dashboard');
+
+        // Laporan Absensi Pembimbing (Diperbaiki)
+        Route::get('/laporan-absensi', [AbsensiController::class, 'laporanAbsensi'])->name('laporan-absensi');
 
         // Gunakan GuruController
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
