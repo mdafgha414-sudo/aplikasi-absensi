@@ -681,24 +681,29 @@
                                                     Edit
                                                 </a>
 
-                                                <form
-                                                    action="{{ url('/admin/hapus-user/' . $pengguna->id) }}"
-                                                    method="POST"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
+                                                {{-- Tombol Hapus: akun Admin dilindungi --}}
+                                                @if (strtolower($pengguna->role) !== 'admin')
 
-                                                    @csrf
-                                                    @method('DELETE')
+                                                    <form
+                                                        action="{{ url('/admin/hapus-user/' . $pengguna->id) }}"
+                                                        method="POST"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
 
-                                                    <button
-                                                        type="submit"
-                                                        class="btn btn-outline-danger btn-action">
+                                                        @csrf
+                                                        @method('DELETE')
 
-                                                        <i class="bi bi-trash3"></i>
-                                                        Hapus
-                                                    </button>
+                                                        <button
+                                                            type="submit"
+                                                            class="btn btn-outline-danger btn-action">
 
-                                                </form>
+                                                            <i class="bi bi-trash3"></i>
+                                                            Hapus
+                                                        </button>
+
+                                                    </form>
+
+                                                @endif
 
                                             </div>
                                         </td>

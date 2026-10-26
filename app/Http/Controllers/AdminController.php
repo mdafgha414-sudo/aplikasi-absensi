@@ -82,6 +82,15 @@ class AdminController extends Controller
     public function destroyUser($id)
     {
         $pengguna = User::findOrFail($id);
+
+        if (strtolower($pengguna->role) === 'admin') {
+            return back()->with(
+                'error',
+                'Akun Admin tidak boleh dihapus!'
+            );
+        }
+
+        // Lanjutkan proses penghapusan yang sudah ada.
         $pengguna->delete();
 
         return redirect('/admin/dashboard')->with('success', 'Pengguna berhasil dihapus!');

@@ -40,7 +40,7 @@
                     <label class="form-label fw-bold">Daftar Sebagai</label>
                     <select name="role" class="form-select" required>
                         <option value="user">Siswa (PKL)</option>
-                        <option value="guru">Guru Pembimbing</option>
+                        <option value="guru">Guru</option>
                           <option value="pembimbing">Pembimbing PKL</option> <!-- TAMBAHKAN INI -->
                     </select>
                     <small class="text-muted">Pilih role agar sistem mengarahkan ke dashboard yang tepat.</small>
