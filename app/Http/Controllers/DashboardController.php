@@ -2,31 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Absensi;
 use App\Models\AlasanKeterlambatan;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Ambil data user yang sedang login
+        // Ambil pengguna yang sedang login
         $user = Auth::user();
 
-        // Cek role-nya
-        if ($user->role === 'admin') {
-            // Jika admin, tampilkan view dashboard/admin.blade.php
-            return view('dashboard.admin'); 
+        // Jika belum login, arahkan ke halaman login
+        if (!$user) {
+            return redirect()->route('login');
         }
 
-        // Jika user biasa, tampilkan view dashboard/user.blade.php
-        return view('dashboard.user'); 
+        // =====================================
+        // DASHBOARD ADMIN
+        // =====================================
+        if ($user->role === 'admin') {
 
+            // Hitung jumlah seluruh pengguna
+            $totalUser = User::count();
+
+            // Ambil data pengguna dengan pagination
+            $semuaPengguna = User::orderBy('id', 'desc')
+                ->paginate(10, ['*'], 'pengguna_page');
+
+            // Ambil laporan absensi beserta data pengguna
+            $semuaAbsensi = Absensi::with('user')
+                ->orderBy('tanggal', 'desc')
+                ->paginate(10, ['*'], 'absensi_page');
+
+            // Kirim seluruh variabel yang diperlukan
+            // oleh dashboard admin
+            return view('dashboard.admin', compact(
+                'totalUser',
+                'semuaPengguna',
+                'semuaAbsensi'
+            ));
+        }
+
+        // =====================================
+        // DASHBOARD USER
+        // =====================================
+
+        // Ambil alasan keterlambatan hari ini
         $alasanTerlambatHariIni = AlasanKeterlambatan::query()
-    ->where('user_id', auth()->id())
-    ->whereDate('tanggal', now('Asia/Jakarta')->toDateString())
-    ->value('alasan');
+            ->where('user_id', $user->id)
+            ->whereDate(
+                'tanggal',
+                now('Asia/Jakarta')->toDateString()
+            )
+            ->value('alasan');
 
-        return view('dashboard.user', compact('alasanTerlambatHariIni'));
+        // Tampilkan dashboard pengguna
+        return view('dashboard.user', compact(
+            'alasanTerlambatHariIni'
+        ));
     }
 }
