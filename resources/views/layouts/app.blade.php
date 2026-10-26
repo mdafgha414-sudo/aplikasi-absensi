@@ -158,7 +158,7 @@
             <i class="bi bi-clipboard-check"></i>
             <div>
                 Timetrix
-                <span>Academic Portal</span>
+                <span>Attendence System</span>
             </div>
         </a>
 
