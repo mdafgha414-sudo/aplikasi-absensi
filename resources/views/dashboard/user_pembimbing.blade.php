@@ -1,24 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-3">
-    <!-- Banner Sambutan -->
+<div class="container-fluid py-4 px-lg-5" style="background-color: #f8fafc; min-height: 100vh;">
+    
+    <!-- Banner Sambutan Minimalis (Biru Lebih Pekat & Kontras) -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 p-lg-5">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                    <div>
-                        <span class="badge bg-white text-primary mb-2 px-3 py-2 rounded-pill fw-bold">
-                            Pembimbing Workspace
-                        </span>
-                        <h2 class="fw-bold mb-2 display-6">Selamat Datang, {{ Auth::user()->name }}!</h2>
-                        <p class="mb-0 opacity-75">
-                            Kelola, nilai jurnal, dan setujui pengajuan izin siswa bimbingan PKL Anda di sini.
+            <div class="p-4 p-lg-5 rounded-4 bg-white border border-light-subtle shadow-2xs position-relative overflow-hidden">
+                
+                <!-- Motif Background Aksen Biru Lebih Pekat -->
+                <div class="banner-pattern-bg"></div>
+                <div class="banner-glow-circle"></div>
+                <div class="banner-glow-circle-2"></div>
+                
+                <div class="row align-items-center position-relative z-1">
+                    <div class="col-lg-8">
+                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary text-white fw-semibold small mb-3 shadow-sm">
+                            <i class="bi bi-circle-fill" style="font-size: 6px;"></i> Pembimbing Workspace
+                        </div>
+                        <h2 class="fw-bold text-dark mb-2 tracking-tight">Selamat Datang, {{ Auth::user()->name }}</h2>
+                        <p class="text-secondary mb-0 fs-6">
+                            Kelola jurnal, nilai aktivitas, dan setujui pengajuan izin siswa bimbingan PKL Anda dengan mudah.
                         </p>
-                    </div>
-                    <!-- Ikon Banner Kanan -->
-                    <div class="d-none d-md-flex align-items-center justify-content-center bg-white bg-opacity-10 rounded-4 p-3 me-2" style="width: 90px; height: 90px;">
-                        <i class="bi bi-person-badge display-4 text-white"></i>
                     </div>
                 </div>
             </div>
@@ -28,88 +31,158 @@
     <!-- Section Menu Utama -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4">
-                <h5 class="fw-bold mb-4 text-dark d-flex align-items-center gap-2">
-                    <i class="bi bi-grid-fill text-primary"></i> Menu Utama
-                </h5>
+            <div class="mb-3 px-1">
+                <h5 class="fw-bold text-dark mb-1">Menu Utama</h5>
+                <p class="text-secondary small mb-0">Pilih menu navigasi di bawah untuk mulai bekerja</p>
+            </div>
 
-                <div class="row g-3">
-                    <!-- Card 1: Lihat & Nilai Jurnal -->
-                    <div class="col-md-4">
-                        <a href="/pembimbing/jurnal" class="text-decoration-none card-menu-link">
-                            <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-success text-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
-                                        <i class="bi bi-journal-check fs-3"></i>
+            <div class="row g-3">
+                <!-- Card 1: Lihat & Nilai Jurnal -->
+                <div class="col-md-4">
+                    <a href="{{ url('/pembimbing/jurnal') }}" class="text-decoration-none group-link">
+                        <div class="card border border-light-subtle rounded-4 p-4 h-100 bg-white shadow-2xs custom-card-hover">
+                            <div class="d-flex flex-column h-100 justify-content-between gap-4">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="icon-box bg-primary text-white rounded-3 d-flex align-items-center justify-content-center shadow-xs">
+                                        <i class="bi bi-journal-check fs-4"></i>
                                     </div>
-                                    <div class="overflow-hidden">
-                                        <h6 class="fw-bold text-dark mb-1">Lihat & Nilai Jurnal</h6>
-                                        <p class="text-muted small mb-0 text-truncate-2">Periksa jurnal siswa dan berikan nilai.</p>
-                                    </div>
-                                    <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
+                                    <span class="text-muted small fw-medium arrow-move">
+                                        <i class="bi bi-arrow-right fs-5"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1 title-color">Lihat & Nilai Jurnal</h6>
+                                    <p class="text-secondary small mb-0 line-clamp-2">Periksa jurnal harian siswa dan berikan penilaian.</p>
                                 </div>
                             </div>
-                        </a>
-                    </div>
-
-                    <!-- Card 2: Laporan Absensi (SUDAH DIPERBAIKI) -->
-                    <div class="col-md-4">
-                        <a href="/pembimbing/laporan-absensi" class="text-decoration-none card-menu-link">
-                            <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
-                                        <i class="bi bi-calendar-check fs-3"></i>
-                                    </div>
-                                    <div class="overflow-hidden">
-                                        <h6 class="fw-bold text-dark mb-1">Laporan Absensi</h6>
-                                        <p class="text-muted small mb-0 text-truncate-2">Pantau kehadiran dan status siswa.</p>
-                                    </div>
-                                    <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Card 3: Daftar Izin Siswa -->
-                    <div class="col-md-4">
-                        <a href="/pembimbing/izin" class="text-decoration-none card-menu-link">
-                            <div class="card border rounded-4 h-100 p-3 card-menu-hover transition-all">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-warning text-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 52px; height: 52px;">
-                                        <i class="bi bi-envelope-paper fs-3"></i>
-                                    </div>
-                                    <div class="overflow-hidden">
-                                        <h6 class="fw-bold text-dark mb-1">Daftar Izin Siswa</h6>
-                                        <p class="text-muted small mb-0 text-truncate-2">Lihat dan setujui pengajuan izin.</p>
-                                    </div>
-                                    <i class="bi bi-chevron-right text-muted ms-auto fs-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
+                        </div>
+                    </a>
                 </div>
+
+                <!-- Card 2: Laporan Absensi -->
+                <div class="col-md-4">
+                    <a href="{{ url('/pembimbing/laporan-absensi') }}" class="text-decoration-none group-link">
+                        <div class="card border border-light-subtle rounded-4 p-4 h-100 bg-white shadow-2xs custom-card-hover">
+                            <div class="d-flex flex-column h-100 justify-content-between gap-4">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="icon-box bg-primary text-white rounded-3 d-flex align-items-center justify-content-center shadow-xs">
+                                        <i class="bi bi-calendar-check fs-4"></i>
+                                    </div>
+                                    <span class="text-muted small fw-medium arrow-move">
+                                        <i class="bi bi-arrow-right fs-5"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1 title-color">Laporan Absensi</h6>
+                                    <p class="text-secondary small mb-0 line-clamp-2">Pantau rekapitulasi kehadiran dan status siswa.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 3: Daftar Izin Siswa -->
+                <div class="col-md-4">
+                    <a href="{{ url('/pembimbing/izin') }}" class="text-decoration-none group-link">
+                        <div class="card border border-light-subtle rounded-4 p-4 h-100 bg-white shadow-2xs custom-card-hover">
+                            <div class="d-flex flex-column h-100 justify-content-between gap-4">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="icon-box bg-primary text-white rounded-3 d-flex align-items-center justify-content-center shadow-xs">
+                                        <i class="bi bi-envelope-paper fs-4"></i>
+                                    </div>
+                                    <span class="text-muted small fw-medium arrow-move">
+                                        <i class="bi bi-arrow-right fs-5"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1 title-color">Daftar Izin Siswa</h6>
+                                    <p class="text-secondary small mb-0 line-clamp-2">Lihat dan setujui pengajuan izin atau sakit siswa.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Styling khusus tampilan menu */
-    .transition-all {
-        transition: all 0.25s ease-in-out;
+    /* Motif Geometric Grid & Lingkaran dengan Biru yang Lebih Pekat/Solid */
+    .banner-pattern-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 400px;
+        height: 100%;
+        background-image: radial-gradient(rgba(13, 110, 253, 0.45) 2px, transparent 2px);
+        background-size: 16px 16px;
+        mask-image: linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+        -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+        pointer-events: none;
     }
-    .card-menu-hover {
-        background-color: #f8f9fa;
-        border-color: #e9ecef !important;
+
+    .banner-glow-circle {
+        position: absolute;
+        top: -40px;
+        right: -20px;
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        background: rgba(13, 110, 253, 0.16);
+        filter: blur(25px);
+        pointer-events: none;
     }
-    .card-menu-link:hover .card-menu-hover {
-        background-color: #ffffff !important;
+
+    .banner-glow-circle-2 {
+        position: absolute;
+        bottom: -40px;
+        right: 160px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 2px dashed rgba(13, 110, 253, 0.35);
+        pointer-events: none;
+    }
+
+    /* Kotak ikon menu utama menggunakan latar biru pekat */
+    .icon-box {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Card Hover minimalis */
+    .custom-card-hover {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .group-link:hover .custom-card-hover {
         border-color: #0d6efd !important;
-        transform: translateY(-3px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(13, 110, 253, 0.08), 0 8px 10px -6px rgba(13, 110, 253, 0.08) !important;
     }
-    .text-truncate-2 {
+
+    .group-link:hover .title-color {
+        color: #0d6efd !important;
+    }
+
+    .group-link:hover .arrow-move {
+        transform: translateX(4px);
+        color: #0d6efd !important;
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    /* Utilitas */
+    .shadow-2xs {
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    }
+
+    .shadow-xs {
+        box-shadow: 0 1px 3px rgba(13, 110, 253, 0.2);
+    }
+    
+    .line-clamp-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
