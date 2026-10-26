@@ -58,8 +58,6 @@
                             <th class="py-3">Nama Siswa</th>
                             <th class="py-3">Kegiatan</th>
                             <th class="py-3">Kendala</th>
-                            <th class="py-3" style="width: 180px;">Status / Nilai</th>
-                            <th class="pe-4 py-3 text-end" style="width: 120px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,63 +81,6 @@
                                 </td>
                                 <td>
                                     <p class="mb-0 text-muted small text-truncate-2" style="max-width: 200px;">{{ $jurnal->kendala ?? '-' }}</p>
-                                </td>
-                                <td>
-                                    @if($jurnal->nilai)
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded-pill fw-semibold">
-                                            <i class="bi bi-star-fill me-1"></i> Nilai: {{ $jurnal->nilai }}
-                                        </span>
-                                        @if($jurnal->catatan_guru)
-                                            <div class="small text-muted mt-1 text-truncate" style="max-width: 180px;" title="{{ $jurnal->catatan_guru }}">
-                                                <i class="bi bi-chat-left-text me-1"></i> {{ $jurnal->catatan_guru }}
-                                            </div>
-                                        @endif
-                                    @else
-                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1.5 rounded-pill fw-semibold">
-                                            <i class="bi bi-clock-history me-1"></i> Belum Dinilai
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="pe-4 text-end">
-                                    <!-- Tombol Buka Modal -->
-                                    <button type="button" class="btn btn-sm btn-primary rounded-3 px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNilai{{ $jurnal->id }}">
-                                        <i class="bi bi-pencil-square me-1"></i> Nilai
-                                    </button>
-
-                                    <!-- Modal Penilaian -->
-                                    <div class="modal fade text-start" id="modalNilai{{ $jurnal->id }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
-                                                <div class="modal-header bg-light border-bottom p-4">
-                                                    <div>
-                                                        <h5 class="modal-title fw-bold text-dark mb-1">Penilaian Jurnal</h5>
-                                                        <p class="text-muted small mb-0">Siswa: <strong>{{ $jurnal->user->name }}</strong></p>
-                                                    </div>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="/guru/nilai/{{ $jurnal->id }}" method="POST">
-                                                    @csrf
-                                                    <div class="modal-body p-4">
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-semibold text-dark small">Nilai (0 - 100) <span class="text-danger">*</span></label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-award text-muted"></i></span>
-                                                                <input type="number" name="nilai" class="form-control border-start-0" value="{{ $jurnal->nilai }}" placeholder="Masukkan angka 0-100" required min="0" max="100">
-                                                            </div>
-                                                        </div>
-                                                        <div class="mb-0">
-                                                            <label class="form-label fw-semibold text-dark small">Catatan / Evaluasi Guru</label>
-                                                            <textarea name="catatan_guru" class="form-control" rows="3" placeholder="Tuliskan umpan balik atau saran untuk siswa...">{{ $jurnal->catatan_guru }}</textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer bg-light border-top p-3">
-                                                        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" class="btn btn-primary rounded-3 px-4">Simpan Penilaian</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </td>
                             </tr>
                         @empty
