@@ -198,105 +198,17 @@
                                         ]);
                                     }
                                 @endphp
-
-                                <span class="type-badge {{ $jenisClass }}">
-                                    {{ $izin->jenis_izin }}
-                                </span>
-
-                                <span class="date-sub">
-                                    <i class="bi bi-calendar-event me-1"></i>
-                                    {{ \Carbon\Carbon::parse($izin->tanggal_izin)->format('d M Y') }}
-                                </span>
-                            </td>
-
-                            {{-- ALASAN --}}
-                            <td>
-                                <span class="reason-text">
-                                    {{ $izin->alasan }}
-                                </span>
-                            </td>
-
-                            {{-- LAMPIRAN --}}
-                            <td>
-                                @if($izin->lampiran)
-                                    <a
-                                        href="{{ asset('storage/' . $izin->lampiran) }}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="attachment-badge attachment-link"
-                                    >
-                                        <i class="bi bi-paperclip"></i>
-                                        Lihat
-                                    </a>
-                                @else
-                                    <span class="attachment-badge">
-                                        <i class="bi bi-paperclip"></i>
-                                        Tidak ada
-                                    </span>
-                                @endif
-                            </td>
-
-                            {{-- STATUS --}}
-                            <td>
-                                @if($izin->status == 'Menunggu')
-                                    <span class="status-badge status-menunggu">
-                                        <i class="bi bi-clock"></i>
-                                        Menunggu
-                                    </span>
-                                @elseif($izin->status == 'Disetujui')
-                                    <span class="status-badge status-disetujui">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                        Disetujui
-                                    </span>
-                                @else
-                                    <span class="status-badge status-ditolak">
-                                        <i class="bi bi-x-circle-fill"></i>
-                                        Ditolak
-                                    </span>
-                                @endif
-                            </td>
-
-                            {{-- AKSI --}}
-                            <td>
-                                <div class="action-group">
-                                    @if($izin->status == 'Menunggu')
-
-                                        <form action="/guru/izin/{{ $izin->id }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Yakin ingin menyetujui pengajuan izin ini?')">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <input type="hidden"
-                                                   name="status"
-                                                   value="Disetujui">
-
-                                            <button type="submit"
-                                                    class="action-btn btn-approve"
-                                                    title="Setujui"
-                                                    aria-label="Setujui izin">
-                                                <i class="bi bi-check-lg"></i>
-                                            </button>
-                                        </form>
-
-                                        <form action="/guru/izin/{{ $izin->id }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Yakin ingin menolak pengajuan izin ini?')">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <input type="hidden"
-                                                   name="status"
-                                                   value="Ditolak">
-
-                                            <button type="submit"
-                                                    class="action-btn btn-reject"
-                                                    title="Tolak"
-                                                    aria-label="Tolak izin">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        </form>
-
+                                <td>
+                                    @if($finalStatus == 'Hadir' || $finalStatus == 'Tepat Waktu')
+                                        <span class="status-box status-hadir"><i class="bi bi-check-lg"></i></span>
+                                    @elseif($finalStatus == 'Izin')
+                                        <a href="javascript:void(0)" class="status-box status-izin clickable" onclick="showDetailIzin({{ $jsonIzin }})">I</a>
+                                    @elseif($finalStatus == 'Sakit')
+                                        <a href="javascript:void(0)" class="status-box status-sakit clickable" onclick="showDetailIzin({{ $jsonIzin }})">S</a>
+                                    @elseif($finalStatus == 'Alpa' || $finalStatus == 'Tidak Hadir')
+                                        <span class="status-box status-alpa">A</span>
+                                    @elseif($finalStatus == 'Libur')
+                                        <span class="status-box status-empty"><i class="bi bi-dot" style="font-size:24px; line-height:0;"></i></span>
                                     @else
                                         <span class="status-box status-empty"><i class="bi bi-dot" style="font-size:24px; line-height:0;"></i></span>
                                     @endif
