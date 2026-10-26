@@ -5,8 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Jurnal;
 use App\Models\User;
+<<<<<<< HEAD
 use App\Models\Absensi; 
 use App\Models\Izin; 
+=======
+use App\Models\Izin; 
+use App\Models\Absensi;
+>>>>>>> 3533e216f3ad1c5e383005b33ccb6df163a254ee
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon; 
 
@@ -42,13 +47,19 @@ class GuruController extends Controller
         return back()->with('success', 'Penilaian dan catatan berhasil disimpan!');
     }
 
+<<<<<<< HEAD
     // ==========================================
     // 3. LAPORAN ABSENSI GURU
     // ==========================================
+=======
+    // 3. Menampilkan daftar pengajuan izin siswa
+    // 3. Tambahan fungsi untuk Laporan Absensi Guru
+>>>>>>> 3533e216f3ad1c5e383005b33ccb6df163a254ee
     public function laporanAbsensi()
     {
         $laporanAbsensi = Absensi::with('user')->latest()->get(); 
         return view('guru.laporan-absensi', compact('laporanAbsensi'));
+<<<<<<< HEAD
     }
 
     // ==========================================
@@ -104,6 +115,23 @@ class GuruController extends Controller
     // ==========================================
     // 5. PROSES PERSETUJUAN / PENOLAKAN IZIN
     // ==========================================
+=======
+    } // <-- INI YANG KURANG (Tutup kurung kurawal fungsi laporanAbsensi)
+
+    // ==========================================
+    // FITUR BARU: MANAJEMEN IZIN SISWA
+    // ==========================================
+
+    // 4. Menampilkan daftar pengajuan izin siswa
+    public function lihatIzin()
+    {
+        $semuaIzin = Izin::with('user')->orderBy('created_at', 'desc')->get();
+        return view('dashboard.izin_guru', compact('semuaIzin'));
+    }
+
+    // 4. Memproses persetujuan/penolakan izin DAN Sinkronisasi ke Absensi
+    // 5. Memproses persetujuan atau penolakan izin
+>>>>>>> 3533e216f3ad1c5e383005b33ccb6df163a254ee
     public function updateIzin(Request $request, $id)
     {
         $request->validate([

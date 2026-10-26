@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/absensi/alasan-terlambat', [AlasanKeterlambatanController::class, 'simpan'])
         ->name('absensi.alasan.simpan');
 
-    // --- FITUR JURNAL PKL ---
+    // --- FITUR JURNAL PKL (Siswa) ---
     Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
     Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
 
@@ -66,7 +66,7 @@ Route::middleware('auth')->group(function () {
         // Jurnal
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
-
+        
         // Izin & Rekap Kehadiran (Matriks)
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
@@ -77,6 +77,20 @@ Route::middleware('auth')->group(function () {
         // Export
         Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');
         Route::get('/export/pdf', [GuruExportController::class, 'pdf'])->name('export.pdf');
+    });
+
+    // --- FITUR KHUSUS PEMBIMBING PKL ---
+    Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
+        Route::get('/dashboard', function () {
+            return view('dashboard.user_pembimbing');
+        })->name('dashboard');
+
+        // Gunakan GuruController
+        Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
+        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
+
+        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
+        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
     });
 
 }); 

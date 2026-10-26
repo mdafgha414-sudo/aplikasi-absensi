@@ -38,7 +38,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:user,guru', 
+            'role' => 'required|in:user,guru,pembimbing', 
         ]);
 
         User::create([
@@ -66,7 +66,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$id, 
-            'role' => 'required|in:user,guru', // Tambahkan validasi role
+            'role' => 'required|in:user,guru,pembimbing', // Tambahkan validasi role
         ]);
 
         $pengguna->update([
@@ -82,6 +82,15 @@ class AdminController extends Controller
     public function destroyUser($id)
     {
         $pengguna = User::findOrFail($id);
+
+        if (strtolower($pengguna->role) === 'admin') {
+            return back()->with(
+                'error',
+                'Akun Admin tidak boleh dihapus!'
+            );
+        }
+
+        // Lanjutkan proses penghapusan yang sudah ada.
         $pengguna->delete();
 
         return redirect('/admin/dashboard')->with('success', 'Pengguna berhasil dihapus!');

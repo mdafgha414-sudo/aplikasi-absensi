@@ -16,26 +16,53 @@ class AbsensiController extends Controller
     // =====================================================
     public function index()
     {
+        // Mengambil tanggal hari ini.
         $hariIni = Carbon::today()->toDateString();
 
-        // Cari absensi milik user yang login untuk hari ini.
+        // Mencari absensi user yang login untuk hari ini.
         $absenHariIni = Absensi::where('user_id', Auth::id())
             ->where('tanggal', $hariIni)
             ->first();
 
-        // Tampilkan halaman utama absensi.
-        return view('absensi.index', compact('absenHariIni'));
+        // Menentukan nama hari dalam bahasa Indonesia.
+        $hari = [
+            1 => 'senin',
+            2 => 'selasa',
+            3 => 'rabu',
+            4 => 'kamis',
+            5 => 'jumat',
+            6 => 'sabtu',
+            7 => 'minggu',
+        ];
+
+        $nomorHari = Carbon::now()->dayOfWeekIso;
+        $namaHari = $hari[$nomorHari];
+
+        // Mengambil batas jam masuk berdasarkan hari ini.
+        $keyJam = 'jam_masuk_' . $namaHari;
+        $settingJam = Setting::where('key', $keyJam)->first();
+
+        $jamMasukHariIni = $settingJam
+            ? substr($settingJam->value, 0, 5)
+            : '08:00';
+
+        // Menampilkan halaman absensi beserta jadwal hari ini.
+        return view('absensi.index', compact(
+            'absenHariIni',
+            'jamMasukHariIni'
+        ));
     }
 
-    // =====================================================
+   // =====================================================
     // 2. PROSES ABSEN MASUK
-    // Menyimpan jam masuk dan menentukan status keterlambatan.
+    // Jam masuk mengikuti pengaturan admin setiap hari.
     // =====================================================
     public function masuk()
     {
+        // Mengambil tanggal hari ini.
         $hariIni = Carbon::today()->toDateString();
 
-        // Cek apakah user sudah memiliki absensi hari ini.
+        // Cek apakah user sudah absen hari ini.
         $cek = Absensi::where('user_id', Auth::id())
             ->where('tanggal', $hariIni)
             ->first();
@@ -47,25 +74,54 @@ class AbsensiController extends Controller
             );
         }
 
-        // Ambil pengaturan jam masuk dari database (aman jika tabel belum ada)
+       // ============================================
+        // AMBIL JAM MASUK BERDASARKAN HARI
+        // ============================================
+
+        $hari = [
+            1 => 'senin',
+            2 => 'selasa',
+            3 => 'rabu',
+            4 => 'kamis',
+            5 => 'jumat',
+            6 => 'sabtu',
+            7 => 'minggu',
+        ];
+
+        // Menentukan hari saat ini.
+        $nomorHari = Carbon::now()->dayOfWeekIso;
+        $namaHari = $hari[$nomorHari];
+
+        // Mengambil jam masuk khusus hari tersebut.
+        $keyJam = 'jam_masuk_' . $namaHari;
+
         try {
-            $setting = Setting::where('key', 'jam_masuk')->first();
+            $setting = Setting::where('key', $keyJam)->first();
+
+            // Jika belum ada pengaturan, gunakan pukul 08:00.
             $jam = $setting ? $setting->value : '08:00';
         } catch (\Exception $e) {
             $jam = '08:00';
         }
 
-        $jamMasukKantor = Carbon::createFromTimeString($jam);
+        // Mengambil waktu saat ini.
         $waktuSekarang = Carbon::now();
 
-        // Tentukan status berdasarkan jam masuk kantor.
-        $statusAbsen = 'Tepat Waktu';
+        // Membandingkan waktu dengan batas jam masuk.
+        $batasWaktu = Carbon::today()->setTimeFromTimeString($jam);
 
-        if ($waktuSekarang->format('H:i:s') > $jamMasukKantor->format('H:i:s')) {
-            $statusAbsen = 'Telat';
-        }
+        // Menentukan status absensi.
+        $statusAbsen = $waktuSekarang->lte($batasWaktu)
+            ? 'Tepat Waktu'
+            : 'Telat';  
 
-        // Simpan data absensi masuk ke database.
+        // ============================================
+        // AKHIR PENGATURAN JAM MASUK HARIAN
+        // ============================================
+
+        // ============================================
+        // SIMPAN ABSENSI KE DATABASE
+        // ============================================
         Absensi::create([
             'user_id' => Auth::id(),
             'tanggal' => $hariIni,
@@ -73,12 +129,15 @@ class AbsensiController extends Controller
             'status' => $statusAbsen,
         ]);
 
-        // Kembali ke halaman sebelumnya dengan pesan hasil.
+        // Menampilkan pesan hasil absensi.
         return back()->with(
             'success',
             'Absen masuk berhasil! Status Anda: ' . $statusAbsen
         );
     }
+    // =====================================================
+    // AKHIR PROSES ABSEN MASUK
+    // =====================================================
 
     // =====================================================
     // 3. PROSES ABSEN PULANG (YANG SEBELUMNYA HILANG)

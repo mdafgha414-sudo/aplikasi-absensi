@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('content')
@@ -78,26 +79,56 @@
     }
 
     .info-text {
-        font-size: 0.8rem;
+        font-size: .8rem;
         color: #91a0b5;
         margin-top: 5px;
+    }
+
+    .day-setting {
+        padding: 16px;
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        margin-bottom: 14px;
+        background: #fff;
+    }
+
+    .day-setting:last-child {
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 576px) {
+        .setting-card-header,
+        .setting-card-body {
+            padding: 18px;
+        }
+
+        .setting-card-title {
+            font-size: 1rem;
+        }
+
+        .btn-save {
+            padding: 10px 14px;
+        }
     }
 </style>
 
 <div class="setting-container">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-7">
-            
-            <!-- Notifikasi Sukses -->
-            @if(session('success'))
-                <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 12px; font-size: .9rem;">
-                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+
+            {{-- Notifikasi sukses --}}
+            @if (session('success'))
+                <div class="alert alert-success border-0 shadow-sm mb-4"
+                     style="border-radius: 12px; font-size: .9rem;">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    {{ session('success') }}
                 </div>
             @endif
 
-            <!-- Notifikasi Error Validasi -->
+            {{-- Notifikasi error validasi --}}
             @if ($errors->any())
-                <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 12px; font-size: .9rem;">
+                <div class="alert alert-danger border-0 shadow-sm mb-4"
+                     style="border-radius: 12px; font-size: .9rem;">
                     <ul class="mb-0">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -115,39 +146,83 @@
                 </div>
 
                 <div class="setting-card-body">
+
+                    {{-- Form pengaturan jam masuk mingguan --}}
                     <form action="/admin/setting" method="POST">
                         @csrf
                         @method('PUT')
 
-                        <div class="mb-4">
-                            <label class="form-label">Jam Masuk Kantor (Batas Tepat Waktu)</label>
-                            
-                            <!-- Input Jam -->
-                            <input 
-                                type="time" 
-                                name="jam_masuk" 
-                                class="form-control" 
-                                value="{{ $settings->where('key', 'jam_masuk')->first()->value ?? '08:00' }}" 
-                                required
-                            >
-                            
-                            <div class="info-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Pengguna yang melakukan absen masuk setelah jam ini akan otomatis tercatat sebagai <strong>"Telat"</strong>.
+                        <p class="mb-3">
+                            Atur batas jam masuk tepat waktu untuk setiap hari.
+                        </p>
+
+                        @php
+                            $daftarHari = [
+                                'senin' => 'Senin',
+                                'selasa' => 'Selasa',
+                                'rabu' => 'Rabu',
+                                'kamis' => 'Kamis',
+                                'jumat' => 'Jumat',
+                                'sabtu' => 'Sabtu',
+                                'minggu' => 'Minggu',
+                            ];
+                        @endphp
+
+                        @foreach ($daftarHari as $keyHari => $namaHari)
+                            <div class="day-setting">
+                                <label
+                                    for="jam_masuk_{{ $keyHari }}"
+                                    class="form-label"
+                                >
+                                    <i class="bi bi-calendar-day me-1"></i>
+                                    Jam Masuk Hari {{ $namaHari }}
+                                </label>
+
+                                <input
+                                    type="time"
+                                    id="jam_masuk_{{ $keyHari }}"
+                                    name="jam_masuk_{{ $keyHari }}"
+                                    class="form-control"
+                                    value="{{ old('jam_masuk_' . $keyHari, $jadwalJam[$keyHari] ?? '08:00') }}"
+                                    required
+                                >
+
+                                @error('jam_masuk_' . $keyHari)
+                                    <div class="text-danger small mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
+                        @endforeach
+
+                        <div class="info-text mt-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Jika pengguna melakukan absensi masuk setelah batas
+                            waktu yang ditetapkan pada hari tersebut, statusnya
+                            akan tercatat sebagai <strong>Telat</strong>.
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                            <a href="/admin/dashboard" class="btn btn-light border" style="border-radius: 10px;">Kembali</a>
+                        {{-- Tombol kembali dan simpan --}}
+                        <div class="d-flex flex-wrap justify-content-between
+                                    align-items-center gap-2 mt-5 pt-3 border-top">
+                            <a href="/admin/dashboard"
+                               class="btn btn-light border"
+                               style="border-radius: 10px;">
+                                Kembali
+                            </a>
+
                             <button type="submit" class="btn btn-save">
-                                <i class="bi bi-save me-2"></i> Simpan Pengaturan
+                                <i class="bi bi-save me-2"></i>
+                                Simpan Pengaturan
                             </button>
                         </div>
                     </form>
+
                 </div>
             </div>
 
         </div>
     </div>
 </div>
+
 @endsection
