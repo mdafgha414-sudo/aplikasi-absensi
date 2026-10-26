@@ -66,7 +66,6 @@ Route::middleware('auth')->group(function () {
         // Jurnal
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
-<<<<<<< HEAD
         
         // Izin & Rekap Kehadiran (Matriks)
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
@@ -74,7 +73,6 @@ Route::middleware('auth')->group(function () {
         
         // Laporan Absensi
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
-=======
         
         // Laporan Absensi
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
@@ -82,7 +80,6 @@ Route::middleware('auth')->group(function () {
         // Izin Guru
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
->>>>>>> 77ba3541edee14ab97fd9dcf3912d6bf855ec156
         
         // Export
         Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');
