@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers;
 
-// Model untuk mengambil data jurnal siswa dari database.
+use Illuminate\Http\Request;
 use App\Models\Jurnal;
-
-// Library untuk membuat file Excel.
+use App\Models\Absensi;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\JurnalExport;
-
-// Library untuk membuat file PDF.
+use App\Exports\AbsensiExport; // Tambahkan import ini
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class GuruExportController extends Controller
 {
     /**
      * EKSPOR EXCEL JURNAL SISWA
-     * Mengunduh jurnal, bukan data absensi.
      */
     public function excel()
     {
@@ -28,30 +25,59 @@ class GuruExportController extends Controller
 
     /**
      * FUNGSI EKSPOR PDF JURNAL SISWA
-     * Mengambil data jurnal dan membuat laporan PDF.
      */
     public function pdf()
     {
-        // Mengambil data jurnal beserta relasi pengguna.
-        // Relasi user digunakan untuk mendapatkan nama siswa.
         $jurnal = Jurnal::with('user')
-
-            // Mengurutkan jurnal berdasarkan tanggal terbaru.
             ->orderBy('tanggal', 'desc')
-
-            // Menjalankan query dan mengambil data dari database.
             ->get();
 
-        // Memuat template Blade khusus laporan jurnal PDF.
-        // compact('jurnal') mengirim variabel $jurnal ke template.
         $pdf = Pdf::loadView(
             'guru.laporan-jurnal-pdf',
             compact('jurnal')
         );
 
-        // Mengatur ukuran kertas A4 dengan orientasi landscape,
-        // kemudian mengunduh hasilnya sebagai file PDF.
         return $pdf->setPaper('a4', 'landscape')
             ->download('laporan-jurnal-siswa.pdf');
+    }
+
+    // ==========================================
+    // FUNGSI EXPORT ABSENSI
+    // ==========================================
+
+    /**
+     * EKSPOR EXCEL ABSENSI
+     */
+    public function exportExcelAbsensi(Request $request)
+    {
+        $bulan = $request->input('bulan', date('m'));
+        $tahun = $request->input('tahun', date('Y'));
+
+        // Panggil class AbsensiExport
+        return Excel::download(
+            new AbsensiExport($bulan, $tahun), 
+            'laporan-absensi-' . $bulan . '-' . $tahun . '.xlsx'
+        );
+    }
+
+    /**
+     * EKSPOR PDF ABSENSI
+     */
+    public function exportPdfAbsensi(Request $request)
+    {
+        $bulan = $request->input('bulan', date('m'));
+        $tahun = $request->input('tahun', date('Y'));
+
+        $absensi = Absensi::with('user')
+                    ->whereMonth('tanggal', $bulan)
+                    ->whereYear('tanggal', $tahun)
+                    ->orderBy('tanggal', 'desc')
+                    ->get();
+
+        // Pastikan file view 'guru.laporan-absensi-pdf' sudah ada
+        $pdf = Pdf::loadView('guru.laporan-absensi-pdf', compact('absensi', 'bulan', 'tahun'));
+        
+        return $pdf->setPaper('a4', 'landscape')
+            ->download('laporan-absensi-' . $bulan . '-' . $tahun . '.pdf');
     }
 }

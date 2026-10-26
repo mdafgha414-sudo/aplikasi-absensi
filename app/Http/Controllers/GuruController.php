@@ -8,7 +8,7 @@ use App\Models\Absensi;
 use App\Models\Izin; 
 use App\Models\Jurnal;
 use Carbon\Carbon; 
-use Illuminate\Support\Facades\Auth; // Tambahkan ini untuk mengecek role
+use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
 {
@@ -36,29 +36,16 @@ class GuruController extends Controller
         return back()->with('success', 'Penilaian dan catatan berhasil disimpan!');
     }
 
-    public function laporanAbsensi()
-    {
-        $laporanAbsensi = Absensi::with('user')->latest()->get(); 
-        return view('guru.laporan-absensi', compact('laporanAbsensi'));
-    }
-
     // ==========================================
-    // FUNGSI LIHAT IZIN (DIPISAH ANTARA GURU & PEMBIMBING)
+    // FUNGSI LAPORAN ABSENSI (MATRIKS)
     // ==========================================
-    public function lihatIzin(Request $request)
+    public function laporanAbsensi(Request $request)
     {
-        // 1. JIKA YANG LOGIN ADALAH PEMBIMBING
-        // Tampilkan tabel daftar izin dengan tombol Setujui/Tolak
-        if (Auth::user()->role === 'pembimbing') {
-            $semuaIzin = Izin::with('user')->orderBy('created_at', 'desc')->get();
-            return view('dashboard.izin_pembimbing', compact('semuaIzin'));
-        }
-
-        // 2. JIKA YANG LOGIN ADALAH GURU
-        // Tampilkan matriks kalender kehadiran (hanya melihat)
+        // Ambil bulan dan tahun dari request, default bulan ini
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
 
+        // Siapkan daftar tanggal 1 - 31
         $startDate = Carbon::createFromDate($tahun, $bulan, 1);
         $daysInMonth = $startDate->daysInMonth;
         $tanggalList = [];
@@ -66,8 +53,10 @@ class GuruController extends Controller
             $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
         }
 
+        // Ambil semua siswa
         $siswa = User::where('role', 'user')->orderBy('name', 'asc')->get();
 
+        // Ambil data absensi untuk bulan ini, keyBy untuk memudahkan pencarian
         $absensi = Absensi::whereMonth('tanggal', $bulan)
                           ->whereYear('tanggal', $tahun)
                           ->get()
@@ -75,6 +64,48 @@ class GuruController extends Controller
                               return $item->user_id . '-' . date('d', strtotime($item->tanggal));
                           });
 
+        // Cek role untuk menentukan view yang tepat
+        if (Auth::user()->role === 'pembimbing') {
+            // Untuk Pembimbing: arahkan ke view pembimbing
+            return view('pembimbing.laporan-absensi', compact(
+                'siswa', 'tanggalList', 'absensi', 'bulan', 'tahun'
+            ));
+        }
+
+        // Untuk Guru: arahkan ke view guru
+        return view('guru.laporan-absensi', compact(
+            'siswa', 'tanggalList', 'absensi', 'bulan', 'tahun'
+        ));
+    }
+
+    // ==========================================
+    // FUNGSI LIHAT IZIN (MATRIKS UNTUK GURU & PEMBIMBING)
+    // ==========================================
+    public function lihatIzin(Request $request)
+    {
+        $bulan = $request->input('bulan', date('m'));
+        $tahun = $request->input('tahun', date('Y'));
+
+        // 1. Siapkan daftar tanggal (1 - 31)
+        $startDate = Carbon::createFromDate($tahun, $bulan, 1);
+        $daysInMonth = $startDate->daysInMonth;
+        $tanggalList = [];
+        for ($i = 1; $i <= $daysInMonth; $i++) {
+            $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
+        }
+
+        // 2. Ambil semua siswa
+        $siswa = User::where('role', 'user')->orderBy('name', 'asc')->get();
+
+        // 3. Ambil data absensi
+        $absensi = Absensi::whereMonth('tanggal', $bulan)
+                          ->whereYear('tanggal', $tahun)
+                          ->get()
+                          ->keyBy(function($item) {
+                              return $item->user_id . '-' . date('d', strtotime($item->tanggal));
+                          });
+
+        // 4. Ambil data izin (untuk matriks)
         $izin = Izin::whereMonth('tanggal_izin', $bulan)
                     ->whereYear('tanggal_izin', $tahun)
                     ->get()
@@ -82,13 +113,21 @@ class GuruController extends Controller
                         return $item->user_id . '-' . date('d', strtotime($item->tanggal_izin));
                     });
 
+        // 5. Tentukan View berdasarkan role
+        if (Auth::user()->role === 'pembimbing') {
+            $izinMenunggu = Izin::with('user')
+                                ->where('status', 'Menunggu')
+                                ->orderBy('created_at', 'asc')
+                                ->get();
+
+            return view('dashboard.izin_pembimbing', compact(
+                'siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun', 'izinMenunggu'
+            ));
+        }
+
+        // Untuk guru: tampilkan matriks (hanya melihat)
         return view('dashboard.izin_guru', compact(
-            'siswa', 
-            'tanggalList', 
-            'absensi', 
-            'izin',
-            'bulan',
-            'tahun'
+            'siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun'
         ));
     }
 
@@ -100,22 +139,33 @@ class GuruController extends Controller
 
         $izin = Izin::findOrFail($id);
         
+        // 1. Update status pengajuan izin
         $izin->update([
             'status' => $request->status,
         ]);
 
+        // 2. Sinkronisasi ke tabel Absensi
         if ($request->status == 'Disetujui') {
+            // Cari data absensi siswa di tanggal tersebut
             $cekAbsen = Absensi::where('user_id', $izin->user_id)
                                ->where('tanggal', $izin->tanggal_izin)
                                ->first();
 
             if (!$cekAbsen) {
+                // Jika belum ada data absen, buat baru dengan status Izin
                 Absensi::create([
                     'user_id' => $izin->user_id,
                     'tanggal' => $izin->tanggal_izin,
                     'jam_masuk' => null,
                     'jam_pulang' => null,
                     'status' => 'Izin', 
+                ]);
+            } else {
+                // Jika sudah ada (misal sebelumnya Tepat Waktu/Telat), paksa ubah jadi Izin
+                $cekAbsen->update([
+                    'status' => 'Izin',
+                    'jam_masuk' => null, // Kosongkan jam masuk karena izin
+                    'jam_pulang' => null,
                 ]);
             }
         }

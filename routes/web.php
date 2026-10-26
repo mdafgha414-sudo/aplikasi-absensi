@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
     // Dashboard (Admin, Guru, Siswa)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // --- FITUR ABSENSI ---
+    // --- FITUR ABSENSI (Siswa) ---
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
     Route::post('/absensi/masuk', [AbsensiController::class, 'masuk'])->name('absensi.masuk');
     Route::post('/absensi/pulang', [AbsensiController::class, 'pulang'])->name('absensi.pulang');
@@ -67,17 +67,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
         
-        // Izin & Rekap Kehadiran (Matriks)
-        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
-        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
-        
-        // Laporan Absensi
-        Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
-        
-        // Laporan Absensi
+        // Laporan Absensi (Menggunakan GuruController)
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
 
-        // Izin Guru
+        // Izin Guru (HANYA SATU KALI)
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
@@ -92,13 +85,18 @@ Route::middleware('auth')->group(function () {
             return view('dashboard.user_pembimbing');
         })->name('dashboard');
 
-        // Laporan Absensi Pembimbing (Diperbaiki)
-        Route::get('/laporan-absensi', [AbsensiController::class, 'laporanAbsensi'])->name('laporan-absensi');
+        // Laporan Absensi Pembimbing (Menggunakan GuruController)
+        Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
 
-        // Gunakan GuruController
+   // TAMBAHKAN ROUTE EXPORT INI (SESUAIKAN NAMA FUNGSINYA)
+        Route::get('/laporan-absensi/export-excel', [GuruExportController::class, 'exportExcelAbsensi'])->name('laporan.export.excel');
+        Route::get('/laporan-absensi/export-pdf', [GuruExportController::class, 'exportPdfAbsensi'])->name('laporan.export.pdf');
+
+         // Jurnal & Nilai
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
 
+        // Izin & Approve
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
     });

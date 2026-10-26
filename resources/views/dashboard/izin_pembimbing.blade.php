@@ -1,758 +1,355 @@
-
 @extends('layouts.app')
 
 @section('content')
-
 <style>
-    .izin-page {
-        --izin-blue: #4385f5;
-        --izin-navy: #1e2b45;
-        --izin-bg: #f2f6fd;
-        background: var(--izin-bg);
-        min-height: 100vh;
-        padding: 24px;
-        color: #263754;
+    /* --- STYLING MATRIKS MODERN --- */
+    .matrix-container { 
+        overflow-x: auto; 
+        background: white; 
+        border-radius: 20px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+        padding: 25px; 
+        margin-bottom: 30px;
+        border: 1px solid #eef2f9;
     }
-
-    .izin-page * {
-        box-sizing: border-box;
+    
+    .matrix-table { 
+        border-collapse: separate; 
+        border-spacing: 0; 
+        width: 100%; 
+        min-width: 1100px; 
     }
-
-    .izin-page .izin-alert {
-        display: flex;
+    
+    .matrix-table th, .matrix-table td { 
+        border: none; 
+        border-bottom: 1px solid #f1f5f9; 
+        text-align: center; 
+        padding: 14px 8px; 
+        vertical-align: middle; 
+    }
+    
+    .matrix-table th { 
+        background: transparent; 
+        color: #64748b; 
+        font-weight: 600; 
+        font-size: 12px; 
+        white-space: nowrap;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .matrix-table td { 
+        font-size: 13px; 
+        color: #334155; 
+        min-width: 45px;
+    }
+    
+    .matrix-table .student-name { 
+        text-align: left; 
+        padding-left: 20px; 
+        font-weight: 700; 
+        color: #1e293b;
+        min-width: 200px; 
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 1;
+        border-right: 1px solid #f1f5f9;
+    }
+    
+    .matrix-table thead .student-name {
+        z-index: 2;
+        background: white;
+    }
+    
+    /* Efek Hover Baris */
+    .matrix-table tbody tr:hover td {
+        background-color: #f8fafc;
+    }
+    
+    /* Desain Kotak Status (Pill/Bulat) */
+    .status-badge-cell {
+        display: inline-flex;
         align-items: center;
-        gap: 14px;
-        padding: 17px 20px;
-        margin-bottom: 24px;
-        border: 1px solid #c5ead7;
-        border-radius: 15px;
-        background: #e6f8ef;
-        color: #16794b;
-        box-shadow: 0 4px 14px rgba(31, 65, 110, .04);
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
-
-    .izin-page .alert-icon {
-        width: 40px;
-        height: 40px;
-        display: grid;
-        place-items: center;
-        flex-shrink: 0;
-        border-radius: 12px;
-        background: #c7f0dc;
-        font-size: 20px;
+    
+    .status-badge-cell:hover {
+        transform: scale(1.15);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+    
+    /* Warna Status */
+    .cell-hadir { background: #dcfce7; color: #166534; }
+    .cell-izin { background: #dbeafe; color: #1e40af; }
+    .cell-sakit { background: #fef9c3; color: #854d0e; }
+    .cell-telat { background: #fee2e2; color: #991b1b; }
+    .cell-alfa { background: #fecdd3; color: #9f1239; }
+    .cell-menunggu { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
 
-    .izin-page .izin-card {
-        background: #fff;
-        border: 1px solid #e8eef8;
+    /* Legend */
+    .legend-box { display: flex; gap: 20px; flex-wrap: wrap; padding: 15px 25px; background: #f8fafc; border-radius: 12px; border: 1px solid #eef2f9; margin-top: 15px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #475569; }
+    .legend-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 11px; font-weight: bold; }
+
+    /* --- STYLING PANEL APPROVE BAWAH --- */
+    .approval-card {
+        background: white;
         border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 8px 28px rgba(39, 65, 108, .06);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border: 1px solid #eef2f9;
+        padding: 25px;
     }
-
-    .izin-page .izin-heading {
-        padding: 26px 26px 22px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-        flex-wrap: wrap;
-    }
-
-    .izin-page .heading-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .izin-page .heading-icon {
-        width: 58px;
-        height: 58px;
-        display: grid;
-        place-items: center;
-        flex-shrink: 0;
-        border-radius: 16px;
-        color: white;
-        background: linear-gradient(135deg, #65a3ff, #4778f5);
-        font-size: 25px;
-        box-shadow: 0 7px 15px rgba(67, 133, 245, .18);
-    }
-
-    .izin-page .heading-title {
-        margin: 0 0 7px;
-        font-size: 22px;
-        font-weight: 750;
-        color: #203354;
-    }
-
-    .izin-page .heading-desc {
-        margin: 0;
-        color: #8292ad;
-        font-size: 14px;
-        line-height: 1.6;
-    }
-
-    .izin-page .izin-toolbar {
-        padding: 0 26px 20px;
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .izin-page .search-box {
-        flex: 1;
-        min-width: 200px;
-        position: relative;
-    }
-
-    .izin-page .search-box i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #8b9bb6;
-        font-size: 16px;
-    }
-
-    .izin-page .search-input,
-    .izin-page .filter-select {
-        width: 100%;
-        min-height: 44px;
-        border: 1px solid #e2eaf6;
-        background: #f8faff;
-        color: #334765;
-        border-radius: 11px;
-        padding: 10px 13px;
-        outline: none;
-        font-size: 13px;
-        transition: .2s;
-    }
-
-    .izin-page .search-input {
-        padding-left: 42px;
-    }
-
-    .izin-page .search-input:focus,
-    .izin-page .filter-select:focus {
-        border-color: #79a9ff;
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(67, 133, 245, .10);
-    }
-
-    .izin-page .filter-select {
-        width: 165px;
-        cursor: pointer;
-    }
-
-    .izin-page .table-wrap {
-        padding: 0 18px;
-        overflow-x: auto;
-        scrollbar-width: thin;
-    }
-
-    .izin-page .izin-table {
-        width: 100%;
-        min-width: 1000px;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin: 0;
-    }
-
-    .izin-page .izin-table thead th {
-        padding: 16px 13px;
-        background: #f1f5fd;
-        color: #516582;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: .45px;
-        white-space: nowrap;
-        border: 0;
-    }
-
-    .izin-page .izin-table thead th:first-child {
-        border-radius: 12px 0 0 0;
-    }
-
-    .izin-page .izin-table thead th:last-child {
-        border-radius: 0 12px 0 0;
-    }
-
-    .izin-page .izin-table tbody td {
-        padding: 19px 13px;
-        vertical-align: middle;
-        border-bottom: 1px solid #edf1f8;
-        color: #344765;
-        font-size: 13px;
-    }
-
-    .izin-page .izin-table tbody tr {
-        transition: background .2s;
-    }
-
-    .izin-page .izin-table tbody tr:hover {
-        background: #f8faff;
-    }
-
-    .izin-page .date-main {
-        font-weight: 650;
-        white-space: nowrap;
-        color: #2d4265;
-    }
-
-    .izin-page .date-sub {
-        display: block;
-        margin-top: 5px;
-        color: #92a1ba;
-        font-size: 12px;
-    }
-
-    .izin-page .date-icon {
-        color: #7597d4;
-        margin-right: 6px;
-    }
-
-    .izin-page .student-cell {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 150px;
-    }
-
-    .izin-page .student-avatar {
-        width: 39px;
-        height: 39px;
-        display: grid;
-        place-items: center;
-        flex-shrink: 0;
-        border-radius: 13px;
-        background: #e9e7ff;
-        color: #6554df;
-        font-size: 13px;
-        font-weight: 800;
-    }
-
-    .izin-page .student-name {
-        font-weight: 700;
-        color: #263958;
-        overflow-wrap: anywhere;
-    }
-
-    .izin-page .student-caption {
-        display: block;
-        color: #94a2b9;
-        font-size: 11px;
-        margin-top: 4px;
-    }
-
-    .izin-page .type-badge,
-    .izin-page .status-badge,
-    .izin-page .attachment-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 7px 11px;
-        border-radius: 9px;
-        font-size: 11px;
-        font-weight: 750;
-        white-space: nowrap;
-    }
-
-    .izin-page .type-izin {
-        background: #e3f1ff;
-        color: #2875d8;
-    }
-
-    .izin-page .type-sakit {
-        background: #fff0ce;
-        color: #b97800;
-    }
-
-    .izin-page .type-other {
-        background: #eee9ff;
-        color: #7655cf;
-    }
-
-    .izin-page .status-menunggu {
-        background: #fff1ca;
-        color: #b87500;
-    }
-
-    .izin-page .status-disetujui {
-        background: #d9f7e7;
-        color: #168653;
-    }
-
-    .izin-page .status-ditolak {
-        background: #ffe1e5;
-        color: #d63d51;
-    }
-
-    .izin-page .attachment-badge {
-        background: #f1f5fb;
-        color: #8494ae;
-        font-weight: 600;
-    }
-
-    .izin-page .attachment-link {
-        color: #3677e8;
-        text-decoration: none;
-        background: #eaf2ff;
-        transition: .2s;
-    }
-
-    .izin-page .attachment-link:hover {
-        background: #d8e7ff;
-    }
-
-    .izin-page .reason-text {
-        display: block;
-        max-width: 160px;
-        overflow-wrap: anywhere;
-        line-height: 1.6;
-    }
-
-    .izin-page .action-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 7px;
-    }
-
-    .izin-page .action-btn {
-        width: 38px;
-        height: 36px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 0;
-        border-radius: 11px;
-        color: #fff;
-        font-size: 15px;
-        transition: transform .2s, box-shadow .2s;
-        cursor: pointer;
-    }
-
-    .izin-page .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 12px rgba(30, 50, 80, .13);
-    }
-
-    .izin-page .btn-approve {
-        background: #20b477;
-    }
-
-    .izin-page .btn-reject {
-        background: #f04459;
-    }
-
-    .izin-page .btn-view {
-        width: auto;
-        padding: 0 13px;
-        border: 1px solid #bcd4ff;
-        background: #fff;
-        color: #3678e8;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .izin-page .done-text {
-        color: #8292aa;
-        font-size: 12px;
-        white-space: nowrap;
-    }
-
-    .izin-page .izin-footer {
-        padding: 19px 26px;
+    .approval-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        color: #8797b1;
-        font-size: 12px;
-    }
-
-    .izin-page .empty-state {
-        padding: 48px 15px !important;
-        text-align: center;
-        color: #8c9bb3 !important;
-    }
-
-    .izin-page .empty-state i {
-        display: block;
-        font-size: 40px;
-        color: #91b7fa;
+        padding: 16px;
+        border: 1px solid #f1f5f9;
+        border-radius: 12px;
         margin-bottom: 12px;
+        background: #f8fafc;
+        transition: 0.2s;
     }
-
-    @media (max-width: 768px) {
-        .izin-page {
-            padding: 13px;
-        }
-
-        .izin-page .izin-alert {
-            padding: 14px;
-            font-size: 13px;
-            align-items: flex-start;
-        }
-
-        .izin-page .alert-icon {
-            width: 34px;
-            height: 34px;
-        }
-
-        .izin-page .izin-heading {
-            padding: 20px 16px;
-            align-items: flex-start;
-        }
-
-        .izin-page .heading-left {
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .izin-page .heading-icon {
-            width: 45px;
-            height: 45px;
-            font-size: 20px;
-            border-radius: 12px;
-        }
-
-        .izin-page .heading-title {
-            font-size: 18px;
-            line-height: 1.4;
-        }
-
-        .izin-page .heading-desc {
-            font-size: 12px;
-        }
-
-        .izin-page .izin-toolbar {
-            padding: 0 16px 17px;
-        }
-
-        .izin-page .search-box {
-            flex-basis: 100%;
-        }
-
-        .izin-page .filter-select {
-            width: 100%;
-        }
-
-        .izin-page .table-wrap {
-            padding: 0 10px;
-        }
-
-        .izin-page .izin-footer {
-            padding: 17px;
-        }
-    }
+    .approval-item:hover { background: #f1f5f9; border-color: #e2e8f0; }
+    .approval-info h6 { margin: 0; font-weight: 700; color: #1e293b; }
+    .approval-info p { margin: 0; font-size: 13px; color: #64748b; margin-top: 4px; }
+    
+    .btn-approve { background: #10b981; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; transition: 0.2s; }
+    .btn-approve:hover { background: #059669; }
+    .btn-reject { background: #ef4444; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; transition: 0.2s; }
+    .btn-reject:hover { background: #dc2626; }
 </style>
 
-<div class="izin-page">
-
-    {{-- NOTIFIKASI SUKSES --}}
-    @if(session('success'))
-        <div class="izin-alert" role="alert">
-            <div class="alert-icon">
-                <i class="bi bi-check-lg"></i>
-            </div>
-
-            <div class="flex-grow-1">
-                <strong>Berhasil!</strong>
-                <div>{{ session('success') }}</div>
-            </div>
-        </div>
-    @endif
-
-    {{-- KARTU UTAMA --}}
-    <div class="izin-card">
-
-        {{-- JUDUL --}}
-        <div class="izin-heading">
-            <div class="heading-left">
-                <div class="heading-icon">
-                    <i class="bi bi-envelope-paper"></i>
-                </div>
-
-                <div>
-                    <h4 class="heading-title">Daftar Pengajuan Izin Siswa</h4>
-                    <p class="heading-desc">
-                        Kelola dan setujui pengajuan izin dari siswa bimbingan Anda.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        {{-- PENCARIAN DAN FILTER --}}
-        <div class="izin-toolbar">
-            <div class="search-box">
-                <i class="bi bi-search"></i>
-                <input
-                    type="text"
-                    id="searchIzin"
-                    class="search-input"
-                    placeholder="Cari nama siswa, alasan, atau jenis izin..."
-                    aria-label="Cari pengajuan izin"
-                >
-            </div>
-
-            <select id="filterStatus" class="filter-select"
-                    aria-label="Filter status pengajuan">
-                <option value="">Semua Status</option>
-                <option value="Menunggu">Menunggu</option>
-                <option value="Disetujui">Disetujui</option>
-                <option value="Ditolak">Ditolak</option>
+<div class="container-fluid py-3">
+    
+    <!-- Filter Bulan & Tahun -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i> Matriks Kehadiran</h5>
+        <form action="/pembimbing/izin" method="GET" class="d-flex gap-2">
+            <select name="bulan" class="form-select form-select-sm border-0 shadow-sm" onchange="this.form.submit()" style="background: #f8fafc;">
+                @for($i = 1; $i <= 12; $i++)
+                    <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == $i ? 'selected' : '' }}>
+                        {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                    </option>
+                @endfor
             </select>
-        </div>
+            <select name="tahun" class="form-select form-select-sm border-0 shadow-sm" onchange="this.form.submit()" style="background: #f8fafc;">
+                @for($i = date('Y') - 2; $i <= date('Y') + 2; $i++)
+                    <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
+                @endfor
+            </select>
+        </form>
+    </div>
 
-        {{-- TABEL --}}
-        <div class="table-wrap">
-            <table class="izin-table">
-                <thead>
+    <!-- TABEL MATRIKS -->
+    <div class="matrix-container">
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">No</th>
+                    <th class="student-name">Nama Siswa</th>
+                    @foreach($tanggalList as $tgl)
+                        <th>
+                            {{ $tgl->format('d') }}<br>
+                            <small class="text-muted">{{ $tgl->translatedFormat('D') }}</small>
+                        </th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($siswa as $index => $s)
                     <tr>
-                        <th>Tanggal Pengajuan</th>
-                        <th>Nama Siswa</th>
-                        <th>Jenis &amp; Tanggal Izin</th>
-                        <th>Alasan</th>
-                        <th>Lampiran</th>
-                        <th>Status</th>
-                        <th style="text-align:center;">Aksi</th>
-                    </tr>
-                </thead>
+                        <td class="text-muted fw-bold">{{ $index + 1 }}</td>
+                        <td class="student-name">{{ $s->name }}</td>
+                        
+                        @foreach($tanggalList as $tgl)
+                            @php
+                                $tglStr = $tgl->format('d');
+                                $key = $s->id . '-' . $tglStr;
+                                
+                                // Cek Absensi
+                                $absen = $absensi[$key] ?? null;
+                                $statusAbsen = $absen ? $absen->status : null;
+                                $jamMasuk = $absen ? $absen->jam_masuk : null;
+                                
+                                // Cek Izin
+                                $izinData = $izin[$key] ?? null;
+                                $statusIzin = $izinData ? $izinData->status : null;
+                                $alasanIzin = $izinData ? $izinData->alasan : null;
+                                $jenisIzin = $izinData ? $izinData->jenis_izin : null;
+                                
+                                // Logika Penentuan Status Tampilan
+                                $cellClass = '';
+                                $label = '-';
+                                $tooltipTitle = 'Klik untuk detail';
+                                
+                                if ($statusIzin == 'Menunggu') {
+                                    $cellClass = 'cell-menunggu';
+                                    $label = '⏳';
+                                    $tooltipTitle = 'Menunggu Persetujuan';
+                                } elseif ($statusIzin == 'Disetujui' || $statusAbsen == 'Izin') {
+                                    $cellClass = 'cell-izin';
+                                    $label = 'I';
+                                    $tooltipTitle = 'Izin Disetujui';
+                                } elseif ($statusAbsen == 'Telat') {
+                                    $cellClass = 'cell-telat';
+                                    $label = 'T';
+                                    $tooltipTitle = 'Telat';
+                                } elseif ($statusAbsen == 'Sakit') {
+                                    $cellClass = 'cell-sakit';
+                                    $label = 'S';
+                                    $tooltipTitle = 'Sakit';
+                                } elseif ($statusAbsen) {
+                                    $cellClass = 'cell-hadir';
+                                    $label = 'H';
+                                    $tooltipTitle = 'Hadir';
+                                } else {
+                                    // Jika tidak ada absensi & tidak ada izin, cek apakah hari kerja (Senin-Jumat)
+                                    $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
+                                    if (!$isWeekend && $tgl->isPast()) {
+                                        $cellClass = 'cell-alfa';
+                                        $label = 'A';
+                                        $tooltipTitle = 'Alpa';
+                                    }
+                                }
+                            @endphp
 
-                <tbody id="tabelIzin">
-                    @forelse ($semuaIzin as $izin)
-                        <tr class="izin-row"
-                            data-status="{{ $izin->status }}"
-                            data-search="{{ strtolower(($izin->user->name ?? 'Siswa') . ' ' . $izin->jenis_izin . ' ' . $izin->alasan . ' ' . $izin->status) }}">
-
-                            {{-- TANGGAL PENGAJUAN --}}
                             <td>
-                                <span class="date-main">
-                                    <i class="bi bi-calendar3 date-icon"></i>
-                                    {{ $izin->created_at->format('d M Y') }}
-                                </span>
-                                <span class="date-sub">
-                                    {{ $izin->created_at->format('H:i') }}
-                                </span>
+                                <!-- Kotak Status yang bisa diklik -->
+                                <div class="status-badge-cell {{ $cellClass }}" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#detailModal{{ $s->id }}-{{ $tglStr }}"
+                                    title="{{ $tooltipTitle }}">
+                                    {{ $label }}
+                                </div>
                             </td>
 
-                            {{-- NAMA SISWA --}}
-                            <td>
-                                <div class="student-cell">
-                                    <div class="student-avatar">
-                                        {{ strtoupper(substr($izin->user->name ?? 'S', 0, 1)) }}
-                                    </div>
-
-                                    <div>
-                                        <div class="student-name">
-                                            {{ $izin->user->name ?? 'Siswa' }}
+                            <!-- MODAL DETAIL UNTUK SETIAP SEL -->
+                            <div class="modal fade" id="detailModal{{ $s->id }}-{{ $tglStr }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow" style="border-radius: 15px;">
+                                        <div class="modal-header bg-light border-0" style="border-radius: 15px 15px 0 0;">
+                                            <h6 class="modal-title fw-bold"><i class="bi bi-person-badge text-primary me-2"></i> {{ $s->name }}</h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <span class="student-caption">
-                                            Pengajuan izin
-                                        </span>
+                                        <div class="modal-body p-4">
+                                            <p class="mb-3 text-muted small"><i class="bi bi-calendar3 me-2"></i>{{ $tgl->translatedFormat('l, d F Y') }}</p>
+                                            
+                                            @if($statusAbsen)
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="text-muted">Status Absensi:</span>
+                                                    <span class="fw-bold {{ $statusAbsen == 'Telat' ? 'text-danger' : 'text-success' }}">{{ $statusAbsen }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <span class="text-muted">Jam Masuk:</span>
+                                                    <span class="fw-bold">{{ $jamMasuk ?? '-' }}</span>
+                                                </div>
+                                            @endif
+
+                                            @if($statusIzin)
+                                                <hr class="my-3 text-muted opacity-25">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="text-muted">Pengajuan Izin:</span>
+                                                    <span class="badge bg-warning text-dark">{{ $statusIzin }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="text-muted">Jenis Izin:</span>
+                                                    <span class="fw-bold">{{ $jenisIzin }}</span>
+                                                </div>
+                                                <div class="mb-0 mt-2">
+                                                    <span class="text-muted d-block mb-1">Alasan:</span>
+                                                    <em class="text-secondary">"{{ $alasanIzin }}"</em>
+                                                </div>
+                                            @endif
+                                            
+                                            @if(!$statusAbsen && !$statusIzin)
+                                                <p class="text-center text-muted mb-0 py-3">Tidak ada data kehadiran/izin.</p>
+                                            @endif
+                                        </div>
+                                        <div class="modal-footer border-0 pt-0">
+                                            <button type="button" class="btn btn-light btn-sm rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </td>
-
-                            {{-- JENIS DAN TANGGAL IZIN --}}
-                            <td>
-                                @php
-                                    $jenis = strtolower($izin->jenis_izin);
-                                    $jenisClass = $jenis == 'izin'
-                                        ? 'type-izin'
-                                        : ($jenis == 'sakit' ? 'type-sakit' : 'type-other');
-                                @endphp
-
-                                <span class="type-badge {{ $jenisClass }}">
-                                    {{ $izin->jenis_izin }}
-                                </span>
-
-                                <span class="date-sub">
-                                    <i class="bi bi-calendar-event me-1"></i>
-                                    {{ \Carbon\Carbon::parse($izin->tanggal_izin)->format('d M Y') }}
-                                </span>
-                            </td>
-
-                            {{-- ALASAN --}}
-                            <td>
-                                <span class="reason-text">
-                                    {{ $izin->alasan }}
-                                </span>
-                            </td>
-
-                            {{-- LAMPIRAN --}}
-                            <td>
-                                @if($izin->lampiran)
-                                    <a
-                                        href="{{ asset('storage/' . $izin->lampiran) }}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="attachment-badge attachment-link"
-                                    >
-                                        <i class="bi bi-paperclip"></i>
-                                        Lihat
-                                    </a>
-                                @else
-                                    <span class="attachment-badge">
-                                        <i class="bi bi-paperclip"></i>
-                                        Tidak ada
-                                    </span>
-                                @endif
-                            </td>
-
-                            {{-- STATUS --}}
-                            <td>
-                                @if($izin->status == 'Menunggu')
-                                    <span class="status-badge status-menunggu">
-                                        <i class="bi bi-clock"></i>
-                                        Menunggu
-                                    </span>
-                                @elseif($izin->status == 'Disetujui')
-                                    <span class="status-badge status-disetujui">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                        Disetujui
-                                    </span>
-                                @else
-                                    <span class="status-badge status-ditolak">
-                                        <i class="bi bi-x-circle-fill"></i>
-                                        Ditolak
-                                    </span>
-                                @endif
-                            </td>
-
-                            {{-- AKSI --}}
-                            <td>
-                                <div class="action-group">
-                                    @if($izin->status == 'Menunggu')
-
-                                      <form action="/{{ Auth::user()->role === 'pembimbing' ? 'pembimbing' : 'guru' }}/izin/{{ $izin->id }}" method="POST"
-                                              onsubmit="return confirm('Yakin ingin menyetujui pengajuan izin ini?')">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <input type="hidden"
-                                                   name="status"
-                                                   value="Disetujui">
-
-                                            <button type="submit"
-                                                    class="action-btn btn-approve"
-                                                    title="Setujui"
-                                                    aria-label="Setujui izin">
-                                                <i class="bi bi-check-lg"></i>
-                                            </button>
-                                        </form>
-
-                                        <form action="/pembimbing/izin/{{ $izin->id }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Yakin ingin menolak pengajuan izin ini?')">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <input type="hidden"
-                                                   name="status"
-                                                   value="Ditolak">
-
-                                            <button type="submit"
-                                                    class="action-btn btn-reject"
-                                                    title="Tolak"
-                                                    aria-label="Tolak izin">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        </form>
-
-                                    @else
-                                        <span class="done-text">
-                                            <i class="bi bi-check2-all me-1"></i>
-                                            Selesai
-                                        </span>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr id="emptyRow">
-                            <td colspan="7" class="empty-state">
-                                <i class="bi bi-inbox"></i>
-                                <strong>Belum ada pengajuan izin</strong>
-                                <div class="mt-2">
-                                    Pengajuan izin dari siswa akan muncul di sini.
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-
-                    <tr id="noSearchResult" style="display:none;">
-                        <td colspan="7" class="empty-state">
-                            <i class="bi bi-search"></i>
-                            <strong>Data tidak ditemukan</strong>
-                            <div class="mt-2">
-                                Coba gunakan kata kunci atau filter lainnya.
                             </div>
-                        </td>
+                        @endforeach
                     </tr>
-                </tbody>
-            </table>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- LEGEND / KETERANGAN WARNA -->
+        <div class="legend-box">
+            <div class="legend-item"><div class="legend-icon cell-hadir">H</div> Hadir</div>
+            <div class="legend-item"><div class="legend-icon cell-izin">I</div> Izin</div>
+            <div class="legend-item"><div class="legend-icon cell-sakit">S</div> Sakit</div>
+            <div class="legend-item"><div class="legend-icon cell-telat">T</div> Telat</div>
+            <div class="legend-item"><div class="legend-icon cell-alfa">A</div> Alpa (Tanpa Keterangan)</div>
+        </div>
+    </div>
+
+    <!-- PANEL APPROVE DI BAWAH -->
+    <div class="approval-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold mb-0"><i class="bi bi-inbox-fill text-warning me-2"></i> Menunggu Persetujuan Izin</h5>
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">{{ $izinMenunggu->count() }} Pengajuan</span>
         </div>
 
-        {{-- FOOTER --}}
-        <div class="izin-footer">
-            <span id="jumlahIzin">
-                Menampilkan {{ count($semuaIzin) }} pengajuan izin
-            </span>
+        @if(session('success'))
+            <div class="alert alert-success border-0 mb-4 rounded-3 shadow-sm">{{ session('success') }}</div>
+        @endif
 
-            <span>
-                <i class="bi bi-shield-check me-1"></i>
-                Pengelolaan izin siswa
-            </span>
-        </div>
+        @forelse($izinMenunggu as $izin)
+            <div class="approval-item">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 45px; height: 45px;">
+                        {{ strtoupper(substr($izin->user->name, 0, 1)) }}
+                    </div>
+                    <div class="approval-info">
+                        <h6>{{ $izin->user->name }}</h6>
+                        <p>
+                            <span class="badge bg-secondary me-1 rounded-pill">{{ $izin->jenis_izin }}</span>
+                            <span class="mx-1">&bull;</span> 
+                            <strong>{{ \Carbon\Carbon::parse($izin->tanggal_izin)->format('d M Y') }}</strong>
+                        </p>
+                        <p class="fst-italic text-secondary mt-1">"{{ $izin->alasan }}"</p>
+                        @if($izin->lampiran)
+                            <a href="{{ asset('storage/' . $izin->lampiran) }}" target="_blank" class="small text-decoration-none fw-bold mt-2 d-inline-block">
+                                <i class="bi bi-paperclip"></i> Lihat Lampiran
+                            </a>
+                        @endif
+                    </div>
+                </div>
 
+                <div class="d-flex gap-2">
+                    <form action="/pembimbing/izin/{{ $izin->id }}" method="POST">
+                        @csrf @method('PUT')
+                        <input type="hidden" name="status" value="Disetujui">
+                        <button type="submit" class="btn-approve shadow-sm">Setujui</button>
+                    </form>
+                    <form action="/pembimbing/izin/{{ $izin->id }}" method="POST">
+                        @csrf @method('PUT')
+                        <input type="hidden" name="status" value="Ditolak">
+                        <button type="submit" class="btn-reject shadow-sm">Tolak</button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            <div class="text-center py-5 text-muted">
+                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-check-circle fs-1 text-success"></i>
+                </div>
+                <h6 class="fw-bold">Tidak ada pengajuan izin yang menunggu.</h6>
+                <p class="mb-0 small">Semua pengajuan izin sudah diproses dengan baik.</p>
+            </div>
+        @endforelse
     </div>
 </div>
-
-{{-- FITUR PENCARIAN DAN FILTER --}}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchIzin');
-    const filterStatus = document.getElementById('filterStatus');
-    const rows = Array.from(document.querySelectorAll('.izin-row'));
-    const noResult = document.getElementById('noSearchResult');
-    const jumlahIzin = document.getElementById('jumlahIzin');
-
-    function filterIzin() {
-        const keyword = searchInput.value.toLowerCase().trim();
-        const status = filterStatus.value;
-        let jumlah = 0;
-
-        rows.forEach(function (row) {
-            const teks = row.dataset.search || '';
-            const statusRow = row.dataset.status || '';
-
-            const cocokKeyword = teks.includes(keyword);
-            const cocokStatus = !status || statusRow === status;
-            const tampil = cocokKeyword && cocokStatus;
-
-            row.style.display = tampil ? '' : 'none';
-
-            if (tampil) {
-                jumlah++;
-            }
-        });
-
-        noResult.style.display =
-            rows.length > 0 && jumlah === 0 ? '' : 'none';
-
-        jumlahIzin.textContent =
-            'Menampilkan ' + jumlah + ' dari ' + rows.length +
-            ' pengajuan izin';
-    }
-
-    searchInput.addEventListener('input', filterIzin);
-    filterStatus.addEventListener('change', filterIzin);
-});
-</script>
-
 @endsection
