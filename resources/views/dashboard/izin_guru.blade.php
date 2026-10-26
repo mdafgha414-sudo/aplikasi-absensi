@@ -629,9 +629,8 @@
                                 <div class="action-group">
                                     @if($izin->status == 'Menunggu')
 
-                                        <form action="/guru/izin/{{ $izin->id }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Yakin ingin menyetujui pengajuan izin ini?')">
+                                        <form action="/{{ Auth::user()->role === 'pembimbing' ? 'pembimbing' : 'guru' }}/izin/{{ $izin->id }}" method="POST"
+                                            onsubmit="return confirm('Yakin ingin menyetujui pengajuan izin ini?')">
                                             @csrf
                                             @method('PUT')
 

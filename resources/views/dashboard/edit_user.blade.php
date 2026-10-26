@@ -136,6 +136,7 @@
                             <select name="role" class="form-select" required>
                                 <option value="user" {{ $pengguna->role == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
                                 <option value="guru" {{ $pengguna->role == 'guru' ? 'selected' : '' }}>Guru Pembimbing</option>
+                                 <option value="pembimbing" {{ $pengguna->role == 'pembimbing' ? 'selected' : '' }}>Guru Pembimbing PKL</option> <!-- TAMBAHKAN INI -->
                             </select>
                             <small class="text-muted mt-1 d-block" style="font-size: .78rem;">
                                 *Ubah role untuk memindahkan pengguna ke dashboard yang sesuai.

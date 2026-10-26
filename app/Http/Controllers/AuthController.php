@@ -39,6 +39,10 @@ class AuthController extends Controller
             elseif (Auth::user()->role === 'guru') {
                 return redirect()->intended('/guru/dashboard');
             }
+              // Jika Pembimbing PKL (TAMBAHKAN INI)
+            elseif (Auth::user()->role === 'pembimbing') {
+                return redirect()->intended('/pembimbing/dashboard');
+            }
 
             // Jika User biasa (Siswa)
             return redirect()->intended('/dashboard');

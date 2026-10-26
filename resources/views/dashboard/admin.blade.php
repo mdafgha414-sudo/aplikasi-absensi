@@ -577,7 +577,7 @@
                         </h5>
 
                         <p class="admin-panel-description">
-                            Informasi dan pengelolaan data Siswa & Guru.
+                            Informasi dan pengelolaan data Siswa, Guru & Pembimbing.
                         </p>
                     </div>
 
@@ -658,8 +658,12 @@
                                         </td>
 
                                         <td>
-                                            {{-- Menampilkan Role --}}
-                                            @if($pengguna->role == 'guru')
+                                            {{-- Menampilkan Role (DIPERBAIKI) --}}
+                                            @if($pengguna->role == 'admin')
+                                                <span class="badge rounded-pill" style="background-color: #f3e8ff; color: #7e22ce;">Admin</span>
+                                            @elseif($pengguna->role == 'pembimbing')
+                                                <span class="badge rounded-pill" style="background-color: #fef3c7; color: #b45309;">Pembimbing</span>
+                                            @elseif($pengguna->role == 'guru')
                                                 <span class="badge rounded-pill" style="background-color: #e0f2fe; color: #0369a1;">Guru</span>
                                             @else
                                                 <span class="badge rounded-pill" style="background-color: #f1f5f9; color: #475569;">Siswa</span>

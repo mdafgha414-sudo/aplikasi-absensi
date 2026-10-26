@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/absensi/alasan-terlambat', [AlasanKeterlambatanController::class, 'simpan'])
         ->name('absensi.alasan.simpan');
 
-    // --- FITUR JURNAL PKL ---
+    // --- FITUR JURNAL PKL (Siswa) ---
     Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
     Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
 
@@ -57,7 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/izin', [IzinController::class, 'index'])->name('izin.index');
     Route::post('/izin', [IzinController::class, 'store'])->name('izin.store');
 
-    // --- FITUR KHUSUS GURU ---
+    // --- FITUR KHUSUS GURU (Hanya Melihat) ---
     Route::prefix('guru')->name('guru.')->group(function () {
         Route::get('/dashboard', function () {
             return view('dashboard.user_guru');
@@ -65,18 +65,32 @@ Route::middleware('auth')->group(function () {
 
         // Jurnal
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
-        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
+        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai'); // <-- TAMBAHKAN INI
+        
+        // Laporan Absensi
+        Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
 
-        // Izin (TAMBAHKAN INI)
+          // TAMBAHKAN ROUTE IZIN INI UNTUK GURU
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
-        
-        // 👈 TAMBAHKAN DI SINI (Baris 53)
-        Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         
         // Export
         Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');
         Route::get('/export/pdf', [GuruExportController::class, 'pdf'])->name('export.pdf');
+    });
+
+    // --- FITUR KHUSUS PEMBIMBING PKL (Bisa Menilai & Approve) ---
+    Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
+        Route::get('/dashboard', function () {
+            return view('dashboard.user_pembimbing');
+        })->name('dashboard');
+
+        // Gunakan GuruController
+        Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
+        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
+
+        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
+        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
     });
 
 }); 
