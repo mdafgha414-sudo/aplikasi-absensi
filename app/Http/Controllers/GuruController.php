@@ -8,6 +8,7 @@ use App\Models\Absensi;
 use App\Models\Izin; 
 use App\Models\Jurnal;
 use Carbon\Carbon; 
+use Illuminate\Support\Facades\Auth; // Tambahkan ini untuk mengecek role
 
 class GuruController extends Controller
 {
@@ -42,10 +43,19 @@ class GuruController extends Controller
     }
 
     // ==========================================
-    // FUNGSI REKAP KEHADIRAN (MATRIKS)
+    // FUNGSI LIHAT IZIN (DIPISAH ANTARA GURU & PEMBIMBING)
     // ==========================================
     public function lihatIzin(Request $request)
     {
+        // 1. JIKA YANG LOGIN ADALAH PEMBIMBING
+        // Tampilkan tabel daftar izin dengan tombol Setujui/Tolak
+        if (Auth::user()->role === 'pembimbing') {
+            $semuaIzin = Izin::with('user')->orderBy('created_at', 'desc')->get();
+            return view('dashboard.izin_pembimbing', compact('semuaIzin'));
+        }
+
+        // 2. JIKA YANG LOGIN ADALAH GURU
+        // Tampilkan matriks kalender kehadiran (hanya melihat)
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
 
