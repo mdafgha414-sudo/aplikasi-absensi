@@ -1,544 +1,143 @@
-
 @extends('layouts.app')
 
 @section('content')
 <style>
-    .attendance-page {
-        --primary: #3978f6;
-        --ink: #1e2b45;
-        --muted: #8290aa;
-        color: var(--ink);
-        padding: 20px 16px 36px;
-    }
+    .report-container { padding: 20px; background: #f8fafc; min-height: 100vh; }
+    .report-card { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 25px; border: 1px solid #eef2f9; }
+    
+    /* Styling Tabel Matriks */
+    .matrix-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 1100px; }
+    .matrix-table th, .matrix-table td { border: 1px solid #f1f5f9; text-align: center; padding: 10px 5px; vertical-align: middle; }
+    .matrix-table th { background: #f8faff; color: #64748b; font-weight: 600; font-size: 12px; white-space: nowrap; border-bottom: 2px solid #e2e8f0; }
+    .matrix-table td { font-size: 12px; color: #334155; min-width: 40px; }
+    .matrix-table .student-name { text-align: left; padding-left: 15px; font-weight: 700; color: #1e293b; min-width: 180px; position: sticky; left: 0; background: white; z-index: 1; border-right: 1px solid #f1f5f9; }
+    .matrix-table thead .student-name { z-index: 2; background: #f8faff; }
+    .matrix-table tbody tr:hover td { background-color: #f8fafc; }
 
-    .attendance-page * {
-        box-sizing: border-box;
-    }
-
-    .attendance-heading {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-        background: #fff;
-        border: 1px solid #edf1f8;
-        border-radius: 18px;
-        padding: 24px 26px;
-        margin-bottom: 22px;
-        box-shadow: 0 5px 20px rgba(35, 56, 95, .035);
-    }
-
-    .attendance-heading-left {
-        display: flex;
-        align-items: center;
-        gap: 17px;
-    }
-
-    .attendance-icon {
-        width: 66px;
-        height: 66px;
-        flex-shrink: 0;
-        display: grid;
-        place-items: center;
-        background: #edf2ff;
-        color: var(--primary);
-        border-radius: 17px;
-        font-size: 29px;
-    }
-
-    .attendance-heading h2 {
-        font-size: 25px;
-        font-weight: 750;
-        margin: 0 0 7px;
-        letter-spacing: -.6px;
-    }
-
-    .attendance-heading p {
-        color: var(--muted);
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .attendance-date {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 15px;
-        background: #fff;
-        border: 1px solid #e3eaf6;
-        border-radius: 12px;
-        color: #526482;
-        font-size: 13px;
-        white-space: nowrap;
-    }
-
-    .attendance-card {
-        background: #fff;
-        border: 1px solid #edf1f8;
-        border-radius: 18px;
-        padding: 24px 25px;
-        min-height: 350px;
-        box-shadow: 0 5px 22px rgba(35, 56, 95, .04);
-    }
-
-    .attendance-toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 22px;
-    }
-
-    .attendance-search {
-        position: relative;
-        width: 350px;
-        max-width: 100%;
-    }
-
-    .attendance-search i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #8492ae;
-        font-size: 17px;
-    }
-
-    .attendance-search input {
-        width: 100%;
-        height: 46px;
-        padding: 0 15px 0 43px;
-        border: 1px solid #e2e9f5;
-        border-radius: 12px;
-        outline: none;
-        background: #fafbfe;
-        color: var(--ink);
-        font-size: 13px;
-        transition: .2s;
-    }
-
-    .attendance-search input:focus {
-        border-color: #8eafff;
-        box-shadow: 0 0 0 3px rgba(57, 120, 246, .09);
-        background: #fff;
-    }
-
-    .attendance-count {
-        color: #8794ab;
-        font-size: 12px;
-        margin: 0;
-    }
-
-    .attendance-table-wrap {
-        width: 100%;
-        overflow-x: auto;
-        border: 1px solid #e6edf7;
-        border-radius: 13px;
-    }
-
-    .attendance-table {
-        width: 100%;
-        min-width: 760px;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin: 0;
-    }
-
-    .attendance-table thead th {
-        background: #f5f7fc;
-        color: #637291;
-        padding: 17px 18px;
-        font-size: 11px;
-        font-weight: 750;
-        letter-spacing: .65px;
-        white-space: nowrap;
-        border-bottom: 1px solid #e5ebf5;
-    }
-
-    .attendance-table tbody td {
-        padding: 19px 18px;
-        border-bottom: 1px solid #edf1f7;
-        color: #465774;
-        font-size: 13px;
-        vertical-align: middle;
-        white-space: nowrap;
-    }
-
-    .attendance-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .attendance-table tbody tr {
-        transition: background .2s;
-    }
-
-    .attendance-table tbody tr:hover {
-        background: #fafbff;
-    }
-
-    .attendance-number {
-        color: #8a97ae;
-        font-weight: 600;
-    }
-
-    .attendance-user {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .attendance-avatar {
-        width: 42px;
-        height: 42px;
-        flex-shrink: 0;
-        display: grid;
-        place-items: center;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #80a9ff, #4c78f6);
-        color: #fff;
-        font-size: 15px;
-        font-weight: 700;
-        box-shadow: 0 4px 10px rgba(76, 120, 246, .17);
-    }
-
-    .attendance-name {
-        color: #283853;
-        font-weight: 700;
-        font-size: 13px;
-    }
-
-    .attendance-date-cell {
-        color: #344562;
-        font-weight: 600;
-    }
-
-    .attendance-time {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 10px 13px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .attendance-time i {
-        font-size: 14px;
-    }
-
-    .time-in {
-        color: #15985b;
-        background: #e6f7ed;
-    }
-
-    .time-out {
-        color: #1478ed;
-        background: #e8f3ff;
-    }
-
-    .time-pending {
-        color: #7d8799;
-        background: #f0f2f6;
-        font-size: 11px;
-    }
-
-    .attendance-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 10px 13px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .status-late {
-        background: #fff0f2;
-        color: #ed4d67;
-    }
-
-    .status-on-time {
-        background: #e7f8ef;
-        color: #179b60;
-    }
-
-    .attendance-empty {
-        text-align: center;
-        padding: 55px 15px !important;
-        color: #8b98ae !important;
-        white-space: normal !important;
-    }
-
-    .attendance-empty i {
-        display: block;
-        font-size: 32px;
-        color: #b7c7e4;
-        margin-bottom: 12px;
-    }
-
-    .attendance-empty strong {
-        display: block;
-        color: #52627e;
-        font-size: 14px;
-        margin-bottom: 5px;
-    }
-
-    .attendance-empty span {
-        font-size: 12px;
-    }
-
-    @media (max-width: 768px) {
-        .attendance-page {
-            padding: 12px 4px 25px;
-        }
-
-        .attendance-heading {
-            align-items: flex-start;
-            padding: 18px;
-            border-radius: 15px;
-        }
-
-        .attendance-heading-left {
-            gap: 12px;
-        }
-
-        .attendance-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 13px;
-            font-size: 22px;
-        }
-
-        .attendance-heading h2 {
-            font-size: 19px;
-        }
-
-        .attendance-heading p {
-            font-size: 12px;
-            line-height: 1.6;
-        }
-
-        .attendance-date {
-            display: none;
-        }
-
-        .attendance-card {
-            padding: 17px 13px;
-            border-radius: 15px;
-        }
-
-        .attendance-toolbar {
-            margin-bottom: 15px;
-        }
-
-        .attendance-search {
-            width: 100%;
-        }
-
-        .attendance-search input {
-            height: 43px;
-        }
-
-        .attendance-table thead th {
-            padding: 14px;
-            font-size: 10px;
-        }
-
-        .attendance-table tbody td {
-            padding: 14px;
-        }
-    }
-
-    @media (max-width: 400px) {
-        .attendance-heading {
-            padding: 15px 12px;
-        }
-
-        .attendance-heading h2 {
-            font-size: 17px;
-        }
-
-        .attendance-icon {
-            width: 42px;
-            height: 42px;
-        }
-
-        .attendance-card {
-            padding: 14px 10px;
-        }
-    }
+    /* Badge Status */
+    .status-badge-cell { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 700; font-size: 10px; }
+    .cell-hadir { background: #dcfce7; color: #166534; }
+    .cell-izin { background: #dbeafe; color: #1e40af; }
+    .cell-sakit { background: #fef9c3; color: #854d0e; }
+    .cell-telat { background: #fee2e2; color: #991b1b; }
+    .cell-alfa { background: #fecdd3; color: #9f1239; }
+    .cell-pending { background: #f1f5f9; color: #94a3b8; }
 </style>
 
-<div class="container-fluid attendance-page">
-
-    {{-- HEADER LAPORAN --}}
-    <div class="attendance-heading">
-        <div class="attendance-heading-left">
-            <div class="attendance-icon">
-                <i class="bi bi-calendar-check"></i>
-            </div>
-
+<div class="report-container">
+    <div class="report-card">
+        
+        <!-- Header & Filter -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <div>
-                <h2>Laporan Absensi</h2>
-                <p>Pantau waktu masuk, waktu pulang, dan status kehadiran pengguna.</p>
+                <h4 class="fw-bold mb-1"><i class="bi bi-calendar-check text-primary me-2"></i> Laporan Absensi</h4>
+                <p class="text-muted small mb-0">Rekap kehadiran siswa berdasarkan tanggal.</p>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <form action="/pembimbing/laporan-absensi" method="GET" class="d-flex gap-2">
+                    <select name="bulan" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                        @for($i = 1; $i <= 12; $i++)
+                            <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == $i ? 'selected' : '' }}>
+                                {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                            </option>
+                        @endfor
+                    </select>
+                    <select name="tahun" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                        @for($i = date('Y') - 2; $i <= date('Y') + 2; $i++)
+                            <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
+                        @endfor
+                    </select>
+                </form>
+
+                <!-- Tombol Export -->
+                <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-success btn-sm px-3">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                </a>
+                <a href="{{ route('pembimbing.laporan.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-danger btn-sm px-3">
+                    <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                </a>
             </div>
         </div>
 
-        <div class="attendance-date">
-            <i class="bi bi-calendar3"></i>
-            <span>{{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d M Y') }}</span>
-        </div>
-    </div>
-
-    {{-- TABEL LAPORAN --}}
-    <div class="attendance-card">
-
-        <div class="attendance-toolbar">
-            <div class="attendance-search">
-                <i class="bi bi-search"></i>
-                <input
-                    type="text"
-                    id="attendanceSearch"
-                    placeholder="Cari nama pengguna..."
-                    aria-label="Cari nama pengguna"
-                >
-            </div>
-
-            <p class="attendance-count">
-                Total data: <strong id="attendanceCount">{{ $laporanAbsensi->count() }}</strong>
-            </p>
-        </div>
-
-        <div class="attendance-table-wrap">
-            <table class="attendance-table">
+        <!-- Tabel Matriks -->
+        <div class="table-responsive">
+            <table class="matrix-table">
                 <thead>
                     <tr>
-                        <th>NO.</th>
-                        <th>NAMA PENGGUNA</th>
-                        <th>TANGGAL</th>
-                        <th>JAM MASUK</th>
-                        <th>JAM PULANG</th>
-                        <th>STATUS</th>
+                        <th style="width: 40px;">No</th>
+                        <th class="student-name">Nama Siswa</th>
+                        @foreach($tanggalList as $tgl)
+                            <th>
+                                {{ $tgl->format('d') }}<br>
+                                <small class="text-muted">{{ $tgl->translatedFormat('D') }}</small>
+                            </th>
+                        @endforeach
                     </tr>
                 </thead>
-
-                <tbody id="attendanceTableBody">
-                    @forelse($laporanAbsensi as $index => $absensi)
-                        <tr class="attendance-row">
-                            <td class="attendance-number">{{ $index + 1 }}</td>
-
-                            <td>
-                                <div class="attendance-user">
-                                    <div class="attendance-avatar">
-                                        {{ strtoupper(substr($absensi->user->name ?? '?', 0, 1)) }}
-                                    </div>
-
-                                    <span class="attendance-name">
-                                        {{ $absensi->user->name ?? '-' }}
-                                    </span>
-                                </div>
-                            </td>
-
-                            <td>
-                                <span class="attendance-date-cell">
-                                    {{ \Carbon\Carbon::parse($absensi->tanggal)->locale('id')->translatedFormat('d M Y') }}
-                                </span>
-                            </td>
-
-                            <td>
-                                <span class="attendance-time time-in">
-                                    <i class="bi bi-clock"></i>
-                                    {{ $absensi->jam_masuk ?? '-' }}
-                                </span>
-                            </td>
-
-                            <td>
-                                @if($absensi->jam_pulang)
-                                    <span class="attendance-time time-out">
-                                        <i class="bi bi-clock-history"></i>
-                                        {{ $absensi->jam_pulang }}
-                                    </span>
-                                @else
-                                    <span class="attendance-time time-pending">
-                                        Belum Pulang
-                                    </span>
-                                @endif
-                            </td>
-
-                            <td>
-                                @if($absensi->status == 'Telat')
-                                    <span class="attendance-status status-late">
-                                        <i class="bi bi-clock"></i>
-                                        Telat
-                                    </span>
-                                @else
-                                    <span class="attendance-status status-on-time">
-                                        <i class="bi bi-check-circle"></i>
-                                        Tepat Waktu
-                                    </span>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
+                <tbody>
+                    @foreach($siswa as $index => $s)
                         <tr>
-                            <td colspan="6" class="attendance-empty">
-                                <i class="bi bi-calendar2-x"></i>
-                                <strong>Belum ada data absensi</strong>
-                                <span>Data absensi akan ditampilkan di sini.</span>
-                            </td>
-                        </tr>
-                    @endforelse
+                            <td class="text-muted fw-bold">{{ $index + 1 }}</td>
+                            <td class="student-name">{{ $s->name }}</td>
+                            
+                            @foreach($tanggalList as $tgl)
+                                @php
+                                    $tglStr = $tgl->format('d');
+                                    $key = $s->id . '-' . $tglStr;
+                                    
+                                    $absen = $absensi[$key] ?? null;
+                                    $status = $absen ? $absen->status : null;
+                                    
+                                    $cellClass = '';
+                                    $label = '-';
+                                    
+                                    if ($status == 'Telat') {
+                                        $cellClass = 'cell-telat';
+                                        $label = 'T';
+                                    } elseif ($status == 'Izin') {
+                                        $cellClass = 'cell-izin';
+                                        $label = 'I';
+                                    } elseif ($status == 'Sakit') {
+                                        $cellClass = 'cell-sakit';
+                                        $label = 'S';
+                                    } elseif ($status == 'Alpa') {
+                                        $cellClass = 'cell-alfa';
+                                        $label = 'A';
+                                    } elseif ($status) {
+                                        $cellClass = 'cell-hadir';
+                                        $label = 'H';
+                                    } else {
+                                        // Jika tidak ada data sama sekali, cek hari kerja
+                                        $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
+                                        if (!$isWeekend && $tgl->isPast()) {
+                                            $cellClass = 'cell-alfa';
+                                            $label = 'A';
+                                        }
+                                    }
+                                @endphp
 
-                    <tr id="attendanceNoResults" style="display: none;">
-                        <td colspan="6" class="attendance-empty">
-                            <i class="bi bi-search"></i>
-                            <strong>Data tidak ditemukan</strong>
-                            <span>Coba gunakan kata kunci nama yang lain.</span>
-                        </td>
-                    </tr>
+                                <td>
+                                    <div class="status-badge-cell {{ $cellClass }}">
+                                        {{ $label }}
+                                    </div>
+                                </td>
+                            @endforeach
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Legend -->
+        <div class="d-flex gap-3 mt-3 small text-muted flex-wrap">
+            <span><span class="badge bg-success bg-opacity-25 text-success me-1">H</span> Hadir</span>
+            <span><span class="badge bg-danger bg-opacity-25 text-danger me-1">T</span> Telat</span>
+            <span><span class="badge bg-primary bg-opacity-25 text-primary me-1">I</span> Izin</span>
+            <span><span class="badge bg-warning bg-opacity-25 text-warning me-1">S</span> Sakit</span>
+            <span><span class="badge bg-danger bg-opacity-25 text-danger me-1">A</span> Alpa</span>
         </div>
 
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('attendanceSearch');
-        const rows = document.querySelectorAll('.attendance-row');
-        const countElement = document.getElementById('attendanceCount');
-        const noResults = document.getElementById('attendanceNoResults');
-
-        if (!searchInput) return;
-
-        function filterAttendance() {
-            const keyword = searchInput.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            rows.forEach(function (row) {
-                const name = row.querySelector('.attendance-name');
-
-                const matches = name &&
-                    name.textContent.toLowerCase().includes(keyword);
-
-                row.style.display = matches ? '' : 'none';
-
-                if (matches) {
-                    visibleCount++;
-                }
-            });
-
-            countElement.textContent = visibleCount;
-
-            if (noResults) {
-                noResults.style.display =
-                    rows.length > 0 && visibleCount === 0 ? '' : 'none';
-            }
-        }
-
-        searchInput.addEventListener('input', filterAttendance);
-    });
-</script>
 @endsection
