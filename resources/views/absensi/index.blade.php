@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -15,31 +14,41 @@
     }
 
     .welcome {
-        background: linear-gradient(120deg, #5146e5, #8b5cf6);
-        color: white;
+        /* Warna biru langit soft persis seperti dashboard guru */
+        background: #e0f2fe; 
+        border: 1px solid #bae6fd;
+        color: #0f172a; 
         padding: 32px;
         border-radius: 22px;
         margin-bottom: 28px;
-        box-shadow: 0 10px 25px rgba(81, 70, 229, .16);
+        box-shadow: 0 10px 25px rgba(14, 165, 233, .05);
     }
 
     .welcome h2 {
         font-weight: 750;
         font-size: 27px;
+        color: #0f172a;
     }
 
     .welcome p {
-        color: #eeedff;
+        color: #334155;
         margin-bottom: 0;
+    }
+
+    .welcome .small {
+        color: #0284c7;
     }
 
     .date-box {
         display: inline-block;
-        background: rgba(255,255,255,.18);
+        background: #ffffff;
+        border: 1px solid #bae6fd;
+        color: #0369a1;
         padding: 10px 15px;
         border-radius: 10px;
         margin-top: 18px;
         font-size: 14px;
+        font-weight: 600;
     }
 
     .section-title {
@@ -136,12 +145,13 @@
     }
 
     .btn-masuk {
-        background: linear-gradient(100deg, #5146e5, #7868f0);
+        /* Tombol biru soft */
+        background: #0284c7; 
         color: white;
     }
 
     .btn-masuk:hover {
-        background: #4035c8;
+        background: #0369a1;
         color: white;
     }
 
@@ -156,8 +166,10 @@
     }
 
     .info-box {
-        background: #efeeff;
-        color: #5146b8;
+        /* Background biru sangat muda */
+        background: #f0f9ff;
+        border: 1px solid #e0f2fe;
+        color: #0369a1;
         padding: 17px;
         border-radius: 13px;
         font-size: 14px;
@@ -172,7 +184,7 @@
     }
 
     .history-link {
-        color: #5146e5;
+        color: #0284c7;
         font-size: 28px;
         text-decoration: none;
     }
@@ -229,7 +241,7 @@
         </span>
 
         <h2 class="mt-3">
-            Halo, {{ Auth::user()->name }}! 👋
+            Halo, {{ Auth::user()->name }}! 
         </h2>
 
         <p>Selamat datang! Jangan lupa catat kehadiranmu hari ini.</p>
@@ -267,8 +279,8 @@
         width: 54px;
         height: 54px;
         flex-shrink: 0;
-        color: #5b4be8;
-        background: #efedff;
+        color: #0284c7; 
+        background: #f0f9ff; 
         border-radius: 14px;
         font-size: 27px;
     }
@@ -379,7 +391,7 @@
 
     <box border radius="lg" padding={4} gap={3}>
     <row align="center" gap={3}>
-        <icon name="calendar-clock" size="2xl" color="#5146e5" />
+        <icon name="calendar-clock" size="2xl" color="#0284c7" /> 
         <box flex="1" gap={1}>
         <text color="secondary" size="sm">Batas jam masuk hari ini</text>
         <title size="2xl">07:30</title>
@@ -543,19 +555,24 @@
     }
 
     .reason-input:focus {
-        outline: 2px solid #c9c2ff;
-        border-color: #7860ed;
+        outline: 2px solid #bae6fd;
+        border-color: #0284c7;
     }
 
     .reason-save-btn {
         width: 100%;
         padding: 12px 16px;
         color: #fff;
-        background: linear-gradient(100deg, #5145e5, #8955f6);
+        /* Tombol simpan biru soft */
+        background: #0284c7;
         border: 0;
         border-radius: 10px;
         font-weight: 600;
         cursor: pointer;
+    }
+
+    .reason-save-btn:hover {
+        background: #0369a1;
     }
 
     .reason-success {

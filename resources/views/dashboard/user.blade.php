@@ -19,10 +19,11 @@
         overflow: hidden;
         padding: 35px;
         border-radius: 22px;
-        color: white;
-        background: linear-gradient(120deg, #3658d4, #7547d8);
-        box-shadow: 0 12px 28px rgba(69, 79, 190, .20);
+        color: #1e3a8a; /* Mengubah teks menjadi biru gelap agar kontras dengan background terang */
+        background: #e0f2fe; /* Warna biru muda (light blue) mirip dashboard guru */
+        box-shadow: 0 12px 28px rgba(14, 165, 233, .10); /* Bayangan disesuaikan ke biru */
         margin-bottom: 25px;
+        border: 1px solid #bae6fd; /* Tambahan border tipis */
     }
 
     .ud-welcome::before {
@@ -31,7 +32,7 @@
         width: 220px;
         height: 220px;
         border-radius: 50%;
-        background: rgba(255,255,255,.09);
+        background: rgba(255,255,255,.4); /* Bulatan transparan lebih terang */
         right: -45px;
         top: -95px;
     }
@@ -42,7 +43,7 @@
         width: 150px;
         height: 150px;
         border-radius: 50%;
-        background: rgba(255,255,255,.08);
+        background: rgba(255,255,255,.3);
         right: 100px;
         bottom: -100px;
     }
@@ -55,22 +56,25 @@
     .ud-eyebrow {
         display: inline-block;
         padding: 7px 13px;
-        background: rgba(255,255,255,.16);
-        border: 1px solid rgba(255,255,255,.2);
+        background: #ffffff;
+        border: 1px solid #bae6fd;
         border-radius: 30px;
         font-size: 12px;
         margin-bottom: 17px;
+        color: #0284c7;
+        font-weight: bold;
     }
 
     .ud-welcome h2 {
         font-size: clamp(25px, 4vw, 36px);
         font-weight: 800;
         margin-bottom: 12px;
+        color: #0f172a; /* Teks judul lebih gelap */
     }
 
     .ud-welcome p {
         max-width: 520px;
-        color: #edf0ff;
+        color: #334155;
         line-height: 1.8;
         margin-bottom: 22px;
     }
@@ -78,18 +82,20 @@
     .ud-primary-btn {
         display: inline-block;
         padding: 12px 20px;
-        background: white;
-        color: #4058cb;
+        background: #ffffff;
+        color: #0284c7;
         border-radius: 10px;
         text-decoration: none;
         font-weight: bold;
         transition: .2s;
+        border: 1px solid #bae6fd;
     }
 
     .ud-primary-btn:hover {
-        background: #edf1ff;
-        color: #293da5;
+        background: #f0f9ff;
+        color: #0369a1;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(2, 132, 199, .15);
     }
 
     .ud-hero-icon {
@@ -98,8 +104,9 @@
         top: 50%;
         transform: translateY(-50%);
         font-size: 105px;
-        opacity: .85;
+        opacity: .15; /* Opacity diturunkan agar tidak menutupi teks */
         z-index: 1;
+        color: #0284c7;
     }
 
     .ud-section-title {
@@ -294,7 +301,7 @@
         .ud-hero-icon {
             right: 15px;
             font-size: 65px;
-            opacity: .25;
+            opacity: .1;
         }
 
         .ud-menu-grid,

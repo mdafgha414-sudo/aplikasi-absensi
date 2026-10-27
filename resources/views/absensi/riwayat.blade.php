@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -15,8 +14,9 @@
     }
 
     .history-banner {
-        background: linear-gradient(120deg, #e5eaff, #f0edff);
-        border: 1px solid #e3e5ff;
+        /* Mengubah banner menjadi biru sangat muda */
+        background: #e0f2fe;
+        border: 1px solid #bae6fd;
         border-radius: 22px;
         padding: 30px;
         margin-bottom: 25px;
@@ -24,7 +24,7 @@
 
     .back-link {
         display: inline-block;
-        color: #5146d9;
+        color: #0284c7;
         text-decoration: none;
         background: white;
         padding: 8px 14px;
@@ -32,17 +32,20 @@
         font-size: 13px;
         font-weight: 600;
         margin-bottom: 20px;
+        border: 1px solid #e0f2fe;
+        transition: .2s;
     }
 
     .back-link:hover {
-        color: #3428b6;
-        background: #fafaff;
+        color: #0369a1;
+        background: #f0f9ff;
     }
 
     .banner-icon {
         width: 65px;
         height: 65px;
-        background: linear-gradient(135deg, #5146e5, #8977f8);
+        /* Gradien ikon menjadi biru */
+        background: linear-gradient(135deg, #38bdf8, #0284c7);
         color: white;
         border-radius: 20px;
         display: flex;
@@ -55,12 +58,12 @@
     .history-banner h2 {
         font-size: 27px;
         font-weight: 800;
-        color: #292d79;
+        color: #0f172a; /* Teks lebih gelap */
         margin-bottom: 8px;
     }
 
     .history-banner p {
-        color: #69709f;
+        color: #334155;
         margin-bottom: 0;
     }
 
@@ -85,8 +88,9 @@
     }
 
     .stat-purple {
-        background: #eeebff;
-        color: #6555e8;
+        /* Mengubah icon statistik pertama jadi biru */
+        background: #e0f2fe;
+        color: #0284c7;
     }
 
     .stat-green {
@@ -148,8 +152,9 @@
     }
 
     .history-table thead th {
-        background: #eeefff;
-        color: #4c4a9c;
+        /* Mengubah header tabel jadi biru muda */
+        background: #f0f9ff;
+        color: #0369a1;
         font-size: 12px;
         font-weight: 700;
         padding: 16px 15px;
@@ -166,7 +171,7 @@
     }
 
     .history-table tbody tr:hover td {
-        background: #fafaff;
+        background: #f8fbff; /* Hover tabel biru sangat tipis */
     }
 
     .date-main {
@@ -226,8 +231,8 @@
     .empty-icon {
         width: 75px;
         height: 75px;
-        background: #f0efff;
-        color: #6b5ce7;
+        background: #e0f2fe; /* Biru muda */
+        color: #0284c7; /* Biru */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -239,9 +244,10 @@
     .info-panel {
         margin-top: 20px;
         padding: 17px 20px;
-        background: #efeeff;
+        background: #f0f9ff;
+        border: 1px solid #e0f2fe;
         border-radius: 15px;
-        color: #5146b8;
+        color: #0369a1;
         font-size: 13px;
     }
 
@@ -374,7 +380,7 @@
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
             <div>
                 <h5 class="panel-title mb-1">
-                    <i class="bi bi-list-ul me-2" style="color:#6555e8;"></i>
+                    <i class="bi bi-list-ul me-2" style="color:#0284c7;"></i> {{-- Ikon jadi biru --}}
                     Catatan Kehadiran
                 </h5>
                 <p class="panel-subtitle mb-0">
@@ -383,7 +389,7 @@
             </div>
 
             <span class="badge rounded-pill px-3 py-2"
-                  style="background:#eeebff;color:#5b4bdc;">
+                  style="background:#e0f2fe;color:#0284c7;"> {{-- Badge jadi biru --}}
                 {{ $totalRiwayat }} catatan
             </span>
         </div>
@@ -486,7 +492,7 @@
 
                                     <a href="/absensi"
                                     class="btn btn-sm text-white rounded-pill px-4"
-                                    style="background:#6555e8;">
+                                    style="background:#0284c7;"> {{-- Tombol jadi biru --}}
                                         <i class="bi bi-fingerprint me-1"></i>
                                         Absen Sekarang
                                     </a>
@@ -505,7 +511,7 @@
 
             <a href="/absensi"
                class="btn btn-sm rounded-pill px-3"
-               style="background:#eeebff;color:#5b4bdc;">
+               style="background:#e0f2fe;color:#0284c7;"> {{-- Tombol kembali jadi biru --}}
                 <i class="bi bi-arrow-left me-1"></i>
                 Kembali ke Absensi
             </a>

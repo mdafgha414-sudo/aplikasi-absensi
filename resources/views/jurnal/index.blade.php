@@ -6,19 +6,21 @@
     <div class="row justify-content-center">
         <div class="col-lg-10">
 
-           {{-- HEADER HALAMAN / WELCOME BANNER (Ganti jadi Biru Solid & Kontras) --}}
-<div class="card border-0 shadow-sm rounded-4 mb-4 text-white overflow-hidden position-relative" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;">
-    <div class="position-absolute top-0 end-0 p-4 opacity-10">
-        <i class="bi bi-journal-richtext display-1"></i>
-    </div>
-    <div class="card-body p-4 p-md-5 position-relative z-1">
-        <span class="badge bg-white bg-opacity-25 text-white px-3 py-1 rounded-pill mb-2 fw-normal small">
-            <i class="bi bi-calendar-event me-1"></i> {{ \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}
-        </span>
-        <h2 class="fw-bold mb-1 text-white">Jurnal Harian PKL</h2>
-        <p class="mb-0 text-white-50">Catat kegiatan harian Praktik Kerja Lapangan Anda dengan mudah dan terstruktur.</p>
-    </div>
-</div>
+            {{-- HEADER HALAMAN / WELCOME BANNER (Nuansa Biru Soft) --}}
+            <div class="card border-0 shadow-sm rounded-4 mb-4 text-dark overflow-hidden position-relative" 
+                 style="background: #e0f2fe !important; border: 1px solid #bae6fd !important;">
+                <div class="position-absolute top-0 end-0 p-4 opacity-25" style="color: #0284c7;">
+                    <i class="bi bi-journal-richtext display-1"></i>
+                </div>
+                <div class="card-body p-4 p-md-5 position-relative z-1">
+                    <span class="badge px-3 py-1 rounded-pill mb-2 fw-normal small" 
+                          style="background: #ffffff; color: #0284c7; border: 1px solid #bae6fd;">
+                        <i class="bi bi-calendar-event me-1"></i> {{ \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}
+                    </span>
+                    <h2 class="fw-bold mb-1" style="color: #0f172a;">Jurnal Harian PKL</h2>
+                    <p class="mb-0" style="color: #334155;">Catat kegiatan harian Praktik Kerja Lapangan Anda dengan mudah dan terstruktur.</p>
+                </div>
+            </div>
 
             {{-- ALERT SUKSES --}}
             @if(session('success'))
@@ -70,7 +72,7 @@
                                 <div class="col-md-4">
                                     <span class="text-muted small d-block mb-1">Tanggal Jurnal</span>
                                     <span class="fw-semibold text-dark">
-                                        <i class="bi bi-calendar3 text-primary me-1"></i>
+                                        <i class="bi bi-calendar3 me-1" style="color: #0284c7;"></i>
                                         {{ \Carbon\Carbon::parse($jurnalHariIni->tanggal)->translatedFormat('d F Y') }}
                                     </span>
                                 </div>
@@ -94,7 +96,7 @@
                         </div>
                     @else
                         <div class="d-flex align-items-center mb-4">
-                            <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3 text-primary">
+                            <div class="p-3 rounded-3 me-3" style="background: #e0f2fe; color: #0284c7;">
                                 <i class="bi bi-pencil-square fs-4"></i>
                             </div>
                             <div>
@@ -140,7 +142,8 @@
                                     placeholder="Contoh: Kesulitan menghubungkan database ke Laravel...">{{ old('kendala') }}</textarea>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-semibold shadow-sm">
+                            {{-- Tombol Simpan jadi Biru --}}
+                            <button type="submit" class="btn w-100 py-2.5 rounded-3 fw-semibold shadow-sm text-white" style="background: #0284c7; border: none;">
                                 <i class="bi bi-send-fill me-2"></i>
                                 Simpan Jurnal Hari Ini
                             </button>
@@ -153,7 +156,8 @@
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
                     <div class="d-flex align-items-center">
-                        <div class="bg-info bg-opacity-10 p-2 rounded-3 me-3 text-info">
+                        {{-- Ikon jadi Biru Soft --}}
+                        <div class="p-2 rounded-3 me-3" style="background: #e0f2fe; color: #0284c7;">
                             <i class="bi bi-clock-history fs-5"></i>
                         </div>
                         <div>
@@ -166,12 +170,13 @@
                 <div class="card-body px-4">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-muted small text-uppercase">
+                            {{-- Header Tabel Biru Soft --}}
+                            <thead class="text-uppercase small" style="background: #f0f9ff; color: #0369a1;">
                                 <tr>
-                                    <th class="py-3 rounded-start">Tanggal</th>
-                                    <th class="py-3">Kegiatan</th>
-                                    <th class="py-3">Kendala</th>
-                                    <th class="py-3 rounded-end">Nilai &amp; Catatan Guru</th>
+                                    <th class="py-3 rounded-start border-0">Tanggal</th>
+                                    <th class="py-3 border-0">Kegiatan</th>
+                                    <th class="py-3 border-0">Kendala</th>
+                                    <th class="py-3 rounded-end border-0">Nilai &amp; Catatan Guru</th>
                                 </tr>
                             </thead>
                             <tbody>
