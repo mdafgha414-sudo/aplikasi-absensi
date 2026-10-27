@@ -376,11 +376,6 @@
         Batas jam masuk hari ini:
         <strong>{{ $jamMasukHariIni }}</strong>
     </div>
-    ```
-
-    ## Hasil yang akan terlihat
-
-    Misalnya admin mengatur jadwal berikut:
 
     <box border radius="lg" padding={4} gap={3}>
     <row align="center" gap={3}>
@@ -393,9 +388,6 @@
     </row>
     </box>
 
-    Jika besok jadwal admin berubah menjadi pukul 08:00, halaman siswa akan otomatis menampilkan **08:00**, selama pengaturan harian tersimpan dengan benar.
-
-    **Catatan:** jam tersebut adalah batas penentuan status tepat waktu atau terlambat, bukan jam aktual siswa melakukan absensi. Jam aktual tetap dicatat saat siswa menekan tombol absen.
     </div>
 
     {{-- Kartu absensi --}}

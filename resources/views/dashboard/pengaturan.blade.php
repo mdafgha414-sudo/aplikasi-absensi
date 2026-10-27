@@ -374,6 +374,45 @@
             flex-shrink: 0;
         }
 
+        /* KOLOM KANAN: TOTAL HARI DAN PILIH SEMUA */
+        .panel-side {
+            width: 170px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-self: stretch;
+        }
+
+        .panel-side .total-days {
+            width: 100%;
+            margin: 0;
+        }
+
+        .panel-side-tools {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d4e5ff;
+            border-radius: 11px;
+            background: #fff;
+        }
+
+        .panel-side-tools h2 {
+            font-size: 11px;
+            line-height: 1.5;
+            color: #233d63;
+            margin-bottom: 8px;
+        }
+
+        .panel-side-tools .pilih-semua-hari {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
         .total-days i {
             font-size: 20px;
         }
@@ -390,20 +429,72 @@
             font-size: 11px;
         }
 
-        /* KARTU HARI */
+        /* KARTU JADWAL UTAMA — LEBIH KECIL */
         .day-card {
             --day-color: #2878f0;
             --day-light: #e8f1ff;
 
             display: grid;
-            grid-template-columns: 100px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 82px;
+            grid-template-columns: 40px 95px minmax(0, 1fr)
+                minmax(0, 1fr) minmax(0, 1fr) 65px;
             align-items: center;
-            gap: 14px;
+            gap: 8px;
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 13px;
-            margin-bottom: 13px;
+            border-radius: 11px;
+            padding: 8px;
+            margin-bottom: 8px;
             transition: border-color .2s, box-shadow .2s;
+        }
+
+        /* Perkecil kotak nama hari */
+        .day-info {
+            padding: 8px 4px;
+            border-radius: 9px;
+        }
+
+        /* Perkecil ikon kalender */
+        .day-icon {
+            width: 28px;
+            height: 28px;
+            margin: 0 auto 5px;
+        }
+
+        /* Perkecil nama hari */
+        .day-info h3 {
+            font-size: 11px;
+        }
+
+        /* Perkecil teks Hari Kerja/Hari Libur */
+        .day-info small {
+            font-size: 9px;
+            margin-top: 3px;
+        }
+
+        /* Perkecil kotak jam */
+        .time-input {
+            height: 33px;
+            padding: 0 8px;
+            gap: 5px;
+            border-radius: 7px;
+        }
+
+        /* Perkecil label jam */
+        .field label {
+            font-size: 9px;
+            margin-bottom: 5px;
+        }
+
+        /* Perkecil keterangan di bawah jam */
+        .field-hint {
+            font-size: 8px;
+            margin-top: 4px;
+        }
+
+        /* Perkecil tombol Edit */
+        .edit-button {
+            padding: 8px 6px;
+            font-size: 10px;
+            border-radius: 7px;
         }
 
         .day-card:hover {
@@ -444,10 +535,82 @@
 
         .day-info {
             background: var(--day-light);
-            border-radius: 11px;
+            border-radius: 9px;
             text-align: center;
-            padding: 12px 5px;
+            padding: 8px 4px;
             color: var(--day-color);
+            min-width: 0;
+        }
+
+        .day-icon {
+            width: 28px;
+            height: 28px;
+            margin: 0 auto 5px;
+            border-radius: 50%;
+            background: white;
+            display: grid;
+            place-items: center;
+        }
+
+        .day-info h3 {
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .day-info small {
+            display: block;
+            margin-top: 3px;
+            font-size: 9px;
+            color: #7e91ad;
+        }
+
+        .field label {
+            display: block;
+            font-size: 9px;
+            font-weight: 600;
+            color: #687e9f;
+            margin-bottom: 5px;
+        }
+
+        .time-input {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid #dfe9f8;
+            border-radius: 7px;
+            padding: 0 7px;
+            height: 33px;
+            background: white;
+            transition: .2s;
+        }
+
+        .time-input input {
+            width: 100%;
+            min-width: 0;
+            border: none;
+            outline: none;
+            color: #294567;
+            background: transparent;
+            font-size: 11px;
+        }
+
+        .field-hint {
+            display: block;
+            margin-top: 4px;
+            color: #8295b0;
+            font-size: 8px;
+            line-height: 1.4;
+        }
+
+        .edit-button {
+            border: 1px solid #d6e5fa;
+            background: #f5f9ff;
+            color: #2878f0;
+            border-radius: 7px;
+            padding: 8px 5px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
         }
 
         .day-icon {
@@ -545,11 +708,6 @@
             pointer-events: none;
         }
 
-        .day-card.sunday .time-input,
-        .day-card.sunday .edit-button {
-            opacity: .55;
-        }
-
         /* INFORMASI DAN TOMBOL */
         .info-note {
             display: flex;
@@ -634,7 +792,9 @@
         /* RESPONSIVE LAPTOP KECIL */
         @media (max-width: 1100px) {
             .day-card {
-                grid-template-columns: 80px repeat(3, minmax(0,1fr));
+                grid-template-columns: 35px 85px repeat(3, minmax(0, 1fr)) 60px;
+                gap: 6px;
+                padding: 7px;
             }
 
             .edit-button {
@@ -654,6 +814,14 @@
 
         /* RESPONSIVE HP */
         @media (max-width: 760px) {
+            .panel-side {
+                width: 100%;
+            }
+
+            .panel-side-tools {
+                padding: 12px;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -801,10 +969,12 @@
 
     <div class="nav-label">PENGATURAN</div>
 
-    <a href="{{ url('/pengaturan') }}" class="nav-link active">
+    
+    <a href="{{ url('/admin/setting') }}" class="nav-link active">
         <i class="fa-solid fa-gear"></i>
         Pengaturan
     </a>
+
 
     <a href="{{ url('/logout') }}"
        class="nav-link logout"
@@ -899,8 +1069,9 @@
             </div>
         @endif
 
-        <form action="{{ url('/pengaturan') }}" method="POST">
+        <form action="{{ url('/admin/setting') }}" method="POST">
             @csrf
+            @method('PUT')
 
             <div class="schedule-panel">
 
@@ -910,16 +1081,252 @@
                     </div>
 
                     <div>
-                        <h2>Jadwal Kehadiran Mingguan</h2>
-                        <p>Atur jadwal absensi untuk seluruh hari kerja.<br>
-                           Pastikan waktu sesuai ketentuan sekolah atau instansi.</p>
+                        
+                        
+                        <!-- ==========================================
+                            3 FITUR PENGATURAN JAM TERPISAH
+                        ========================================== -->
+
+                        <div class="pengaturan-massal">
+                            <div class="pengaturan-massal-item">
+                                <label for="serentakMasuk">Waktu Masuk</label>
+                                <input type="time" id="serentakMasuk" value="09:00">
+                                <button type="button" onclick="terapkanSatuJam('masuk')">
+                                    Terapkan Waktu Masuk
+                                </button>
+                            </div>
+
+                            <div class="pengaturan-massal-item">
+                                <label for="serentakTelat">Batas Jam Telat</label>
+                                <input type="time" id="serentakTelat" value="09:15">
+                                <button type="button" onclick="terapkanSatuJam('telat')">
+                                    Terapkan Batas Telat
+                                </button>
+                            </div>
+
+                            <div class="pengaturan-massal-item">
+                                <label for="serentakPulang">Jam Pulang</label>
+                                <input type="time" id="serentakPulang" value="16:00">
+                                <button type="button" onclick="terapkanSatuJam('pulang')">
+                                    Terapkan Jam Pulang
+                                </button>
+                            </div>
+                        </div>
+
+                        <style>
+
+                        /* CHECKBOX PEMILIHAN HARI */
+                        .checkbox-pilih-hari {
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: #2563eb;
+                            margin-bottom: 8px;
+                        }
+
+                        .checkbox-pilih-hari input,
+                        .pilih-semua-hari input {
+                            width: 17px;
+                            height: 17px;
+                            accent-color: #2878f0;
+                            cursor: pointer;
+                        }
+
+                        .pilih-semua-hari {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            margin: 10px 0;
+                            color: #1e40af;
+                            font-size: 13px;
+                            font-weight: 600;
+                            cursor: pointer;
+                        }
+
+                        .day-card:has(.pilih-hari-jadwal:checked) {
+                            border-color: #2878f0;
+                            background-color: #f5f9ff;
+                        }
+
+                        .pengaturan-massal {
+                            display: grid;
+                            grid-template-columns: repeat(3, minmax(0, 1fr));
+                            gap: 12px;
+                            margin: 16px 0;
+                        }
+
+                        .pengaturan-massal-item {
+                            min-width: 0;
+                            padding: 14px;
+                            border: 1px solid #dbeafe;
+                            border-radius: 10px;
+                            background: #f8fbff;
+                        }
+
+                        .pengaturan-massal-item label {
+                            display: block;
+                            margin-bottom: 8px;
+                            font-size: 13px;
+                            font-weight: 600;
+                            color: #334155;
+                        }
+
+                        .pengaturan-massal-item input {
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 10px;
+                            border: 1px solid #dbe3ef;
+                            border-radius: 8px;
+                            background: white;
+                        }
+
+                        .pengaturan-massal-item button {
+                            width: 100%;
+                            margin-top: 10px;
+                            padding: 10px 6px;
+                            border: none;
+                            border-radius: 8px;
+                            background: #2878f0;
+                            color: white;
+                            font-weight: 600;
+                            cursor: pointer;
+                        }
+
+                        .pengaturan-massal-item button:hover {
+                            background: #1764d1;
+                        }
+
+                        @media (max-width: 800px) {
+                            .pengaturan-massal {
+                                grid-template-columns: 1fr;
+                            }
+                        }
+                        </style>
+
+                        <script>
+                        // ==========================================
+                        // TERAPKAN SATU JENIS JAM KE SENIN-SABTU
+                        // ==========================================
+                        
+                        function terapkanSatuJam(jenis) {
+                            const konfigurasi = {
+                                masuk: {
+                                    id: 'serentakMasuk',
+                                    kolom: 'masuk',
+                                    nama: 'Waktu Masuk'
+                                },
+                                telat: {
+                                    id: 'serentakTelat',
+                                    kolom: 'telat',
+                                    nama: 'Batas Jam Telat'
+                                },
+                                pulang: {
+                                    id: 'serentakPulang',
+                                    kolom: 'pulang',
+                                    nama: 'Jam Pulang'
+                                }
+                            };
+
+                            const config = konfigurasi[jenis];
+                            const waktu = document.getElementById(config.id).value;
+
+                            if (!waktu) {
+                                alert('Pilih waktu terlebih dahulu.');
+                                return;
+                            }
+
+                            // Ambil hanya hari yang dicentang.
+                            const hariDipilih = document.querySelectorAll(
+                                '.pilih-hari-jadwal:checked'
+                            );
+
+                            if (hariDipilih.length === 0) {
+                                alert('Centang minimal satu hari terlebih dahulu.');
+                                return;
+                            }
+
+                            const perubahan = [];
+
+                            // Periksa jadwal sebelum mengubah apa pun.
+                            for (const checkbox of hariDipilih) {
+                                const hari = checkbox.value;
+
+                                const masuk = document.querySelector(
+                                    `input[name="jadwal[${hari}][masuk]"]`
+                                );
+                                const telat = document.querySelector(
+                                    `input[name="jadwal[${hari}][telat]"]`
+                                );
+                                const pulang = document.querySelector(
+                                    `input[name="jadwal[${hari}][pulang]"]`
+                                );
+
+                                if (!masuk || !telat || !pulang) {
+                                    alert('Kolom jadwal ' + hari + ' tidak ditemukan.');
+                                    return;
+                                }
+
+                                const nilaiMasuk = jenis === 'masuk' ? waktu : masuk.value;
+                                const nilaiTelat = jenis === 'telat' ? waktu : telat.value;
+                                const nilaiPulang = jenis === 'pulang' ? waktu : pulang.value;
+
+                                if (nilaiTelat < nilaiMasuk) {
+                                    alert('Batas jam telat tidak boleh sebelum jam masuk pada ' + hari + '.');
+                                    return;
+                                }
+
+                                if (nilaiPulang < nilaiTelat) {
+                                    alert('Jam pulang tidak boleh sebelum batas telat pada ' + hari + '.');
+                                    return;
+                                }
+
+                                perubahan.push(
+                                    jenis === 'masuk' ? masuk :
+                                    jenis === 'telat' ? telat : pulang
+                                );
+                            }
+
+                            // Ubah hanya kolom yang dipilih.
+                            perubahan.forEach(function(input) {
+                                input.readOnly = false;
+                                input.value = waktu;
+
+                                input.dispatchEvent(new Event('change', {
+                                    bubbles: true
+                                }));
+                            });
+
+                            alert(
+                                config.nama + ' berhasil diterapkan ke ' +
+                                perubahan.length + ' hari yang dipilih. ' +
+                                'Klik Simpan Pengaturan untuk menyimpan.'
+                            );
+                        }
+
+                        </script>
+
+
                     </div>
 
-                    <div class="total-days">
-                        <i class="fa-regular fa-clock"></i>
-                        <div>
-                            <small>Total Hari Kerja</small>
-                            <strong>6 hari dalam seminggu</strong>
+                    <div class="panel-side">
+                        <div class="total-days">
+                            <i class="fa-regular fa-clock"></i>
+                            <div>
+                                <small>Total Hari Kerja</small>
+                                <strong>6 hari dalam seminggu</strong>
+                            </div>
+                        </div>
+
+                        <!-- JUDUL DAN PILIH SEMUA HARI DI KOTAK KANAN -->
+                        <div class="panel-side-tools">
+                            <h2>Jadwal Kehadiran Mingguan</h2>
+
+                            <label class="pilih-semua-hari">
+                                <input type="checkbox" id="pilihSemuaHari">
+                                Pilih Semua Hari
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -952,6 +1359,19 @@
                          data-day="{{ $day[0] }}"
                          data-holiday="{{ $isSunday ? 'true' : 'false' }}">
 
+                         <!-- CHECKBOX PILIH HARI -->
+                        @if(!$isSunday)
+                            <label class="checkbox-pilih-hari">
+                                <input
+                                    type="checkbox"
+                                    class="pilih-hari-jadwal"
+                                    value="{{ $key }}"
+                                    aria-label="Pilih jadwal {{ $day[0] }}"
+                                >
+                                Pilih
+                            </label>
+                        @endif
+
                         <div class="day-info">
                             <div class="day-icon">
                                 <i class="fa-regular fa-calendar-check"></i>
@@ -967,7 +1387,7 @@
                                        id="{{ $key }}_masuk"
                                        name="jadwal[{{ $key }}][masuk]"
                                        value="{{ old("jadwal.$key.masuk", $schedule['masuk'] ?? '07:00') }}"
-                                       {{ $isSunday ? 'disabled' : 'readonly' }}>
+                                       readonly >
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
@@ -982,7 +1402,7 @@
                                        id="{{ $key }}_telat"
                                        name="jadwal[{{ $key }}][telat]"
                                        value="{{ old("jadwal.$key.telat", $schedule['telat'] ?? '07:15') }}"
-                                       {{ $isSunday ? 'disabled' : 'readonly' }}>
+                                       readonly>
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
@@ -997,7 +1417,7 @@
                                        id="{{ $key }}_pulang"
                                        name="jadwal[{{ $key }}][pulang]"
                                        value="{{ old("jadwal.$key.pulang", $schedule['pulang'] ?? '15:00') }}"
-                                       {{ $isSunday ? 'disabled' : 'readonly' }}>
+                                       readonly>
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
@@ -1005,9 +1425,7 @@
                             </small>
                         </div>
 
-                        <button type="button"
-                                class="edit-button"
-                                {{ $isSunday ? 'disabled' : '' }}>
+                        <button type="button" class="edit-button">
                             <i class="fa-solid fa-pen"></i>
                             Edit
                         </button>
@@ -1047,6 +1465,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const searchInput = document.getElementById('searchInput');
+    // ==========================================
+    // FUNGSI PILIH SEMUA HARI
+    // ==========================================
+
+    const pilihSemua = document.getElementById('pilihSemuaHari');
+    const checkboxHari = document.querySelectorAll('.pilih-hari-jadwal');
+
+    // Centang atau lepaskan semua checkbox hari.
+    pilihSemua.addEventListener('change', function () {
+        checkboxHari.forEach(function (checkbox) {
+            checkbox.checked = pilihSemua.checked;
+        });
+    });
+
+    // Jika satu hari diubah, perbarui status Pilih Semua Hari.
+    checkboxHari.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            pilihSemua.checked =
+                checkboxHari.length > 0 &&
+                Array.from(checkboxHari).every(function (item) {
+                    return item.checked;
+                });
+        });
+    });
 
     // Tombol garis tiga berfungsi di laptop maupun HP.
     menuToggle.addEventListener('click', function () {
@@ -1092,9 +1534,6 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function () {
             const card = button.closest('.day-card');
 
-            if (card.dataset.holiday === 'true') {
-                return;
-            }
 
             const inputs = card.querySelectorAll('input[type="time"]');
             const isEditing = card.classList.toggle('editing');

@@ -11,16 +11,10 @@ use Illuminate\Support\Facades\Auth;
 class AbsensiController extends Controller
 {
     // =====================================================
-    // 1. HALAMAN UTAMA ABSENSI
+    // FUNGSI BANTU: MENGAMBIL JADWAL HARI INI
     // =====================================================
-    public function index()
+    private function jadwalHariIni()
     {
-        $hariIni = Carbon::today()->toDateString();
-
-        $absenHariIni = Absensi::where('user_id', Auth::id())
-            ->where('tanggal', $hariIni)
-            ->first();
-
         $hari = [
             1 => 'senin',
             2 => 'selasa',
@@ -31,15 +25,43 @@ class AbsensiController extends Controller
             7 => 'minggu',
         ];
 
-        $nomorHari = Carbon::now()->dayOfWeekIso;
-        $namaHari = $hari[$nomorHari];
+        $namaHari = $hari[Carbon::now()->dayOfWeekIso];
 
-        $keyJam = 'jam_masuk_' . $namaHari;
-        $settingJam = Setting::where('key', $keyJam)->first();
+        // Ambil jadwal yang disimpan admin
+        $masuk = Setting::where(
+            'key', 'waktu_masuk_' . $namaHari
+        )->value('value') ?? '09:00';
 
-        $jamMasukHariIni = $settingJam
-            ? substr($settingJam->value, 0, 5)
-            : '08:00';
+        $batasTelat = Setting::where(
+            'key', 'batas_jam_telat_' . $namaHari
+        )->value('value') ?? '09:00';
+
+        $pulang = Setting::where(
+            'key', 'jam_pulang_' . $namaHari
+        )->value('value') ?? '16:00';
+
+        return [
+            'masuk' => substr($masuk, 0, 5),
+            'telat' => substr($batasTelat, 0, 5),
+            'pulang' => substr($pulang, 0, 5),
+        ];
+    }
+
+    // =====================================================
+    // 1. HALAMAN UTAMA ABSENSI
+    // =====================================================
+    public function index()
+    {
+        $hariIni = Carbon::today()->toDateString();
+
+        $absenHariIni = Absensi::where('user_id', Auth::id())
+            ->where('tanggal', $hariIni)
+            ->first();
+
+        $jadwal = $this->jadwalHariIni();
+
+        // Variabel ini dipakai untuk menampilkan batas terlambat
+        $jamMasukHariIni = $jadwal['telat'];
 
         return view('absensi.index', compact(
             'absenHariIni',
@@ -65,34 +87,18 @@ class AbsensiController extends Controller
             );
         }
 
-        $hari = [
-            1 => 'senin',
-            2 => 'selasa',
-            3 => 'rabu',
-            4 => 'kamis',
-            5 => 'jumat',
-            6 => 'sabtu',
-            7 => 'minggu',
-        ];
-
-        $nomorHari = Carbon::now()->dayOfWeekIso;
-        $namaHari = $hari[$nomorHari];
-
-        $keyJam = 'jam_masuk_' . $namaHari;
-
-        try {
-            $setting = Setting::where('key', $keyJam)->first();
-            $jam = $setting ? $setting->value : '08:00';
-        } catch (\Exception $e) {
-            $jam = '08:00';
-        }
+        $jadwal = $this->jadwalHariIni();
 
         $waktuSekarang = Carbon::now();
-        $batasWaktu = Carbon::today()->setTimeFromTimeString($jam);
 
-        $statusAbsen = $waktuSekarang->lte($batasWaktu)
+        // Status ditentukan berdasarkan batas terlambat admin
+        $batasTelat = Carbon::today()->setTimeFromTimeString(
+            $jadwal['telat']
+        );
+
+        $statusAbsen = $waktuSekarang->lte($batasTelat)
             ? 'Tepat Waktu'
-            : 'Telat';  
+            : 'Telat';
 
         Absensi::create([
             'user_id' => Auth::id(),
@@ -119,18 +125,46 @@ class AbsensiController extends Controller
             ->first();
 
         if (!$absen) {
-            return back()->with('error', 'Anda belum melakukan absen masuk hari ini!');
+            return back()->with(
+                'error',
+                'Anda belum melakukan absen masuk hari ini!'
+            );
         }
 
         if ($absen->jam_pulang) {
-            return back()->with('error', 'Anda sudah melakukan absen pulang hari ini!');
+            return back()->with(
+                'error',
+                'Anda sudah melakukan absen pulang hari ini!'
+            );
         }
 
+        // Ambil jam pulang dari pengaturan admin
+        $jadwal = $this->jadwalHariIni();
+
+        $sekarang = Carbon::now();
+
+        $waktuPulang = Carbon::today()->setTimeFromTimeString(
+            $jadwal['pulang']
+        );
+
+        // Tolak absen pulang jika belum waktunya
+        if ($sekarang->lt($waktuPulang)) {
+            return back()->with(
+                'error',
+                'Absen pulang hanya dapat dilakukan mulai pukul '
+                . $jadwal['pulang'] . '!'
+            );
+        }
+
+        // Simpan absensi pulang
         $absen->update([
-            'jam_pulang' => Carbon::now()->toTimeString(),
+            'jam_pulang' => $sekarang->toTimeString(),
         ]);
 
-        return back()->with('success', 'Absen pulang berhasil dicatat. Hati-hati di jalan!');
+        return back()->with(
+            'success',
+            'Absen pulang berhasil dicatat. Hati-hati di jalan!'
+        );
     }
 
     // =====================================================
@@ -146,12 +180,17 @@ class AbsensiController extends Controller
     }
 
     // =====================================================
-    // 5. LAPORAN ABSENSI (KHUSUS PEMBIMBING)
+    // 5. LAPORAN ABSENSI KHUSUS PEMBIMBING
     // =====================================================
     public function laporanAbsensi()
     {
-        $laporanAbsensi = Absensi::with('user')->latest()->get();
+        $laporanAbsensi = Absensi::with('user')
+            ->latest()
+            ->get();
 
-        return view('pembimbing.laporan-absensi', compact('laporanAbsensi'));
+        return view(
+            'pembimbing.laporan-absensi',
+            compact('laporanAbsensi')
+        );
     }
 }
