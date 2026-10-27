@@ -10,8 +10,8 @@
                 <div class="banner-overlay"></div>
                 <div class="row align-items-center position-relative z-2">
                     <div class="col-lg-8 mb-3 mb-lg-0">
-                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-20 backdrop-blur text-white fw-medium small mb-3 border border-white border-opacity-25">
-                            <span class="status-pulse"></span> Pembimbing Workspace
+                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-50 backdrop-blur text-white fw-medium small mb-3 border border-white border-opacity-25">
+                            <span class="status-pulse"></span> Teacher Workspace
                         </div>
                         <h2 class="fw-bold fs-2 text-white mb-2 tracking-tight">
                             Selamat Datang, {{ Auth::user()->name }} 
