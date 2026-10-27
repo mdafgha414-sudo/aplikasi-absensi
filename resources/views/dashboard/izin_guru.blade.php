@@ -20,42 +20,47 @@
     }
 
     /* =========================================
-       BANNER BIRU ATAS (SEPERTI GAMBAR) 
+       BANNER BIRU MUDA (DISAMAKAN DENGAN DASHBOARD)
        ========================================= */
     .hero-banner {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        border: 1px solid #7dd3fc;
         border-radius: 16px;
         padding: 30px;
-        color: white;
+        color: #0f172a; /* Teks gelap agar terbaca */
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 25px;
-        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        box-shadow: 0 10px 25px rgba(56, 189, 248, 0.15);
         flex-wrap: wrap;
         gap: 20px;
     }
     .hero-left { display: flex; flex-direction: column; gap: 10px; }
+    
     .hero-badge {
         display: inline-flex; align-items: center; gap: 6px;
-        background: rgba(255, 255, 255, 0.2); color: white;
+        background: #ffffff; color: #0284c7; /* Biru laut */
         padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
         width: fit-content;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    .hero-title { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-    .hero-desc { font-size: 14px; color: #bfdbfe; margin: 0; max-width: 500px; line-height: 1.5; }
+    .hero-title { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #0f172a; }
+    .hero-desc { font-size: 14px; color: #334155; margin: 0; max-width: 500px; line-height: 1.5; }
     
     .hero-right {
         display: flex; align-items: center; gap: 15px;
-        background: rgba(255, 255, 255, 0.15); padding: 15px 25px; border-radius: 12px;
+        background: rgba(255, 255, 255, 0.6); padding: 15px 25px; border-radius: 12px;
         backdrop-filter: blur(5px);
+        border: 1px solid #bae6fd;
     }
     .hero-icon-box {
-        width: 45px; height: 45px; background: white; color: #2563eb;
+        width: 45px; height: 45px; background: #ffffff; color: #0284c7;
         border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    .hero-stat h5 { margin: 0 0 2px 0; font-size: 13px; color: #bfdbfe; font-weight: 500; }
-    .hero-stat h3 { margin: 0; font-size: 22px; font-weight: 700; color: white; }
+    .hero-stat h5 { margin: 0 0 2px 0; font-size: 13px; color: #475569; font-weight: 600; }
+    .hero-stat h3 { margin: 0; font-size: 22px; font-weight: 700; color: #0284c7; }
 
     /* HEADER & TOMBOL EXPORT */
     .rekap-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
@@ -178,7 +183,7 @@
 
 <div class="rekap-page">
     
-    <!-- BANNER BIRU (TAMBAHAN BARU) -->
+    <!-- BANNER BIRU MUDA -->
     <div class="hero-banner">
         <div class="hero-left">
             <div class="hero-badge">

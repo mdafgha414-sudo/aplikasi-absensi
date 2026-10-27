@@ -4,27 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timetrix</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
         :root {
-            --sidebar-bg: #1e293b; 
-            --sidebar-hover: #334155;
-            --sidebar-active: #3b82f6;
-            --text-muted-light: #94a3b8;
+            /* WARNA BIRU MUDA PASTEL (SESUAI BACKGROUND LOGIN) */
+            --sidebar-bg: #e0f2fe; /* Biru langit sangat lembut */
+            --sidebar-hover: #bae6fd;
+            --sidebar-active: #0284c7; 
+            --text-main: #0f172a; 
+            --text-muted: #334155;
             --sidebar-width: 260px;
         }
 
         body { 
-            background-color: #f1f5f9; 
+            background-color: #f8fafc; 
             overflow-x: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* --- STYLING SIDEBAR (Desktop) --- */
         .sidebar {
             height: 100vh;
             width: var(--sidebar-width);
@@ -36,7 +35,8 @@
             z-index: 1050;
             transition: all 0.3s ease;
             overflow-y: auto;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.03);
+            border-right: 1px solid #bae6fd;
         }
 
         .sidebar.collapsed {
@@ -46,28 +46,36 @@
         .sidebar-brand {
             font-size: 22px;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-main);
             padding: 0 25px 25px 25px;
             display: flex;
             align-items: center;
             text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid #bae6fd;
             margin-bottom: 15px;
         }
-        .sidebar-brand i { color: #38bdf8; font-size: 28px; margin-right: 12px; }
-        .sidebar-brand span { font-size: 12px; font-weight: 400; color: var(--text-muted-light); display: block; margin-top: -5px; letter-spacing: 0.5px; }
+        .sidebar-brand i { color: var(--sidebar-active); font-size: 28px; margin-right: 12px; }
+        .sidebar-brand span { font-size: 12px; font-weight: 500; color: var(--text-muted); display: block; margin-top: -5px; letter-spacing: 0.5px; }
 
         .sidebar-menu { list-style: none; padding: 0 15px; margin: 0; }
-        .sidebar-menu .menu-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted-light); padding: 15px 10px 5px 10px; font-weight: 700; letter-spacing: 1px; }
-        .sidebar-menu li a { display: flex; align-items: center; padding: 12px 15px; color: #cbd5e1; text-decoration: none; font-weight: 500; font-size: 14px; border-radius: 8px; margin-bottom: 5px; transition: all 0.2s; }
-        .sidebar-menu li a i { margin-right: 12px; font-size: 18px; width: 24px; text-align: center; }
-        .sidebar-menu li a:hover { background-color: var(--sidebar-hover); color: #ffffff; }
-        .sidebar-menu li a.active { background-color: var(--sidebar-active); color: #ffffff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        .sidebar-menu .menu-label { font-size: 11px; text-transform: uppercase; color: #64748b; padding: 15px 10px 5px 10px; font-weight: 700; letter-spacing: 1px; }
+        .sidebar-menu li a { display: flex; align-items: center; padding: 12px 15px; color: var(--text-main); text-decoration: none; font-weight: 500; font-size: 14px; border-radius: 8px; margin-bottom: 5px; transition: all 0.2s; }
+        .sidebar-menu li a i { margin-right: 12px; font-size: 18px; width: 24px; text-align: center; color: #64748b; }
+        .sidebar-menu li a:hover { background-color: var(--sidebar-hover); color: var(--text-main); }
+        .sidebar-menu li a:hover i { color: var(--text-main); }
         
-        .logout-btn { color: #f87171 !important; font-weight: 600 !important; }
-        .logout-btn:hover { background-color: rgba(248, 113, 113, 0.1) !important; }
+        .sidebar-menu li a.active { 
+            background-color: var(--sidebar-active); 
+            color: #ffffff; 
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2); 
+        }
+        .sidebar-menu li a.active i { color: #ffffff; }
+        
+        .logout-btn { color: #dc2626 !important; font-weight: 600 !important; }
+        .logout-btn i { color: #dc2626 !important; }
+        .logout-btn:hover { background-color: #fecaca !important; }
 
-        /* --- STYLING KONTEN UTAMA (Desktop) --- */
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 30px;
@@ -79,7 +87,6 @@
             margin-left: 0;
         }
 
-        /* --- STYLING TOPBAR --- */
         .topbar {
             display: flex;
             justify-content: space-between;
@@ -109,48 +116,23 @@
         }
         .btn-toggle-sidebar:hover { background-color: #f8fafc; }
 
-        /* --- RESPONSIF MOBILE (OFFCANVAS) --- */
         @media (max-width: 991px) {
-            .sidebar {
-                left: calc(-1 * var(--sidebar-width));
-            }
-            
-            .sidebar.show-mobile {
-                left: 0;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 15px;
-            }
-
+            .sidebar { left: calc(-1 * var(--sidebar-width)); }
+            .sidebar.show-mobile { left: 0; }
+            .main-content { margin-left: 0; padding: 15px; }
             .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: rgba(15, 23, 42, 0.6);
-                z-index: 1040;
-                backdrop-filter: blur(2px);
-                opacity: 0;
-                transition: opacity 0.3s ease;
+                display: none; position: fixed; top: 0; left: 0;
+                width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.5);
+                z-index: 1040; backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.3s ease;
             }
-
-            .sidebar-overlay.show {
-                display: block;
-                opacity: 1;
-            }
+            .sidebar-overlay.show { display: block; opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY GELAP -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- SIDEBAR -->
     @auth
     <nav class="sidebar" id="sidebar">
         <a href="#" class="sidebar-brand">
@@ -164,70 +146,42 @@
         <ul class="sidebar-menu">
             <li class="menu-label">Menu Utama</li>
 
-            <!-- Menu USER (Siswa) -->
             @if(Auth::user()->role === 'user')
-                <li><a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
-                <li><a href="/absensi" class="{{ request()->is('absensi') ? 'active' : '' }}"><i class="bi bi-calendar2-check"></i> Isi Absensi</a></li>
-                <li><a href="/absensi/riwayat" class="{{ request()->is('absensi/riwayat') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Absensi</a></li>
-                <li><a href="/jurnal" class="{{ request()->is('jurnal') ? 'active' : '' }}"><i class="bi bi-journal-text"></i> Jurnal Harian PKL</a></li>
-                <li><a href="/izin" class="{{ request()->is('izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Pengajuan Izin</a></li>
+                <li><a href="{{ url('/dashboard') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                <li><a href="{{ url('/absensi') }}" class="{{ request()->is('absensi') ? 'active' : '' }}"><i class="bi bi-calendar2-check"></i> Isi Absensi</a></li>
+                <li><a href="{{ url('/absensi/riwayat') }}" class="{{ request()->is('absensi/riwayat') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Absensi</a></li>
+                <li><a href="{{ url('/jurnal') }}" class="{{ request()->is('jurnal') ? 'active' : '' }}"><i class="bi bi-journal-text"></i> Jurnal Harian PKL</a></li>
+                <li><a href="{{ url('/izin') }}" class="{{ request()->is('izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Pengajuan Izin</a></li>
             @endif
 
-            <!-- Menu GURU -->
             @if(Auth::user()->role === 'guru')
-                <li><a href="/guru/dashboard" class="{{ request()->is('guru/dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
-                <li><a href="/guru/jurnal" class="{{ request()->is('guru/jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
-                
-                <!-- 1 MENU UNTUK LAPORAN ABSENSI & DAFTAR IZIN -->
+                <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
+                <li><a href="{{ route('guru.jurnal') }}" class="{{ request()->routeIs('guru.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
                 <li><a href="{{ route('guru.izin') }}" class="{{ request()->routeIs('guru.izin*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi & Izin</a></li>
             @endif
 
-            <!-- Menu PEMBIMBING PKL -->
             @if(Auth::user()->role === 'pembimbing')
-                <li><a href="/pembimbing/dashboard" class="{{ request()->is('pembimbing/dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
-                <li><a href="/pembimbing/jurnal" class="{{ request()->is('pembimbing/jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
-                
-                <!-- 1 MENU UNTUK LAPORAN ABSENSI & DAFTAR IZIN -->
+                <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
+                <li><a href="{{ route('pembimbing.jurnal') }}" class="{{ request()->routeIs('pembimbing.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
                 <li><a href="{{ route('pembimbing.izin') }}" class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi & Izin</a></li>
             @endif
 
-            <!-- Menu ADMIN -->
             @if(Auth::user()->role === 'admin')
-                <li><a href="/admin/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
+                <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
             @endif
-
-            {{-- ==========================================
-                MENU PENGATURAN BERDASARKAN ROLE
-            ========================================== --}}
 
             @if (Auth::user()->role === 'admin')
                 <li class="menu-label mt-4">Pengaturan</li>
-                <li>
-                    <a href="/admin/setting" class="{{ request()->is('admin/setting') ? 'active' : '' }}">
-                        <i class="bi bi-gear"></i> Pengaturan
-                    </a>
-                </li>
+                <li><a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             @elseif (Auth::user()->role === 'guru')
                 <li class="menu-label mt-4">Pengaturan</li>
-                <li>
-                    <a href="/guru/dashboard" class="{{ request()->is('guru/dashboard') ? 'active' : '' }}">
-                        <i class="bi bi-gear"></i> Pengaturan
-                    </a>
-                </li>
+                <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             @elseif (Auth::user()->role === 'user')
                 <li class="menu-label mt-4">Pengaturan</li>
-                <li>
-                    <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
-                        <i class="bi bi-gear"></i> Pengaturan
-                    </a>
-                </li>
+                <li><a href="{{ url('/dashboard') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             @elseif (Auth::user()->role === 'pembimbing')
                 <li class="menu-label mt-4">Pengaturan</li>
-                <li>
-                    <a href="/pembimbing/dashboard" class="{{ request()->is('pembimbing/dashboard') ? 'active' : '' }}">
-                        <i class="bi bi-gear"></i> Pengaturan
-                    </a>
-                </li>
+                <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             @endif
           
             <li>
@@ -242,9 +196,7 @@
     </nav>
     @endauth
 
-    <!-- KONTEN UTAMA -->
     <div class="main-content" id="main-content">
-        <!-- TOPBAR -->
         <div class="topbar">
             <div class="d-flex align-items-center">
                 @auth
@@ -265,14 +217,11 @@
             </div>
         </div>
 
-        <!-- Konten Dinamis -->
         @yield('content') 
     </div>
 
-    <!-- Script Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Script JavaScript Toggle Sidebar -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('toggleSidebar');
@@ -288,12 +237,7 @@
                     } else {
                         sidebar.classList.toggle('collapsed');
                         mainContent.classList.toggle('expanded');
-                        
-                        if (sidebar.classList.contains('collapsed')) {
-                            localStorage.setItem('sidebarCollapsed', 'true');
-                        } else {
-                            localStorage.setItem('sidebarCollapsed', 'false');
-                        }
+                        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
                     }
                 });
             }
@@ -305,12 +249,9 @@
                 });
             }
 
-            if (window.innerWidth >= 992) {
-                const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-                if (isCollapsed && sidebar) {
-                    sidebar.classList.add('collapsed');
-                    mainContent.classList.add('expanded');
-                }
+            if (window.innerWidth >= 992 && localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
             }
         });
     </script>
