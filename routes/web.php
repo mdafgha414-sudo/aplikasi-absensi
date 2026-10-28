@@ -22,20 +22,27 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register']);
 
 // ==========================================
-// ROUTE AUTH
+// ROUTE AUTH (Semua Role yang Login)
 // ==========================================
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Fitur Siswa
+    // --- PENGATURAN PROFIL (USER, GURU, PEMBIMBING) ---
+    // Tambahan: Route ini agar menu Pengaturan di Sidebar tidak error/bentrok
+    Route::get('/pengaturan', [SettingController::class, 'profil'])->name('pengaturan');
+    Route::put('/pengaturan/update', [SettingController::class, 'updateProfil'])->name('pengaturan.update');
+
+    // --- FITUR SISWA ---
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
     Route::post('/absensi/masuk', [AbsensiController::class, 'masuk'])->name('absensi.masuk');
     Route::post('/absensi/pulang', [AbsensiController::class, 'pulang'])->name('absensi.pulang');
     Route::get('/absensi/riwayat', [AbsensiController::class, 'riwayat'])->name('absensi.riwayat');
     Route::post('/absensi/alasan-terlambat', [AlasanKeterlambatanController::class, 'simpan'])->name('absensi.alasan.simpan');
+    
     Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
     Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
+    
     Route::get('/izin', [IzinController::class, 'index'])->name('izin.index');
     Route::post('/izin', [IzinController::class, 'store'])->name('izin.store');
 
@@ -59,15 +66,20 @@ Route::middleware('auth')->group(function () {
 
     // --- FITUR KHUSUS PEMBIMBING PKL ---
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
-        Route::get('/dashboard', [GuruController::class, 'dashboardPembimbing'])->name('dashboard');
+        // Dashboard Pembimbing (Menggunakan fungsi dari GuruController)
+        Route::get('/dashboard', function () {
+            return view('dashboard.user_pembimbing');
+        })->name('dashboard');
+
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         Route::get('/laporan-absensi/export-excel', [GuruExportController::class, 'exportExcelAbsensi'])->name('laporan.export.excel');
         Route::get('/laporan-absensi/export-pdf', [GuruExportController::class, 'exportPdfAbsensi'])->name('laporan.export.pdf');
         
-        // Jurnal & Nilai Pembimbing (Menggunakan fungsi index yang sama dengan Guru)
+        // Jurnal & Nilai Pembimbing
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
 
+        // Izin & Approve
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
     });
@@ -83,6 +95,8 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser']);
     Route::put('/admin/edit-user/{id}', [AdminController::class, 'updateUser']);
     Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser']);
-    Route::get('/admin/setting', [SettingController::class, 'index']);
-    Route::put('/admin/setting', [SettingController::class, 'update']);
+    
+    // Pengaturan Jam (Khusus Admin)
+    Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
+    Route::put('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
 });
