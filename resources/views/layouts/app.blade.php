@@ -9,8 +9,7 @@
     
     <style>
         :root {
-            /* WARNA BIRU MUDA PASTEL (SESUAI BACKGROUND LOGIN) */
-            --sidebar-bg: #e0f2fe; /* Biru langit sangat lembut */
+            --sidebar-bg: #e0f2fe;
             --sidebar-hover: #bae6fd;
             --sidebar-active: #0284c7; 
             --text-main: #0f172a; 
@@ -39,9 +38,7 @@
             border-right: 1px solid #bae6fd;
         }
 
-        .sidebar.collapsed {
-            left: calc(-1 * var(--sidebar-width));
-        }
+        .sidebar.collapsed { left: calc(-1 * var(--sidebar-width)); }
 
         .sidebar-brand {
             font-size: 22px;
@@ -83,8 +80,12 @@
             transition: all 0.3s ease;
         }
 
-        .main-content.expanded {
+        .main-content.expanded { margin-left: 0; }
+
+        /* Style saat di halaman pengaturan (sidebar & topbar hilang) */
+        .main-content.full-screen {
             margin-left: 0;
+            padding: 30px 40px;
         }
 
         .topbar {
@@ -120,6 +121,7 @@
             .sidebar { left: calc(-1 * var(--sidebar-width)); }
             .sidebar.show-mobile { left: 0; }
             .main-content { margin-left: 0; padding: 15px; }
+            .main-content.full-screen { padding: 15px; }
             .sidebar-overlay {
                 display: none; position: fixed; top: 0; left: 0;
                 width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.5);
@@ -134,12 +136,14 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     @auth
+    {{-- SEMBUNYIKAN SIDEBAR UTAMA JIKA DI HALAMAN PENGATURAN --}}
+    @if(!request()->is('pengaturan*'))
     <nav class="sidebar" id="sidebar">
         <a href="#" class="sidebar-brand">
             <i class="bi bi-clipboard-check"></i>
             <div>
                 Timetrix
-                <span>Attendence System</span>
+                <span>Attendance System</span>
             </div>
         </a>
 
@@ -170,18 +174,13 @@
                 <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
             @endif
 
+            <!-- MENU PENGATURAN -->
+            <li class="menu-label mt-4">Pengaturan</li>
+            
             @if (Auth::user()->role === 'admin')
-                <li class="menu-label mt-4">Pengaturan</li>
-                <li><a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
-            @elseif (Auth::user()->role === 'guru')
-                <li class="menu-label mt-4">Pengaturan</li>
-                <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
-            @elseif (Auth::user()->role === 'user')
-                <li class="menu-label mt-4">Pengaturan</li>
-                <li><a href="{{ url('/dashboard') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
-            @elseif (Auth::user()->role === 'pembimbing')
-                <li class="menu-label mt-4">Pengaturan</li>
-                <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
+                <li><a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan Jam</a></li>
+            @else
+                <li><a href="{{ route('pengaturan') }}" class="{{ request()->is('pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan Profil</a></li>
             @endif
           
             <li>
@@ -194,9 +193,14 @@
             </li>
         </ul>
     </nav>
+    @endif
     @endauth
 
-    <div class="main-content" id="main-content">
+    {{-- KONTEN UTAMA --}}
+    <div class="main-content {{ request()->is('pengaturan*') ? 'full-screen' : '' }}" id="main-content">
+        
+        {{-- SEMBUNYIKAN TOPBAR JIKA DI HALAMAN PENGATURAN --}}
+        @if(!request()->is('pengaturan*'))
         <div class="topbar">
             <div class="d-flex align-items-center">
                 @auth
@@ -210,12 +214,21 @@
             <div class="d-flex align-items-center">
                 @if(Auth::check())
                     <span class="me-3 fw-bold text-muted d-none d-sm-inline" style="font-size: 14px;">Halo, {{ Auth::user()->name }}</span>
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-weight: bold;">
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    </div>
+                    
+                    <!-- FOTO PROFIL DI TOPBAR (BISA DIKLIK) -->
+                    <a href="{{ route('pengaturan') }}" title="Buka Pengaturan Profil" class="text-decoration-none">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-weight: bold; overflow: hidden; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                            @if(Auth::user()->foto_profil)
+                                <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                            @else
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            @endif
+                        </div>
+                    </a>
                 @endif
             </div>
         </div>
+        @endif
 
         @yield('content') 
     </div>
@@ -250,7 +263,7 @@
             }
 
             if (window.innerWidth >= 992 && localStorage.getItem('sidebarCollapsed') === 'true') {
-                sidebar.classList.add('collapsed');
+                if (sidebar) sidebar.classList.add('collapsed');
                 mainContent.classList.add('expanded');
             }
         });

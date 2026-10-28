@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage; // Tambahan untuk hapus foto lama
 
 class SettingController extends Controller
 {
     // ============================================
-    // 1. MENAMPILKAN HALAMAN PENGATURAN
+    // 1. MENAMPILKAN HALAMAN PENGATURAN JAM (ADMIN)
     // ============================================
     public function index()
     {
@@ -54,7 +57,6 @@ class SettingController extends Controller
             }
         }
 
-        // Nama view harus sesuai lokasi file Blade kamu.
         return view('dashboard.pengaturan', compact(
             'daftarHari',
             'jadwal'
@@ -62,7 +64,7 @@ class SettingController extends Controller
     }
 
     // ============================================
-    // 2. MENYIMPAN PENGATURAN 7 HARI
+    // 2. MENYIMPAN PENGATURAN 7 HARI (ADMIN)
     // ============================================
     public function update(Request $request)
     {
@@ -87,7 +89,6 @@ class SettingController extends Controller
 
         $data = $request->validate($aturan);
 
-        
         // Periksa urutan jam sebelum menyimpan.
         foreach ($daftarHari as $hari) {
             if ($hari === 'minggu') {
@@ -158,5 +159,56 @@ class SettingController extends Controller
             'success',
             'Jadwal absensi berhasil disimpan!'
         );
+    }
+
+    // ============================================
+    // 3. MENAMPILKAN PROFIL (USER/GURU/PEMBIMBING)
+    // ============================================
+    public function profil()
+    {
+        $user = Auth::user();
+        return view('pengaturan.index', compact('user'));
+    }
+
+    // ============================================
+    // 4. MENYIMPAN PERUBAHAN PROFIL (DIPERBARUI)
+    // ============================================
+    public function updateProfil(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Validasi Input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Maks 2MB
+            'password_lama' => 'nullable|required_with:password_baru',
+            'password_baru' => 'nullable|min:6|confirmed', // Harus ada password_baru_confirmation
+        ]);
+
+        // 1. Update Nama
+        $user->name = $request->name;
+
+        // 2. Update Foto Profil (jika ada)
+        if ($request->hasFile('foto_profil')) {
+            // Hapus foto lama jika ada
+            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+            // Simpan foto baru
+            $path = $request->file('foto_profil')->store('foto_profil', 'public');
+            $user->foto_profil = $path;
+        }
+
+        // 3. Update Password (dengan verifikasi password lama)
+        if ($request->filled('password_baru')) {
+            if (!Hash::check($request->password_lama, $user->password)) {
+                return back()->withErrors(['password_lama' => 'Password lama tidak sesuai.']);
+            }
+            $user->password = Hash::make($request->password_baru);
+        }
+        
+        $user->save();
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
     }
 }
