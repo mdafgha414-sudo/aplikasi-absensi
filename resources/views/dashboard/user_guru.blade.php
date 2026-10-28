@@ -98,7 +98,7 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold text-dark mb-2 card-title-hover">Lihat & Nilai Jurnal</h5>
+                                    <h5 class="fw-bold text-dark mb-2 card-title-hover">Lihat Jurnal Siswa</h5>
                                     <p class="text-secondary small mb-0 leading-relaxed">
                                         Periksa catatan aktivitas harian siswa PKL, berikan ulasan, dan input nilai secara langsung.
                                     </p>

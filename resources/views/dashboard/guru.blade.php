@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
         <div>
             <h3 class="fw-bold text-dark mb-1">Laporan Jurnal Siswa</h3>
-            <p class="text-secondary small mb-0">Pantau, periksa, dan berikan penilaian pada jurnal harian siswa PKL.</p>
+            <p class="text-secondary small mb-0">Pantau, dan periksa, jurnal harian siswa PKL.</p>
         </div>
         
         <!-- Card Total Siswa -->
