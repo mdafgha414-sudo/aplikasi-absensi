@@ -74,6 +74,14 @@ class AbsensiController extends Controller
     // =====================================================
     public function masuk()
     {
+        // CEK APAKAH ABSENSI HARI INI AKTIF
+        if (!$this->absensiDiizinkan()) {
+            return back()->with(
+                'error',
+                'Absensi hari ini sedang dinonaktifkan oleh admin.'
+            );
+        }
+
         $hariIni = Carbon::today()->toDateString();
 
         $cek = Absensi::where('user_id', Auth::id())
@@ -118,6 +126,14 @@ class AbsensiController extends Controller
     // =====================================================
     public function pulang()
     {
+        // CEK APAKAH ABSENSI HARI INI AKTIF
+        if (!$this->absensiDiizinkan()) {
+            return back()->with(
+                'error',
+                'Absensi hari ini sedang dinonaktifkan oleh admin.'
+            );
+        }
+
         $hariIni = Carbon::today()->toDateString();
 
         $absen = Absensi::where('user_id', Auth::id())
@@ -192,5 +208,27 @@ class AbsensiController extends Controller
             'pembimbing.laporan-absensi',
             compact('laporanAbsensi')
         );
+    }
+
+    /**
+     * Memeriksa apakah absensi diizinkan pada hari ini.
+     */
+    private function absensiDiizinkan(): bool
+    {
+        $hariIni = strtolower(Carbon::now()->locale('id')->dayName);
+
+        // Sabtu dan Minggu mengikuti pengaturan admin.
+        if (in_array($hariIni, ['sabtu', 'minggu'])) {
+            $status = Setting::where('key', $hariIni . '_aktif')
+                ->value('value');
+
+            // Sabtu default ON, Minggu default OFF.
+            $default = $hariIni === 'sabtu' ? '1' : '0';
+
+            return (string) ($status ?? $default) === '1';
+        }
+
+        // Senin sampai Jumat tetap diizinkan.
+        return true;
     }
 }

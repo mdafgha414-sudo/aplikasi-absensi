@@ -167,7 +167,13 @@
             @endif
 
             @if(Auth::user()->role === 'admin')
-                <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
+                <li>
+                    <a href="{{ url('/admin/dashboard') }}"
+                    class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard Admin
+                    </a>
+                </li>
             @endif
 
             @if (Auth::user()->role === 'admin')

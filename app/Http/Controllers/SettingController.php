@@ -23,23 +23,18 @@ class SettingController extends Controller
             'minggu' => 'Minggu',
         ];
 
-        // Ambil seluruh pengaturan dari database.
         $settings = Setting::pluck('value', 'key')->toArray();
 
-        // Nilai default jika pengaturan belum pernah disimpan.
         $default = [
             'masuk'  => '07:00',
             'telat'  => '07:15',
             'pulang' => '15:00',
         ];
 
-        // Susun jadwal sesuai struktur input Blade.
         $jadwal = [];
 
         foreach ($daftarHari as $hari => $namaHari) {
             foreach ($default as $jenis => $jamDefault) {
-
-                // Samakan key dengan format yang digunakan database.
                 $jenisDatabase = [
                     'masuk'  => 'waktu_masuk',
                     'telat'  => 'batas_jam_telat',
@@ -54,7 +49,14 @@ class SettingController extends Controller
             }
         }
 
-        // Nama view harus sesuai lokasi file Blade kamu.
+        // Status Sabtu dan Minggu.
+        foreach (['sabtu', 'minggu'] as $hari) {
+            $jadwal[$hari]['aktif'] = (string) (
+                $settings[$hari . '_aktif']
+                ?? ($hari === 'sabtu' ? '1' : '0')
+            );
+        }
+
         return view('dashboard.pengaturan', compact(
             'daftarHari',
             'jadwal'
@@ -62,7 +64,7 @@ class SettingController extends Controller
     }
 
     // ============================================
-    // 2. MENYIMPAN PENGATURAN 7 HARI
+    // 2. MENYIMPAN JADWAL TUJUH HARI
     // ============================================
     public function update(Request $request)
     {
@@ -71,45 +73,39 @@ class SettingController extends Controller
             'jumat', 'sabtu', 'minggu',
         ];
 
-        // Validasi berdasarkan nama input di Blade.
         $aturan = [];
 
         foreach ($daftarHari as $hari) {
             $aturan["jadwal.$hari.masuk"] =
-                'exclude_if:jadwal.' . $hari . '.masuk,null|nullable|date_format:H:i';
+                'required|date_format:H:i';
 
             $aturan["jadwal.$hari.telat"] =
-                'exclude_if:jadwal.' . $hari . '.telat,null|nullable|date_format:H:i';
+                'required|date_format:H:i';
 
             $aturan["jadwal.$hari.pulang"] =
-                'exclude_if:jadwal.' . $hari . '.pulang,null|nullable|date_format:H:i';
+                'required|date_format:H:i';
         }
+
+        // Checkbox tidak dicentang akan bernilai 0.
+        $aturan['jadwal.sabtu.aktif'] = 'nullable|boolean';
+        $aturan['jadwal.minggu.aktif'] = 'nullable|boolean';
 
         $data = $request->validate($aturan);
 
-        
-        // Periksa urutan jam sebelum menyimpan.
+        // Periksa urutan jam untuk semua hari yang aktif.
         foreach ($daftarHari as $hari) {
-            if ($hari === 'minggu') {
+            if (
+                in_array($hari, ['sabtu', 'minggu']) &&
+                !((int) ($data['jadwal'][$hari]['aktif'] ?? 0))
+            ) {
+                // Hari nonaktif: jam tetap disimpan,
+                // tetapi tidak perlu divalidasi urutannya.
                 continue;
             }
 
-            $jadwalHari = $data['jadwal'][$hari] ?? [];
+            $jadwalHari = $data['jadwal'][$hari];
 
-            $masuk = $jadwalHari['masuk'] ?? null;
-            $telat = $jadwalHari['telat'] ?? null;
-            $pulang = $jadwalHari['pulang'] ?? null;
-
-            if (!$masuk || !$telat || !$pulang) {
-                return back()
-                    ->withErrors([
-                        'jadwal' => 'Lengkapi semua waktu untuk hari ' .
-                            ucfirst($hari) . '.',
-                    ])
-                    ->withInput();
-            }
-
-            if ($telat < $masuk) {
+            if ($jadwalHari['telat'] < $jadwalHari['masuk']) {
                 return back()
                     ->withErrors([
                         'jadwal' => 'Batas jam telat hari ' .
@@ -119,7 +115,7 @@ class SettingController extends Controller
                     ->withInput();
             }
 
-            if ($pulang < $telat) {
+            if ($jadwalHari['pulang'] < $jadwalHari['telat']) {
                 return back()
                     ->withErrors([
                         'jadwal' => 'Jam pulang hari ' .
@@ -130,19 +126,20 @@ class SettingController extends Controller
             }
         }
 
-        // Simpan seluruh jadwal dalam transaksi database.
+        // Simpan jadwal dan status dalam satu transaksi.
         DB::transaction(function () use ($data, $daftarHari) {
             foreach ($daftarHari as $hari) {
-                if ($hari === 'minggu') {
-                    continue;
-                }
-
                 $jadwalHari = $data['jadwal'][$hari];
 
                 $pengaturan = [
-                    'waktu_masuk_' . $hari => $jadwalHari['masuk'],
-                    'batas_jam_telat_' . $hari => $jadwalHari['telat'],
-                    'jam_pulang_' . $hari => $jadwalHari['pulang'],
+                    'waktu_masuk_' . $hari =>
+                        $jadwalHari['masuk'],
+
+                    'batas_jam_telat_' . $hari =>
+                        $jadwalHari['telat'],
+
+                    'jam_pulang_' . $hari =>
+                        $jadwalHari['pulang'],
                 ];
 
                 foreach ($pengaturan as $key => $value) {
@@ -151,6 +148,18 @@ class SettingController extends Controller
                         ['value' => $value]
                     );
                 }
+            }
+
+            // Simpan status aktif/nonaktif Sabtu dan Minggu.
+            foreach (['sabtu', 'minggu'] as $hari) {
+                Setting::updateOrCreate(
+                    ['key' => $hari . '_aktif'],
+                    [
+                        'value' => (string) (
+                            (int) ($data['jadwal'][$hari]['aktif'] ?? 0)
+                        ),
+                    ]
+                );
             }
         });
 
