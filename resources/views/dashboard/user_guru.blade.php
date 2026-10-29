@@ -85,7 +85,7 @@
 
                 <!-- Card 1 -->
                 <div class="col-md-6 col-lg-4">
-                    <a href="{{ url('/pembimbing/jurnal') }}" class="text-decoration-none action-card-link">
+                    <a href="{{ url('/guru/jurnal') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card position-relative overflow-hidden">
                             <div class="card-accent-line bg-indigo"></div>
                             <div class="d-flex flex-column h-100 justify-content-between gap-4">
@@ -114,7 +114,7 @@
 
                 <!-- Card 2 -->
                 <div class="col-md-6 col-lg-4">
-                    <a href="{{ url('/pembimbing/laporan-absensi') }}" class="text-decoration-none action-card-link">
+                    <a href="{{ url('/guru/laporan-absensi') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card position-relative overflow-hidden">
                             <div class="card-accent-line bg-teal"></div>
                             <div class="d-flex flex-column h-100 justify-content-between gap-4">
@@ -143,7 +143,7 @@
 
                 <!-- Card 3 -->
                 <div class="col-md-6 col-lg-4">
-                    <a href="{{ url('/pembimbing/izin') }}" class="text-decoration-none action-card-link">
+                    <a href="{{ url('/guru/izin') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card position-relative overflow-hidden">
                             <div class="card-accent-line bg-amber"></div>
                             <div class="d-flex flex-column h-100 justify-content-between gap-4">
