@@ -271,9 +271,15 @@
     <div class="settings-container">
         
         <!-- Tombol Kembali (Tanpa Underline) -->
-        <a href="{{ route('dashboard') }}" class="btn-back">
-            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
-        </a>
+        @if(Auth::user()->role === 'guru')
+            <a href="{{ route('guru.dashboard') }}">Kembali ke Dashboard</a>
+        @elseif(Auth::user()->role === 'pembimbing')
+            <a href="{{ route('pembimbing.dashboard') }}">Kembali ke Dashboard</a>
+        @elseif(Auth::user()->role === 'user')
+            <a href="{{ url('/dashboard') }}">Kembali ke Dashboard</a>
+        @elseif(Auth::user()->role === 'admin')
+            <a href="{{ url('/admin/dashboard') }}">Kembali ke Dashboard</a>
+        @endif
 
         <!-- Card Pengaturan -->
         <div class="settings-card">

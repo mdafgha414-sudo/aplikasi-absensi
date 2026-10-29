@@ -222,7 +222,9 @@
                     <span class="me-3 fw-bold text-muted d-none d-sm-inline" style="font-size: 14px;">Halo, {{ Auth::user()->name }}</span>
                     
                     <!-- FOTO PROFIL DI TOPBAR (BISA DIKLIK) -->
-                    <a href="{{ route('pengaturan') }}" title="Buka Pengaturan Profil" class="text-decoration-none">
+                    <a href="{{ route('pengaturan') }}"
+                        title="Buka Pengaturan Profil"
+                        class="text-decoration-none">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-weight: bold; overflow: hidden; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                             @if(Auth::user()->foto_profil)
                                 <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
