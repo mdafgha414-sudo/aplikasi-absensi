@@ -22,6 +22,138 @@
     .cell-telat { background: #fee2e2; color: #991b1b; }
     .cell-alfa { background: #fecdd3; color: #9f1239; }
     .cell-pending { background: #f1f5f9; color: #94a3b8; }
+
+    /* Keterangan Status Kehadiran */
+    .status-legend-wrapper {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid #eeeeee;
+    }
+
+    .status-legend-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #292d32;
+        margin-bottom: 6px;
+    }
+
+    .status-legend-subtitle {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 16px;
+    }
+
+    .status-legend-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .status-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 15px;
+        min-height: 40px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .status-legend-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    /* Hadir */
+    .status-legend-item.hadir {
+        background: #e8f6ef;
+        border-color: #a9dfc5;
+        color: #168653;
+    }
+
+    .status-legend-item.hadir .status-legend-icon {
+        background: #b5f5d0;
+        color: #168653;
+    }
+
+    /* Telat */
+    .status-legend-item.telat {
+        background: #fff8e7;
+        border-color: #ffdc91;
+        color: #333333;
+    }
+
+    .status-legend-item.telat .status-legend-icon {
+        background: #ffd5a8;
+        color: #b75b00;
+    }
+
+    /* Izin */
+    .status-legend-item.izin {
+        background: #e5efff;
+        border-color: #a8c9ff;
+        color: #2563b9;
+    }
+
+    .status-legend-item.izin .status-legend-icon {
+        background: #bfdbfe;
+        color: #2563b9;
+    }
+
+    /* Sakit */
+    .status-legend-item.sakit {
+        background: #e8fbff;
+        border-color: #9be7f5;
+        color: #333333;
+    }
+
+    .status-legend-item.sakit .status-legend-icon {
+        background: #fff08a;
+        color: #806500;
+    }
+
+    /* Alpa */
+    .status-legend-item.alpa {
+        background: #fdebed;
+        border-color: #ffb8c0;
+        color: #333333;
+    }
+
+    .status-legend-item.alpa .status-legend-icon {
+        background: #ffc4c8;
+        color: #c62828;
+    }
+
+    /* Libur/Belum */
+    .status-legend-item.libur {
+        background: #f5f6f7;
+        border-color: #f5f6f7;
+        color: #60656b;
+    }
+
+    .status-legend-item.libur .status-legend-icon {
+        background: #edf0f4;
+        color: #8a929d;
+    }
+
+    @media (max-width: 576px) {
+        .status-legend-list {
+            gap: 7px;
+        }
+
+        .status-legend-item {
+            padding: 7px 10px;
+            gap: 7px;
+        }
+    }
 </style>
 
 <div class="report-container">
@@ -129,13 +261,44 @@
             </table>
         </div>
         
-        <!-- Legend -->
-        <div class="d-flex gap-3 mt-3 small text-muted flex-wrap">
-            <span><span class="badge bg-success bg-opacity-25 text-success me-1">H</span> Hadir</span>
-            <span><span class="badge bg-danger bg-opacity-25 text-danger me-1">T</span> Telat</span>
-            <span><span class="badge bg-primary bg-opacity-25 text-primary me-1">I</span> Izin</span>
-            <span><span class="badge bg-warning bg-opacity-25 text-warning me-1">S</span> Sakit</span>
-            <span><span class="badge bg-danger bg-opacity-25 text-danger me-1">A</span> Alpa</span>
+        <!-- Keterangan Status -->
+        <div class="status-legend-wrapper">
+            <h6 class="status-legend-title">Keterangan Status</h6>
+            <p class="status-legend-subtitle">
+                Indikator warna matriks kehadiran
+            </p>
+
+            <div class="status-legend-list">
+                <div class="status-legend-item hadir">
+                    <span class="status-legend-icon">H</span>
+                    <span>Hadir</span>
+                </div>
+
+                <div class="status-legend-item telat">
+                    <span class="status-legend-icon">T</span>
+                    <span>Telat</span>
+                </div>
+
+                <div class="status-legend-item izin">
+                    <span class="status-legend-icon">I</span>
+                    <span>Izin</span>
+                </div>
+
+                <div class="status-legend-item sakit">
+                    <span class="status-legend-icon">S</span>
+                    <span>Sakit</span>
+                </div>
+
+                <div class="status-legend-item alpa">
+                    <span class="status-legend-icon">A</span>
+                    <span>Alpa</span>
+                </div>
+
+                <div class="status-legend-item libur">
+                    <span class="status-legend-icon">-</span>
+                    <span>Libur/Belum</span>
+                </div>
+            </div>
         </div>
 
     </div>
