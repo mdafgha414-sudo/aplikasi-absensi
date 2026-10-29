@@ -299,6 +299,9 @@
                                     } elseif ($status == 'Alpa') {
                                         $cellClass = 'cell-alfa';
                                         $label = 'A';
+                                    } elseif ($status == 'Alpha') {
+                                        $cellClass = 'cell-alfa';
+                                        $label = 'A';
                                     } elseif ($status) {
                                         $cellClass = 'cell-hadir';
                                         $label = 'H';
