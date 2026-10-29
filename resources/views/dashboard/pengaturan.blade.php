@@ -1671,7 +1671,7 @@
                 </div>
 
                 <div class="panel-footer">
-                    <a href="{{ url('/dashboard') }}" class="btn btn-back">
+                    <a href="{{ url('/admin/dashboard') }}" class="btn btn-back">
                         <i class="fa-solid fa-arrow-left"></i>
                         Kembali
                     </a>
