@@ -66,10 +66,11 @@ Route::middleware('auth')->group(function () {
 
     // --- FITUR KHUSUS PEMBIMBING PKL ---
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
-        // Dashboard Pembimbing (Menggunakan fungsi dari GuruController)
-        Route::get('/dashboard', function () {
-            return view('dashboard.user_pembimbing');
-        })->name('dashboard');
+        // Dashboard Pembimbing
+        Route::get(
+            '/dashboard',
+            [GuruController::class, 'dashboardPembimbing']
+        )->name('dashboard');
 
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         Route::get('/laporan-absensi/export-excel', [GuruExportController::class, 'exportExcelAbsensi'])->name('laporan.export.excel');

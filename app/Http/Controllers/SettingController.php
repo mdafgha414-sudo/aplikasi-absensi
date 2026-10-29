@@ -52,7 +52,6 @@ class SettingController extends Controller
             }
         }
 
-<<<<<<< HEAD
         // Status Sabtu dan Minggu.
         foreach (['sabtu', 'minggu'] as $hari) {
             $jadwal[$hari]['aktif'] = (string) (
@@ -61,8 +60,6 @@ class SettingController extends Controller
             );
         }
 
-=======
->>>>>>> 50ad58812ca843df1c0c8c1ac0b2c48aa9bb55fc
         return view('dashboard.pengaturan', compact(
             'daftarHari',
             'jadwal'
@@ -70,11 +67,8 @@ class SettingController extends Controller
     }
 
     // ============================================
-<<<<<<< HEAD
     // 2. MENYIMPAN JADWAL TUJUH HARI
-=======
     // 2. MENYIMPAN PENGATURAN 7 HARI (ADMIN)
->>>>>>> 50ad58812ca843df1c0c8c1ac0b2c48aa9bb55fc
     // ============================================
     public function update(Request $request)
     {
@@ -102,11 +96,8 @@ class SettingController extends Controller
 
         $data = $request->validate($aturan);
 
-<<<<<<< HEAD
         // Periksa urutan jam untuk semua hari yang aktif.
-=======
         // Periksa urutan jam sebelum menyimpan.
->>>>>>> 50ad58812ca843df1c0c8c1ac0b2c48aa9bb55fc
         foreach ($daftarHari as $hari) {
             if (
                 in_array($hari, ['sabtu', 'minggu']) &&
@@ -198,7 +189,11 @@ class SettingController extends Controller
     public function updateProfil(Request $request)
     {
         $user = Auth::user();
-        
+
+        if (! $user || ! method_exists($user, 'save')) {
+            $user = \App\Models\User::findOrFail(Auth::id());
+        }
+
         // Validasi Input
         $request->validate([
             'name' => 'required|string|max:255',
@@ -228,7 +223,7 @@ class SettingController extends Controller
             }
             $user->password = Hash::make($request->password_baru);
         }
-        
+
         $user->save();
 
         return back()->with('success', 'Profil berhasil diperbarui!');
