@@ -131,6 +131,66 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
+    /* ========================================
+    WARNA HEADER TABEL: LAVENDER
+    ======================================== */
+    .matrix-table thead th {
+        background-color: #E6E6FA !important;
+        color: #312E5C;
+        border-color: #D8D5F2 !important;
+        font-weight: 700;
+    }
+
+    /* Header kolom nama siswa juga lavender */
+    .matrix-table thead .student-name {
+        background-color: #E6E6FA !important;
+        color: #312E5C;
+    }
+
+    /* Header nomor */
+    .matrix-table thead th:first-child {
+        background-color: #E6E6FA !important;
+    }
+
+    /* ========================================
+    WARNA STATUS KEHADIRAN
+    ======================================== */
+
+    /* T = Telat, oranye */
+    .cell-telat {
+        background-color: #FED7AA !important;
+        color: #C2410C !important;
+    }
+
+    /* H = Hadir, hijau */
+    .cell-hadir {
+        background-color: #BBF7D0 !important;
+        color: #166534 !important;
+    }
+
+    /* A = Alpa, merah */
+    .cell-alfa {
+        background-color: #FECACA !important;
+        color: #B91C1C !important;
+    }
+
+    /* S = Sakit, kuning */
+    .cell-sakit {
+        background-color: #FEF08A !important;
+        color: #854D0E !important;
+    }
+
+    /* I = Izin, biru muda */
+    .cell-izin {
+        background-color: #BFDBFE !important;
+        color: #1D4ED8 !important;
+    }
+
+    /* Hari tanpa data */
+    .cell-pending {
+        background-color: #F1F5F9 !important;
+        color: #64748B !important;
+    }
 </style>
 
 <div class="report-container">
@@ -197,12 +257,15 @@
             <table class="matrix-table">
                 <thead>
                     <tr>
-                        <th style="width: 45px;">No</th>
+                        <th style="width: 40px;">No</th>
                         <th class="student-name">Nama Siswa</th>
+
                         @foreach($tanggalList as $tgl)
                             <th>
-                                <div>{{ $tgl->format('d') }}</div>
-                                <small class="text-muted fw-normal" style="font-size: 10px;">{{ $tgl->translatedFormat('D') }}</small>
+                                {{ $tgl->format('d') }}<br>
+                                <small>
+                                    {{ $tgl->translatedFormat('D') }}
+                                </small>
                             </th>
                         @endforeach
                     </tr>

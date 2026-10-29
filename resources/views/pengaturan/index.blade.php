@@ -228,6 +228,46 @@
         background-color: #2563eb;
     }
 
+    /* Tombol kembali ke dashboard */
+    .back-dashboard-wrapper {
+        margin: 0 0 16px 0;
+    }
+
+    .btn-back-dashboard {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 20px;
+        background: #ffffff;
+        color: #334155;
+        border: 1px solid #dbe4f0;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s ease;
+    }
+
+    .btn-back-dashboard i {
+        font-size: 17px;
+    }
+
+    .btn-back-dashboard:hover {
+        background: #eff6ff;
+        color: #0284c7;
+        border-color: #93c5fd;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 576px) {
+        .btn-back-dashboard {
+            width: 100%;
+            padding: 12px 16px;
+        }
+    }
+
     /* --- RESPONSIF MOBILE --- */
     @media (max-width: 768px) {
         .pengaturan-page {
@@ -270,16 +310,22 @@
 <div class="pengaturan-page">
     <div class="settings-container">
         
-        <!-- Tombol Kembali (Tanpa Underline) -->
-        @if(Auth::user()->role === 'guru')
-            <a href="{{ route('guru.dashboard') }}">Kembali ke Dashboard</a>
-        @elseif(Auth::user()->role === 'pembimbing')
-            <a href="{{ route('pembimbing.dashboard') }}">Kembali ke Dashboard</a>
-        @elseif(Auth::user()->role === 'user')
-            <a href="{{ url('/dashboard') }}">Kembali ke Dashboard</a>
-        @elseif(Auth::user()->role === 'admin')
-            <a href="{{ url('/admin/dashboard') }}">Kembali ke Dashboard</a>
-        @endif
+        {{-- Tombol kembali ke dashboard sesuai role --}}
+        @php
+            $dashboardUrl = match (Auth::user()->role) {
+                'admin' => url('/admin/dashboard'),
+                'guru' => route('guru.dashboard'),
+                'pembimbing' => route('pembimbing.dashboard'),
+                default => url('/dashboard'),
+            };
+        @endphp
+
+        <div class="back-dashboard-wrapper">
+            <a href="{{ $dashboardUrl }}" class="btn-back-dashboard">
+                <i class="bi bi-arrow-left"></i>
+                <span>Kembali ke Dashboard</span>
+            </a>
+        </div>
 
         <!-- Card Pengaturan -->
         <div class="settings-card">
