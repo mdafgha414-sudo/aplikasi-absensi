@@ -49,14 +49,10 @@ class AbsensiController extends Controller
         // Sabtu dan Minggu mengikuti pengaturan admin.
         if (in_array($hariIni, ['sabtu', 'minggu'])) {
             $status = Setting::where('key', $hariIni . '_aktif')->value('value');
-            
-            // Sabtu default ON, Minggu default OFF.
             $default = $hariIni === 'sabtu' ? '1' : '0';
-
             return (string) ($status ?? $default) === '1';
         }
 
-        // Senin sampai Jumat tetap diizinkan.
         return true;
     }
 
@@ -86,11 +82,7 @@ class AbsensiController extends Controller
     public function index()
     {
         $hariIni = Carbon::today()->toDateString();
-
-        $absenHariIni = Absensi::where('user_id', Auth::id())
-            ->where('tanggal', $hariIni)
-            ->first();
-
+        $absenHariIni = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
         $jadwal = $this->jadwalHariIni();
         $jamMasukHariIni = $jadwal['telat'];
 
@@ -107,10 +99,7 @@ class AbsensiController extends Controller
         }
 
         $hariIni = Carbon::today()->toDateString();
-
-        $cek = Absensi::where('user_id', Auth::id())
-            ->where('tanggal', $hariIni)
-            ->first();
+        $cek = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
 
         if ($cek) {
             return back()->with('error', 'Anda sudah absen masuk hari ini!');
@@ -119,7 +108,6 @@ class AbsensiController extends Controller
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
-
         $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Tepat Waktu' : 'Telat';
 
         Absensi::create([
@@ -142,15 +130,11 @@ class AbsensiController extends Controller
         }
 
         $hariIni = Carbon::today()->toDateString();
-
-        $absen = Absensi::where('user_id', Auth::id())
-            ->where('tanggal', $hariIni)
-            ->first();
+        $absen = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
 
         if (!$absen) {
             return back()->with('error', 'Anda belum melakukan absen masuk hari ini!');
         }
-
         if ($absen->jam_pulang) {
             return back()->with('error', 'Anda sudah melakukan absen pulang hari ini!');
         }
@@ -163,10 +147,7 @@ class AbsensiController extends Controller
             return back()->with('error', 'Absen pulang hanya dapat dilakukan mulai pukul ' . $jadwal['pulang'] . '!');
         }
 
-        $absen->update([
-            'jam_pulang' => $sekarang->toTimeString(),
-        ]);
-
+        $absen->update(['jam_pulang' => $sekarang->toTimeString()]);
         return back()->with('success', 'Absen pulang berhasil dicatat. Hati-hati di jalan!');
     }
 
@@ -175,10 +156,7 @@ class AbsensiController extends Controller
     // =====================================================
     public function riwayat()
     {
-        $riwayat = Absensi::where('user_id', Auth::id())
-            ->orderBy('tanggal', 'desc')
-            ->get();
-
+        $riwayat = Absensi::where('user_id', Auth::id())->orderBy('tanggal', 'desc')->get();
         return view('absensi.riwayat', compact('riwayat'));
     }
 
@@ -187,10 +165,7 @@ class AbsensiController extends Controller
     // =====================================================
     public function laporanAbsensi()
     {
-        $laporanAbsensi = Absensi::with('user')
-            ->latest()
-            ->get();
-
+        $laporanAbsensi = Absensi::with('user')->latest()->get();
         return view('pembimbing.laporan-absensi', compact('laporanAbsensi'));
     }
 
@@ -212,6 +187,21 @@ class AbsensiController extends Controller
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
         ]);
+
+        // =====================================================
+        // DEBUGGING: TAMPILKAN DATA SEBELUM DIPROSES
+        // =====================================================
+        $tokenDikirim = $request->token;
+        $tokenDiDatabase = QrToken::where('is_active', true)->latest()->first();
+        
+        dd([
+            'Token yang di-scan (dari HP)' => $tokenDikirim,
+            'Token aktif di Database' => $tokenDiDatabase ? $tokenDiDatabase->token : 'TIDAK ADA',
+            'Waktu Sekarang' => Carbon::now()->toDateTimeString(),
+            'Waktu Expired (Database)' => $tokenDiDatabase ? $tokenDiDatabase->expires_at : 'TIDAK ADA',
+            'Status Aktif?' => $tokenDiDatabase ? ($tokenDiDatabase->is_active ? 'Ya' : 'Tidak') : 'N/A'
+        ]);
+        // =====================================================
 
         // 1. Cek Validitas Token QR
         $token = QrToken::where('token', $request->token)
@@ -240,9 +230,7 @@ class AbsensiController extends Controller
 
         // 3. Cek apakah sudah absen hari ini
         $hariIni = Carbon::today()->toDateString();
-        $sudahAbsen = Absensi::where('user_id', Auth::id())
-                             ->where('tanggal', $hariIni)
-                             ->first();
+        $sudahAbsen = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
 
         if ($sudahAbsen) {
             return response()->json(['message' => 'Anda sudah absen hari ini.'], 400);
@@ -252,7 +240,6 @@ class AbsensiController extends Controller
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
-
         $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Tepat Waktu' : 'Telat';
 
         Absensi::create([
