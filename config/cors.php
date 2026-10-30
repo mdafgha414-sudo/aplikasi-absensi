@@ -14,7 +14,7 @@ return [
     'allowed_methods' => ['*'],
 
     // 2. Samakan persis dengan URL di address bar HP Anda
-    'allowed_origins' => ['https://0e98.up.railway.app'],
+    'allowed_origins' => ['https://aplikasi-absensi-production-0e98.up.railway.app'],
 
     'allowed_origins_patterns' => [],
 
