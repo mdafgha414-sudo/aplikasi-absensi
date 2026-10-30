@@ -39,12 +39,13 @@ class AlasanKeterlambatanController extends Controller
     }
 
     // ==========================================
-    // PEMBIMBING: MELIHAT DAFTAR ALASAN
+    // GURU & PEMBIMBING: MELIHAT DAFTAR ALASAN
     // ==========================================
     public function index(Request $request)
     {
+        // Izinkan Guru dan Pembimbing
         abort_unless(
-            $request->user()->role === 'pembimbing',
+            in_array($request->user()->role, ['guru', 'pembimbing']),
             403
         );
 
@@ -53,16 +54,23 @@ class AlasanKeterlambatanController extends Controller
             ->orderByDesc('tanggal')
             ->get();
 
+        // KITA ARAHKAN KE FOLDER 'dashboard' KARENA FILE-NYA ADA DI SANA
+        if ($request->user()->role === 'guru') {
+            return view('dashboard.alasan_keterlambatan', compact('daftarAlasan'));
+        }
+
+        // Pembimbing
         return view('dashboard.alasan_keterlambatan', compact('daftarAlasan'));
     }
 
     // ==========================================
-    // PEMBIMBING: MENERIMA ALASAN
+    // GURU & PEMBIMBING: MENERIMA ALASAN
     // ==========================================
     public function terima(Request $request, $id)
     {
+        // Izinkan Guru dan Pembimbing
         abort_unless(
-            $request->user()->role === 'pembimbing',
+            in_array($request->user()->role, ['guru', 'pembimbing']),
             403
         );
 
@@ -86,12 +94,13 @@ class AlasanKeterlambatanController extends Controller
     }
 
     // ==========================================
-    // PEMBIMBING: MENOLAK ALASAN
+    // GURU & PEMBIMBING: MENOLAK ALASAN
     // ==========================================
     public function tolak(Request $request, $id)
     {
+        // Izinkan Guru dan Pembimbing
         abort_unless(
-            $request->user()->role === 'pembimbing',
+            in_array($request->user()->role, ['guru', 'pembimbing']),
             403
         );
 

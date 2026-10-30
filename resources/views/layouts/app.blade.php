@@ -162,6 +162,10 @@
                 <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
                 <li><a href="{{ route('guru.jurnal') }}" class="{{ request()->routeIs('guru.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
                 <li><a href="{{ route('guru.izin') }}" class="{{ request()->routeIs('guru.izin*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi & Izin</a></li>
+                
+                <!-- MENU ALASAN KETERLAMBATAN GURU -->
+                <li><a href="{{ route('guru.alasan-keterlambatan') }}" class="{{ request()->routeIs('guru.alasan-keterlambatan') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Alasan Keterlambatan</a></li>
+                
                 <li><a href="{{ route('qr.show') }}" class="{{ request()->routeIs('qr.show') ? 'active' : '' }}"><i class="bi bi-qr-code"></i> Tampilkan QR Absensi</a></li>
             @endif
 
@@ -242,7 +246,7 @@
                 @if(Auth::check())
                     <span class="me-3 fw-bold text-muted d-none d-sm-inline" style="font-size: 14px;">Halo, {{ Auth::user()->name }}</span>
                     
-                    <!-- FOTO PROFIL DI TOPBAR (HANYA SATU TAG <a>) -->
+                    <!-- FOTO PROFIL DI TOPBAR -->
                     <a href="{{ route('pengaturan') }}" title="Buka Pengaturan Profil" class="text-decoration-none">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-weight: bold; overflow: hidden; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                             @if(Auth::user()->foto_profil)

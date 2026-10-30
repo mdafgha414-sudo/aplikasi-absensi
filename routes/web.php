@@ -59,19 +59,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
+        
+        // IZIN
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
+        // ALASAN KETERLAMBATAN (TAMBAHAN BARU)
+        Route::get('/alasan-keterlambatan', [AlasanKeterlambatanController::class, 'index'])->name('alasan-keterlambatan');
+        Route::put('/alasan-keterlambatan/{id}/terima', [AlasanKeterlambatanController::class, 'terima'])->name('alasan.terima');
+        Route::put('/alasan-keterlambatan/{id}/tolak', [AlasanKeterlambatanController::class, 'tolak'])->name('alasan.tolak');
+
+        // EXPORT
         Route::get('/export/excel', [GuruExportController::class, 'excel'])->name('export.excel');
         Route::get('/export/pdf', [GuruExportController::class, 'pdf'])->name('export.pdf');
     });
 
     // --- FITUR KHUSUS PEMBIMBING PKL ---
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
-        // CUKUP SATU ROUTE DASHBOARD SAJA
-        Route::get('/dashboard', [GuruController::class, 'dashboardPembimbing'])
-        ->name('dashboard');
-
+        Route::get('/dashboard', [GuruController::class, 'dashboardPembimbing'])->name('dashboard');
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         Route::get('/laporan-absensi/export-excel', [GuruExportController::class, 'exportExcelAbsensi'])->name('laporan.export.excel');
         Route::get('/laporan-absensi/export-pdf', [GuruExportController::class, 'exportPdfAbsensi'])->name('laporan.export.pdf');
@@ -79,30 +84,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
 
-                // ==========================================
+        // IZIN
+        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
+        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
+
         // ALASAN KETERLAMBATAN
-        // ==========================================
-        Route::get('/alasan-keterlambatan', [
-            AlasanKeterlambatanController::class,
-            'index'
-        ])->name('alasan.index');
-
-        Route::put('/alasan-keterlambatan/{id}/terima', [
-            AlasanKeterlambatanController::class,
-            'terima'
-        ])->name('alasan.terima');
-
-        Route::put('/alasan-keterlambatan/{id}/tolak', [
-            AlasanKeterlambatanController::class,
-            'tolak'
-        ])->name('alasan.tolak');
-
-        // Izin & Approve
-        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
-        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
-
-        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
-        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
+        Route::get('/alasan-keterlambatan', [AlasanKeterlambatanController::class, 'index'])->name('alasan.index');
+        Route::put('/alasan-keterlambatan/{id}/terima', [AlasanKeterlambatanController::class, 'terima'])->name('alasan.terima');
+        Route::put('/alasan-keterlambatan/{id}/tolak', [AlasanKeterlambatanController::class, 'tolak'])->name('alasan.tolak');
     });
 
     // --- FITUR QR ABSENSI (Guru & Pembimbing) ---
