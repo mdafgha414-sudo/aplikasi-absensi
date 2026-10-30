@@ -44,7 +44,7 @@
                                 </div>
                                 <i class="bi bi-arrow-right text-muted fs-5"></i>
                             </div>
-                            <h5 class="fw-bold text-dark mb-2">Lihat & Nilai Jurnal</h5>
+                            <h5 class="fw-bold text-dark mb-2">Nilai Jurnal Siswa</h5>
                             <p class="text-secondary small mb-0">Periksa jurnal harian siswa dan berikan penilaian.</p>
                         </div>
                     </a>
@@ -60,7 +60,7 @@
                                 </div>
                                 <i class="bi bi-arrow-right text-primary fs-5"></i>
                             </div>
-                            <h5 class="fw-bold text-primary mb-2">Laporan Absensi</h5>
+                            <h5 class="fw-bold text-dark mb-2">Laporan Absensi</h5>
                             <p class="text-secondary small mb-0">Pantau rekapitulasi kehadiran dan status siswa.</p>
                         </div>
                     </a>

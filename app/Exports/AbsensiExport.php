@@ -62,7 +62,7 @@ class AbsensiExport implements FromCollection, WithHeadings, WithStyles
                     $label = 'I';
                 } elseif ($status === 'Sakit') {
                     $label = 'S';
-                } elseif ($status === 'Alpa') {
+                } elseif ($status === 'Alpha') {
                     $label = 'A';
                 } else {
                     // Hari tanpa absensi pada hari kerja yang sudah lewat.
