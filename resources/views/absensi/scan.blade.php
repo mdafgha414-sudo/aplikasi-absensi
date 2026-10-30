@@ -46,16 +46,17 @@
                     document.getElementById('status').innerText = data.message;
                 })
                 .catch(error => {
-                    document.getElementById('status').className = 'mt-4 alert alert-danger';
-    document.getElementById('status').innerText = "Error: " + error.message; // <-- Ubah teks ini
-    console.error(error); // <-- Ini untuk melihat detail di Console
+                    // MODIFIKASI DISINI: MENAMPILKAN ERROR ASLI
+                    document.getElementById('status').className = 'mt-4 alert alert-danger fw-bold';
+                    document.getElementById('status').innerText = "ERROR SISTEM: " + error.message; 
+                    console.error("Detail Error JS:", error);
                 });
             }, function(error) {
-                document.getElementById('status').className = 'mt-4 alert alert-warning';
-                document.getElementById('status').innerText = "Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin diberikan.";
+                document.getElementById('status').className = 'mt-4 alert alert-warning fw-bold';
+                document.getElementById('status').innerText = "Gagal GPS: " + error.message + " (Pastikan izin lokasi aktif)";
             });
         } else {
-            document.getElementById('status').className = 'mt-4 alert alert-danger';
+            document.getElementById('status').className = 'mt-4 alert alert-danger fw-bold';
             document.getElementById('status').innerText = "Browser Anda tidak mendukung GPS.";
         }
     }
