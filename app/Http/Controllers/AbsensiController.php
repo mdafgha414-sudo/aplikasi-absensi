@@ -188,21 +188,6 @@ class AbsensiController extends Controller
             'lng' => 'required|numeric',
         ]);
 
-        // =====================================================
-        // DEBUGGING: TAMPILKAN DATA SEBELUM DIPROSES
-        // =====================================================
-        $tokenDikirim = $request->token;
-        $tokenDiDatabase = QrToken::where('is_active', true)->latest()->first();
-        
-        dd([
-            'Token yang di-scan (dari HP)' => $tokenDikirim,
-            'Token aktif di Database' => $tokenDiDatabase ? $tokenDiDatabase->token : 'TIDAK ADA',
-            'Waktu Sekarang' => Carbon::now()->toDateTimeString(),
-            'Waktu Expired (Database)' => $tokenDiDatabase ? $tokenDiDatabase->expires_at : 'TIDAK ADA',
-            'Status Aktif?' => $tokenDiDatabase ? ($tokenDiDatabase->is_active ? 'Ya' : 'Tidak') : 'N/A'
-        ]);
-        // =====================================================
-
         // 1. Cek Validitas Token QR
         $token = QrToken::where('token', $request->token)
                     ->where('is_active', true)
