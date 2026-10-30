@@ -184,10 +184,13 @@
 
                 <!-- Tombol Export -->
                 <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-success btn-sm px-3">
-                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                    <i class="bi bi-file-earmark-excel me-1"></i> EXCEL
                 </a>
-                <a href="{{ route('pembimbing.laporan.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-danger btn-sm px-3">
-                    <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                <a href="{{ route('pembimbing.laporan.export.pdf', [
+                'bulan' => $bulan, 
+                'tahun' => $tahun
+                ]) }}" class="btn btn-danger">
+                    <i class="bi bi-file-pdf"></i> PDF
                 </a>
             </div>
         </div>

@@ -35,7 +35,7 @@
         <div class="col-12">
             <div class="row g-3">
                 <!-- Card 1: Jurnal -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <a href="{{ url('/pembimbing/jurnal') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -51,7 +51,7 @@
                 </div>
 
                 <!-- Card 2: Laporan Absensi -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <a href="{{ url('/pembimbing/laporan-absensi') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card border-primary" style="border: 1px solid #bfdbfe !important;">
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -67,7 +67,7 @@
                 </div>
 
                 <!-- Card 3: Daftar Izin -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <a href="{{ url('/pembimbing/izin') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -79,6 +79,35 @@
                             <h5 class="fw-bold text-dark mb-2">Daftar Izin Siswa</h5>
                             <p class="text-secondary small mb-0">Lihat dan setujui pengajuan izin atau sakit siswa.</p>
                         </div>
+                    </a>
+                </div>
+                <!-- Card 4: Alasan Keterlambatan -->
+                <div class="col-md-3">
+                    <a href="{{ url('/pembimbing/alasan-keterlambatan') }}"
+                    class="text-decoration-none action-card-link">
+
+                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
+
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+
+                                <div class="action-icon-wrapper rounded-3 bg-primary text-white d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-clock-history fs-3"></i>
+                                </div>
+
+                                <i class="bi bi-arrow-right text-muted fs-5"></i>
+
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-2">
+                                Alasan Keterlambatan
+                            </h5>
+
+                            <p class="text-secondary small mb-0">
+                                Kelola dan atur alasan keterlambatan siswa.
+                            </p>
+
+                        </div>
+
                     </a>
                 </div>
             </div>
