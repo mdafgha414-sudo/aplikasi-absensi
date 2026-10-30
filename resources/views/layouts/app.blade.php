@@ -82,7 +82,6 @@
 
         .main-content.expanded { margin-left: 0; }
 
-        /* Style saat di halaman pengaturan (sidebar & topbar hilang) */
         .main-content.full-screen {
             margin-left: 0;
             padding: 30px 40px;
@@ -170,6 +169,8 @@
                 <li><a href="{{ route('pembimbing.jurnal') }}" class="{{ request()->routeIs('pembimbing.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
                 <li><a href="{{ route('pembimbing.laporan-absensi') }}" class="{{ request()->routeIs('pembimbing.laporan-absensi') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi</a></li>
                 <li><a href="{{ route('pembimbing.izin') }}" class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
+                {{-- TAMBAHAN: Menu Keterlambatan Siswa untuk Pembimbing --}}
+                <li><a href="{{ route('pembimbing.keterlambatan.index') }}" class="{{ request()->routeIs('pembimbing.keterlambatan.*') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Keterlambatan Siswa</a></li>
             @endif
 
             @if(Auth::user()->role === 'admin')
@@ -190,7 +191,7 @@
             @else
                 <li><a href="{{ route('pengaturan') }}" class="{{ request()->is('pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan Profil</a></li>
             @endif
-          
+         
             <li>
                 <form action="/logout" method="POST">
                     @csrf

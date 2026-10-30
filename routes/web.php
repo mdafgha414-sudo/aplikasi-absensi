@@ -29,7 +29,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- PENGATURAN PROFIL (USER, GURU, PEMBIMBING) ---
-    // Tambahan: Route ini agar menu Pengaturan di Sidebar tidak error/bentrok
     Route::get('/pengaturan', [SettingController::class, 'profil'])->name('pengaturan');
     Route::put('/pengaturan/update', [SettingController::class, 'updateProfil'])->name('pengaturan.update');
 
@@ -83,6 +82,10 @@ Route::middleware('auth')->group(function () {
         // Izin & Approve
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
+
+        // --- TAMBAHAN: Verifikasi Alasan Keterlambatan Siswa ---
+        Route::get('/keterlambatan', [AlasanKeterlambatanController::class, 'indexPembimbing'])->name('keterlambatan.index');
+        Route::post('/keterlambatan/verify/{id}', [AlasanKeterlambatanController::class, 'verifyPembimbing'])->name('keterlambatan.verify');
     });
 }); 
 
