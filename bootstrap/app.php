@@ -12,9 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-           $middleware->alias([
-        'isAdmin' => \App\Http\Middleware\IsAdmin::class, // <--- Tambahkan ini
-    ]);
+        // 1. Tambahkan ini agar Laravel percaya pada proxy Railway (Fix Mixed Content)
+        $middleware->trustProxies(at: '*');
+
+        // 2. Daftarkan alias middleware isAdmin
+        $middleware->alias([
+            'isAdmin' => \App\Http\Middleware\IsAdmin::class, 
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
