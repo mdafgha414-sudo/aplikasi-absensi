@@ -47,7 +47,8 @@
                 })
                 .catch(error => {
                     document.getElementById('status').className = 'mt-4 alert alert-danger';
-                    document.getElementById('status').innerText = "Terjadi kesalahan sistem.";
+    document.getElementById('status').innerText = "Error: " + error.message; // <-- Ubah teks ini
+    console.error(error); // <-- Ini untuk melihat detail di Console
                 });
             }, function(error) {
                 document.getElementById('status').className = 'mt-4 alert alert-warning';
