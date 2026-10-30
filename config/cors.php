@@ -6,20 +6,15 @@ return [
     |--------------------------------------------------------------------------
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
-    |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
-    |
-    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    // 1. Daftarkan route scan di sini
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'absensi/proses-scan'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://aplikasi-absensi-production-0e98.up.railway.app'],
+    // 2. Samakan persis dengan URL di address bar HP Anda
+    'allowed_origins' => ['https://0e98.up.railway.app'],
 
     'allowed_origins_patterns' => [],
 
