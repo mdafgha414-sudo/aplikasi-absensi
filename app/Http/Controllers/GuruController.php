@@ -144,7 +144,11 @@ class GuruController extends Controller
     // FUNGSI DASHBOARD PEMBIMBING (RIWAYAT JURNAL)
     public function dashboardPembimbing()
     {
-        $jurnalTerbaru = Jurnal::with('user')->orderBy('created_at', 'desc')->take(5)->get();
+        $jurnalTerbaru = Jurnal::with('user')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
         return view('dashboard.user_pembimbing', compact('jurnalTerbaru'));
     }
 }

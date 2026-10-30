@@ -11,6 +11,7 @@ use App\Http\Controllers\GuruExportController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\AlasanKeterlambatanController;
+use App\Http\Controllers\QrAbsensiController;
 
 // ==========================================
 // ROUTE PUBLIK
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- PENGATURAN PROFIL (USER, GURU, PEMBIMBING) ---
+    // --- PENGATURAN PROFIL ---
     Route::get('/pengaturan', [SettingController::class, 'profil'])->name('pengaturan');
     Route::put('/pengaturan/update', [SettingController::class, 'updateProfil'])->name('pengaturan.update');
 
@@ -39,9 +41,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/absensi/riwayat', [AbsensiController::class, 'riwayat'])->name('absensi.riwayat');
     Route::post('/absensi/alasan-terlambat', [AlasanKeterlambatanController::class, 'simpan'])->name('absensi.alasan.simpan');
     
+    // FITUR SCAN QR (Siswa)
+    Route::get('/absensi/scan', [AbsensiController::class, 'showScan'])->name('absensi.scan');
+    Route::post('/absensi/proses-scan', [AbsensiController::class, 'prosesScan'])->name('absensi.proses-scan');
+    
+    // JURNAL & IZIN SISWA
     Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
     Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
-    
     Route::get('/izin', [IzinController::class, 'index'])->name('izin.index');
     Route::post('/izin', [IzinController::class, 'store'])->name('izin.store');
 
@@ -53,9 +59,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
-        
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
-
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
@@ -65,19 +69,34 @@ Route::middleware('auth')->group(function () {
 
     // --- FITUR KHUSUS PEMBIMBING PKL ---
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
-        // Dashboard Pembimbing
-        Route::get(
-            '/dashboard',
-            [GuruController::class, 'dashboardPembimbing']
-        )->name('dashboard');
+        // CUKUP SATU ROUTE DASHBOARD SAJA
+        Route::get('/dashboard', [GuruController::class, 'dashboardPembimbing'])
+        ->name('dashboard');
 
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         Route::get('/laporan-absensi/export-excel', [GuruExportController::class, 'exportExcelAbsensi'])->name('laporan.export.excel');
         Route::get('/laporan-absensi/export-pdf', [GuruExportController::class, 'exportPdfAbsensi'])->name('laporan.export.pdf');
         
-        // Jurnal & Nilai Pembimbing
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
+
+                // ==========================================
+        // ALASAN KETERLAMBATAN
+        // ==========================================
+        Route::get('/alasan-keterlambatan', [
+            AlasanKeterlambatanController::class,
+            'index'
+        ])->name('alasan.index');
+
+        Route::put('/alasan-keterlambatan/{id}/terima', [
+            AlasanKeterlambatanController::class,
+            'terima'
+        ])->name('alasan.terima');
+
+        Route::put('/alasan-keterlambatan/{id}/tolak', [
+            AlasanKeterlambatanController::class,
+            'tolak'
+        ])->name('alasan.tolak');
 
         // Izin & Approve
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
@@ -86,7 +105,13 @@ Route::middleware('auth')->group(function () {
         // --- TAMBAHAN: Verifikasi Alasan Keterlambatan Siswa ---
         Route::get('/keterlambatan', [AlasanKeterlambatanController::class, 'indexPembimbing'])->name('keterlambatan.index');
         Route::post('/keterlambatan/verify/{id}', [AlasanKeterlambatanController::class, 'verifyPembimbing'])->name('keterlambatan.verify');
+        Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
+        Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
     });
+
+    // --- FITUR QR ABSENSI (Guru & Pembimbing) ---
+    Route::get('/qr-absensi', [QrAbsensiController::class, 'show'])->name('qr.show');
+    Route::post('/qr-absensi/generate', [QrAbsensiController::class, 'generate'])->name('qr.generate');
 }); 
 
 // ==========================================

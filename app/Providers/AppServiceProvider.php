@@ -3,7 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Pagination\Paginator; // Tambahkan di atas
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\URL; // Tambahan untuk paksa HTTPS
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        
+        //
     }
 
     /**
@@ -20,6 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-          Paginator::useBootstrapFive(); // <--- TAMBAHKAN BARIS INI
+        // 1. Gunakan Bootstrap 5 untuk Pagination
+        Paginator::useBootstrapFive();
+
+        // 2. Paksa HTTPS jika di server Production (Railway)
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }

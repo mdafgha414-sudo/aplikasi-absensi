@@ -159,28 +159,52 @@
 
             @if(Auth::user()->role === 'guru')
                 <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
-                <li><a href="{{ route('guru.jurnal') }}" class="{{ request()->routeIs('guru.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Lihat Jurnal Siswa</a></li>
-                <li><a href="{{ route('guru.laporan-absensi') }}" class="{{ request()->routeIs('guru.laporan-absensi') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi</a></li>
-                <li><a href="{{ route('guru.izin') }}" class="{{ request()->routeIs('guru.izin*') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
+                <li><a href="{{ route('guru.jurnal') }}" class="{{ request()->routeIs('guru.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
+                <li><a href="{{ route('guru.izin') }}" class="{{ request()->routeIs('guru.izin*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi & Izin</a></li>
+                <li><a href="{{ route('qr.show') }}" class="{{ request()->routeIs('qr.show') ? 'active' : '' }}"><i class="bi bi-qr-code"></i> Tampilkan QR Absensi</a></li>
             @endif
 
             @if(Auth::user()->role === 'pembimbing')
                 <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
                 <li><a href="{{ route('pembimbing.jurnal') }}" class="{{ request()->routeIs('pembimbing.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
+<<<<<<< HEAD
                 <li><a href="{{ route('pembimbing.laporan-absensi') }}" class="{{ request()->routeIs('pembimbing.laporan-absensi') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi</a></li>
                 <li><a href="{{ route('pembimbing.izin') }}" class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
                 {{-- TAMBAHAN: Menu Keterlambatan Siswa untuk Pembimbing --}}
                 <li><a href="{{ route('pembimbing.keterlambatan.index') }}" class="{{ request()->routeIs('pembimbing.keterlambatan.*') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Keterlambatan Siswa</a></li>
+=======
+                <li>
+                    <a href="{{ route('pembimbing.laporan-absensi') }}"
+                       class="{{ request()->routeIs('pembimbing.laporan-absensi') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-check"></i> Laporan Absensi
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('/pembimbing/alasan-keterlambatan') }}"
+                       class="{{ request()->is('pembimbing/alasan-keterlambatan*') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history"></i> Alasan Keterlambatan
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('pembimbing.izin') }}"
+                       class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}">
+                        <i class="bi bi-envelope-paper"></i> Daftar Izin Siswa
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('qr.show') }}"
+                       class="{{ request()->routeIs('qr.show') ? 'active' : '' }}">
+                        <i class="bi bi-qr-code"></i> Tampilkan QR Absensi
+                    </a>
+                </li>
+>>>>>>> 31e5207b0a2e24f9dd38d68a8b251297c4ab5cff
             @endif
 
             @if(Auth::user()->role === 'admin')
-                <li>
-                    <a href="{{ url('/admin/dashboard') }}"
-                    class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
-                        <i class="bi bi-speedometer2"></i>
-                        Dashboard Admin
-                    </a>
-                </li>
+                <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
             @endif
 
             <!-- MENU PENGATURAN -->
@@ -224,10 +248,8 @@
                 @if(Auth::check())
                     <span class="me-3 fw-bold text-muted d-none d-sm-inline" style="font-size: 14px;">Halo, {{ Auth::user()->name }}</span>
                     
-                    <!-- FOTO PROFIL DI TOPBAR (BISA DIKLIK) -->
-                    <a href="{{ route('pengaturan') }}"
-                        title="Buka Pengaturan Profil"
-                        class="text-decoration-none">
+                    <!-- FOTO PROFIL DI TOPBAR (HANYA SATU TAG <a>) -->
+                    <a href="{{ route('pengaturan') }}" title="Buka Pengaturan Profil" class="text-decoration-none">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-weight: bold; overflow: hidden; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                             @if(Auth::user()->foto_profil)
                                 <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
