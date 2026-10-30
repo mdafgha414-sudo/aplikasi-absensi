@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Absensi;
 use App\Models\Setting;
-use App\Models\QrToken; // Tambahan untuk QR
+use App\Models\QrToken;
 use Illuminate\Support\Facades\Auth;
 
 class AbsensiController extends Controller
@@ -28,24 +28,56 @@ class AbsensiController extends Controller
 
         $namaHari = $hari[Carbon::now()->dayOfWeekIso];
 
-        // Ambil jadwal yang disimpan admin
-        $masuk = Setting::where(
-            'key', 'waktu_masuk_' . $namaHari
-        )->value('value') ?? '09:00';
-
-        $batasTelat = Setting::where(
-            'key', 'batas_jam_telat_' . $namaHari
-        )->value('value') ?? '09:00';
-
-        $pulang = Setting::where(
-            'key', 'jam_pulang_' . $namaHari
-        )->value('value') ?? '16:00';
+        $masuk = Setting::where('key', 'waktu_masuk_' . $namaHari)->value('value') ?? '09:00';
+        $batasTelat = Setting::where('key', 'batas_jam_telat_' . $namaHari)->value('value') ?? '09:00';
+        $pulang = Setting::where('key', 'jam_pulang_' . $namaHari)->value('value') ?? '16:00';
 
         return [
             'masuk' => substr($masuk, 0, 5),
             'telat' => substr($batasTelat, 0, 5),
             'pulang' => substr($pulang, 0, 5),
         ];
+    }
+
+    // =====================================================
+    // FUNGSI BANTU: CEK APAKAH ABSENSI DIIZINKAN HARI INI
+    // =====================================================
+    private function absensiDiizinkan(): bool
+    {
+        $hariIni = strtolower(Carbon::now()->locale('id')->dayName);
+
+        // Sabtu dan Minggu mengikuti pengaturan admin.
+        if (in_array($hariIni, ['sabtu', 'minggu'])) {
+            $status = Setting::where('key', $hariIni . '_aktif')->value('value');
+            
+            // Sabtu default ON, Minggu default OFF.
+            $default = $hariIni === 'sabtu' ? '1' : '0';
+
+            return (string) ($status ?? $default) === '1';
+        }
+
+        // Senin sampai Jumat tetap diizinkan.
+        return true;
+    }
+
+    // =====================================================
+    // FUNGSI BANTU: HITUNG JARAK (HAVERSINE)
+    // =====================================================
+    private function hitungJarak($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371000; // meter
+        $latFrom = deg2rad($lat1);
+        $lonFrom = deg2rad($lon1);
+        $latTo = deg2rad($lat2);
+        $lonTo = deg2rad($lon2);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+          cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+
+        return $angle * $earthRadius;
     }
 
     // =====================================================
@@ -60,14 +92,9 @@ class AbsensiController extends Controller
             ->first();
 
         $jadwal = $this->jadwalHariIni();
-
-        // Variabel ini dipakai untuk menampilkan batas terlambat
         $jamMasukHariIni = $jadwal['telat'];
 
-        return view('absensi.index', compact(
-            'absenHariIni',
-            'jamMasukHariIni'
-        ));
+        return view('absensi.index', compact('absenHariIni', 'jamMasukHariIni'));
     }
 
     // =====================================================
@@ -75,6 +102,10 @@ class AbsensiController extends Controller
     // =====================================================
     public function masuk()
     {
+        if (!$this->absensiDiizinkan()) {
+            return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
+        }
+
         $hariIni = Carbon::today()->toDateString();
 
         $cek = Absensi::where('user_id', Auth::id())
@@ -82,24 +113,14 @@ class AbsensiController extends Controller
             ->first();
 
         if ($cek) {
-            return back()->with(
-                'error',
-                'Anda sudah absen masuk hari ini!'
-            );
+            return back()->with('error', 'Anda sudah absen masuk hari ini!');
         }
 
         $jadwal = $this->jadwalHariIni();
-
         $waktuSekarang = Carbon::now();
+        $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
 
-        // Status ditentukan berdasarkan batas terlambat admin
-        $batasTelat = Carbon::today()->setTimeFromTimeString(
-            $jadwal['telat']
-        );
-
-        $statusAbsen = $waktuSekarang->lte($batasTelat)
-            ? 'Tepat Waktu'
-            : 'Telat';
+        $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Tepat Waktu' : 'Telat';
 
         Absensi::create([
             'user_id' => Auth::id(),
@@ -108,10 +129,7 @@ class AbsensiController extends Controller
             'status' => $statusAbsen,
         ]);
 
-        return back()->with(
-            'success',
-            'Absen masuk berhasil! Status Anda: ' . $statusAbsen
-        );
+        return back()->with('success', 'Absen masuk berhasil! Status Anda: ' . $statusAbsen);
     }
 
     // =====================================================
@@ -119,6 +137,10 @@ class AbsensiController extends Controller
     // =====================================================
     public function pulang()
     {
+        if (!$this->absensiDiizinkan()) {
+            return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
+        }
+
         $hariIni = Carbon::today()->toDateString();
 
         $absen = Absensi::where('user_id', Auth::id())
@@ -126,46 +148,26 @@ class AbsensiController extends Controller
             ->first();
 
         if (!$absen) {
-            return back()->with(
-                'error',
-                'Anda belum melakukan absen masuk hari ini!'
-            );
+            return back()->with('error', 'Anda belum melakukan absen masuk hari ini!');
         }
 
         if ($absen->jam_pulang) {
-            return back()->with(
-                'error',
-                'Anda sudah melakukan absen pulang hari ini!'
-            );
+            return back()->with('error', 'Anda sudah melakukan absen pulang hari ini!');
         }
 
-        // Ambil jam pulang dari pengaturan admin
         $jadwal = $this->jadwalHariIni();
-
         $sekarang = Carbon::now();
+        $waktuPulang = Carbon::today()->setTimeFromTimeString($jadwal['pulang']);
 
-        $waktuPulang = Carbon::today()->setTimeFromTimeString(
-            $jadwal['pulang']
-        );
-
-        // Tolak absen pulang jika belum waktunya
         if ($sekarang->lt($waktuPulang)) {
-            return back()->with(
-                'error',
-                'Absen pulang hanya dapat dilakukan mulai pukul '
-                . $jadwal['pulang'] . '!'
-            );
+            return back()->with('error', 'Absen pulang hanya dapat dilakukan mulai pukul ' . $jadwal['pulang'] . '!');
         }
 
-        // Simpan absensi pulang
         $absen->update([
             'jam_pulang' => $sekarang->toTimeString(),
         ]);
 
-        return back()->with(
-            'success',
-            'Absen pulang berhasil dicatat. Hati-hati di jalan!'
-        );
+        return back()->with('success', 'Absen pulang berhasil dicatat. Hati-hati di jalan!');
     }
 
     // =====================================================
@@ -189,10 +191,7 @@ class AbsensiController extends Controller
             ->latest()
             ->get();
 
-        return view(
-            'pembimbing.laporan-absensi',
-            compact('laporanAbsensi')
-        );
+        return view('pembimbing.laporan-absensi', compact('laporanAbsensi'));
     }
 
     // =====================================================
@@ -229,7 +228,7 @@ class AbsensiController extends Controller
         $lngSiswa = $request->lng;
         $latPkl = env('PKL_LATITUDE');
         $lngPkl = env('PKL_LONGITUDE');
-        $radius = env('PKL_RADIUS', 100); // Default 100 meter
+        $radius = env('PKL_RADIUS', 100);
 
         $jarak = $this->hitungJarak($latSiswa, $lngSiswa, $latPkl, $lngPkl);
 
@@ -264,25 +263,5 @@ class AbsensiController extends Controller
         ]);
 
         return response()->json(['message' => 'Absensi berhasil! Status: ' . $statusAbsen]);
-    }
-
-    // =====================================================
-    // FUNGSI BANTU: HITUNG JARAK (HAVERSINE)
-    // =====================================================
-    private function hitungJarak($lat1, $lon1, $lat2, $lon2)
-    {
-        $earthRadius = 6371000; // meter
-        $latFrom = deg2rad($lat1);
-        $lonFrom = deg2rad($lon1);
-        $latTo = deg2rad($lat2);
-        $lonTo = deg2rad($lon2);
-
-        $latDelta = $latTo - $latFrom;
-        $lonDelta = $lonTo - $lonFrom;
-
-        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-          cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
-
-        return $angle * $earthRadius;
     }
 }

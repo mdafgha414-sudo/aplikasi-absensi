@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -528,9 +531,9 @@
         }
 
         .day-card.sunday {
-            --day-color: #8493a9;
-            --day-light: #edf1f5;
-            background: #fafbfd;
+        --day-color: #2878f0;
+        --day-light: #e8f1ff;
+        background: white;
         }
 
         .day-info {
@@ -944,89 +947,186 @@
                 margin-left: 0;
             }
         }
+
+        /* Switch Sabtu dan Minggu */
+        .switch-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-top: 2px;
+        }
+
+        .switch-status {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .switch-wrapper:has(input:checked) .switch-status {
+            color: #1672e8;
+        }
+
+        .sunday-switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .sunday-switch input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+        }
+
+        .sunday-switch .switch-track {
+            position: absolute;
+            inset: 0;
+            background: #cbd5e1;
+            border-radius: 30px;
+            transition: background .2s ease;
+        }
+
+        .sunday-switch .switch-track::before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 3px;
+            top: 3px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px #0002;
+            transition: transform .2s ease;
+        }
+
+        .sunday-switch input:checked + .switch-track {
+            background: #2878f0;
+        }
+
+        .sunday-switch input:checked + .switch-track::before {
+            transform: translateX(18px);
+        }
+
+        .day-card:has(.sunday-switch input:not(:checked)) .day-info {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .day-card:has(.sunday-switch input:not(:checked)) .day-info small {
+            color: #64748b;
+        }
+
+        /* ========================================
+        SIDEBAR PENGATURAN - SAMA DENGAN DASHBOARD
+        ======================================== */
+        .sidebar {
+            background: #e0f2fe !important;
+            color: #172033 !important;
+            border-right: 1px solid #cfe8fb;
+        }
+
+        .brand {
+            background: #e0f2fe !important;
+            border-bottom: 1px solid #cfe8fb !important;
+        }
+
+        .brand-icon {
+            color: #0798e8 !important;
+        }
+
+        .brand h2 {
+            color: #172033 !important;
+        }
+
+        .brand p {
+            color: #526780 !important;
+        }
+
+        .nav-label {
+            color: #71839a !important;
+        }
+
+        .nav-link {
+            color: #172033 !important;
+            border-radius: 10px;
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link:hover {
+            background: #c5e5ff !important;
+            color: #1769c2 !important;
+        }
+
+        /* Menu yang sedang aktif */
+        .nav-link.active {
+            background: #c5e5ff !important;
+            color: #1769c2 !important;
+        }
+
+        /* Logout tetap merah */
+        .nav-link.logout {
+            color: #ef4444 !important;
+        }
+
+        .nav-link.logout:hover {
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+        }
+
+        .sidebar-footer {
+            color: #526780 !important;
+        }
+
+        .sidebar-footer i {
+            color: #0798e8 !important;
+        }
+
+        /* SIDEBAR: MENU AKTIF SAMA DENGAN DASHBOARD ADMIN */
+        .sidebar .nav-link {
+            margin-left: 12px;
+            margin-right: 12px;
+            width: calc(100% - 24px);
+            box-sizing: border-box;
+            border-radius: 9px;
+            transition: background .2s ease, color .2s ease;
+        }
+
+        .sidebar .nav-link.active {
+            background: #0086c9 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(0, 134, 201, .18);
+        }
+
+        .sidebar .nav-link.active i {
+            color: #ffffff !important;
+        }
+
+        .sidebar .nav-link:not(.active):hover {
+            background: #c5e5ff !important;
+            color: #1769c2 !important;
+        }
+
+        /* LOGOUT TETAP MERAH */
+        .sidebar .nav-link.logout {
+            color: #ef4444 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .sidebar .nav-link.logout:hover {
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+        }
     </style>
 </head>
 
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-<aside class="sidebar" id="sidebar">
-    <div class="brand">
-        <i class="fa-regular fa-calendar-check brand-icon"></i>
-        <div>
-            <h2>Timetrix</h2>
-            <p>Attendance System</p>
-        </div>
-    </div>
-
-    <div class="nav-label">MENU UTAMA</div>
-
-    <a href="{{ url('/dashboard') }}" class="nav-link">
-        <i class="fa-solid fa-house"></i>
-        Dashboard Admin
-    </a>
-
-    <div class="nav-label">PENGATURAN</div>
-
-    
-    <a href="{{ url('/admin/setting') }}" class="nav-link active">
-        <i class="fa-solid fa-gear"></i>
-        Pengaturan
-    </a>
-
-
-    <a href="{{ url('/logout') }}"
-       class="nav-link logout"
-       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        Logout
-    </a>
-
-    <form id="logout-form" action="{{ url('/logout') }}" method="POST" hidden>
-        @csrf
-    </form>
-
-    <div class="sidebar-footer">
-        <i class="fa-solid fa-calendar-days"></i>
-        <p>Kelola waktu, tingkatkan produktivitas bersama Timetrix.</p>
-    </div>
-</aside>
-
-<main class="main">
-
-    <header class="topbar">
-        <button type="button"
-                class="menu-toggle"
-                id="menuToggle"
-                aria-label="Buka atau tutup sidebar"
-                aria-expanded="true">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="search"
-                   id="searchInput"
-                   placeholder="Cari hari atau pengaturan...">
-        </div>
-
-        <div class="topbar-right">
-            <div class="notification">
-                <i class="fa-regular fa-bell"></i>
-            </div>
-
-            <div class="profile">
-                <div class="avatar">A</div>
-                <div class="profile-info">
-                    <strong>Halo, Admin</strong>
-                    <small>Administrator</small>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <section class="content">
 
         <div class="breadcrumb">
             <i class="fa-solid fa-house"></i>
@@ -1198,6 +1298,74 @@
                             background: #1764d1;
                         }
 
+                        /* Kontrol pilih hari dan ON/OFF */
+                        .day-controls {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 10px;
+                            min-width: 0;
+                        }
+
+                        .day-controls .checkbox-pilih-hari {
+                            margin: 0;
+                            font-size: 10px;
+                        }
+
+                        /* Tombol switch ON/OFF */
+                        .sunday-switch {
+                            position: relative;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 42px;
+                            height: 24px;
+                            margin: 0;
+                            cursor: pointer;
+                        }
+
+                        .sunday-switch input {
+                            position: absolute;
+                            opacity: 0;
+                            width: 1px;
+                            height: 1px;
+                        }
+
+                        .sunday-switch .switch-track {
+                            position: absolute;
+                            inset: 0;
+                            background: #cbd5e1;
+                            border-radius: 30px;
+                            transition: background .2s ease;
+                        }
+
+                        .sunday-switch .switch-track::before {
+                            content: "";
+                            position: absolute;
+                            width: 18px;
+                            height: 18px;
+                            left: 3px;
+                            top: 3px;
+                            background: white;
+                            border-radius: 50%;
+                            box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+                            transition: transform .2s ease;
+                        }
+
+                        .sunday-switch input:checked + .switch-track {
+                            background: #2878f0;
+                        }
+
+                        .sunday-switch input:checked + .switch-track::before {
+                            transform: translateX(18px);
+                        }
+
+                        .sunday-switch input:focus-visible + .switch-track {
+                            outline: 3px solid #bfdbfe;
+                            outline-offset: 2px;
+                        }
+
                         @media (max-width: 800px) {
                             .pengaturan-massal {
                                 grid-template-columns: 1fr;
@@ -1305,6 +1473,34 @@
                             );
                         }
 
+                         function updateSwitchStatus(input) {
+                        const wrapper = input.closest('.switch-wrapper');
+                        const status = wrapper.querySelector('.switch-status');
+
+                        status.textContent = input.checked ? 'Aktif' : 'Nonaktif';
+                    }
+
+                        function updateSwitchStatus(input) {
+                        const wrapper = input.closest('.switch-wrapper');
+
+                        if (!wrapper) return;
+
+                        const status = wrapper.querySelector('.switch-status');
+
+                        if (status) {
+                            status.textContent = input.checked ? 'Aktif' : 'Nonaktif';
+                        }
+
+                        const card = input.closest('.day-card');
+
+                        if (card) {
+                            const dayInfo = card.querySelector('.day-info small');
+
+                            if (dayInfo) {
+                                dayInfo.textContent = input.checked ? 'Hari Kerja' : 'Hari Libur';
+                            }
+                        }
+                    }
                         </script>
 
 
@@ -1315,7 +1511,7 @@
                             <i class="fa-regular fa-clock"></i>
                             <div>
                                 <small>Total Hari Kerja</small>
-                                <strong>6 hari dalam seminggu</strong>
+                                <strong>7 hari dalam seminggu</strong>
                             </div>
                         </div>
 
@@ -1359,8 +1555,10 @@
                          data-day="{{ $day[0] }}"
                          data-holiday="{{ $isSunday ? 'true' : 'false' }}">
 
-                         <!-- CHECKBOX PILIH HARI -->
-                        @if(!$isSunday)
+                         <!-- KONTROL HARI: PILIH DAN ON/OFF MINGGU -->
+                        <!-- KONTROL PILIH HARI DAN SWITCH SABTU/MINGGU -->
+                        <div class="day-controls">
+
                             <label class="checkbox-pilih-hari">
                                 <input
                                     type="checkbox"
@@ -1370,14 +1568,45 @@
                                 >
                                 Pilih
                             </label>
+
+                            @if(in_array($key, ['sabtu', 'minggu']))
+                            <div class="switch-wrapper">
+                                <label class="sunday-switch">
+                                    <input
+                                        type="checkbox"
+                                        name="jadwal[{{ $key }}][aktif]"
+                                        value="1"
+                                        {{ old(
+                                            "jadwal.$key.aktif",
+                                            $jadwal[$key]['aktif'] ?? ($key === 'sabtu' ? '1' : '0')
+                                        ) == '1' ? 'checked' : '' }}
+                                        onchange="updateSwitchStatus(this)"
+                                    >
+                                    <span class="switch-track"></span>
+                                </label>
+
+                                <span class="switch-status">
+                                    {{ ($jadwal[$key]['aktif'] ?? ($key === 'sabtu' ? '1' : '0')) == '1' ? 'Aktif' : 'Nonaktif' }}
+                                </span>
+                            </div>
                         @endif
+
+                        </div>
+                        <!-- AKHIR KONTROL -->
+                        <!-- AKHIR KONTROL HARI -->
 
                         <div class="day-info">
                             <div class="day-icon">
                                 <i class="fa-regular fa-calendar-check"></i>
                             </div>
                             <h3>{{ $day[0] }}</h3>
-                            <small>{{ $isSunday ? 'Hari Libur' : 'Hari Kerja' }}</small>
+                            <small>
+                                @if($isSunday)
+                                    {{ old('jadwal.minggu.aktif', $jadwal['minggu']['aktif'] ?? '0') == '1' ? 'Hari Kerja' : 'Hari Libur' }}
+                                @else
+                                    Hari Kerja
+                                @endif
+                            </small>
                         </div>
 
                         <div class="field">
@@ -1391,7 +1620,7 @@
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
-                                {{ $isSunday ? 'Tidak aktif' : 'Jam mulai kerja' }}
+                                Jam mulai kerja
                             </small>
                         </div>
 
@@ -1406,7 +1635,7 @@
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
-                                {{ $isSunday ? 'Tidak aktif' : 'Batas waktu keterlambatan' }}
+                                Batas waktu keterlambatan
                             </small>
                         </div>
 
@@ -1421,7 +1650,7 @@
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
-                                {{ $isSunday ? 'Tidak aktif' : 'Jam selesai kerja' }}
+                                Jam selesai kerja 
                             </small>
                         </div>
 
@@ -1442,7 +1671,7 @@
                 </div>
 
                 <div class="panel-footer">
-                    <a href="{{ url('/dashboard') }}" class="btn btn-back">
+                    <a href="{{ url('/admin/dashboard') }}" class="btn btn-back">
                         <i class="fa-solid fa-arrow-left"></i>
                         Kembali
                     </a>
@@ -1456,8 +1685,6 @@
             </div>
         </form>
 
-    </section>
-</main>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -1568,3 +1795,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </body>
 </html>
 ```
+@endsection

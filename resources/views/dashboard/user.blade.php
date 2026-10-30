@@ -198,7 +198,7 @@
 
     .ud-bottom-grid {
         display: grid;
-        grid-template-columns: 1.3fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 20px;
         margin-bottom: 25px;
     }

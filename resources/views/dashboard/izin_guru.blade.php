@@ -190,7 +190,7 @@
                 <i class="bi bi-calendar-check"></i> Laporan Kehadiran
             </div>
             <h1 class="hero-title">Laporan Absensi & Izin PKL</h1>
-            <p class="hero-desc">Pantau riwayat kehadiran, keterlambatan, serta persetujuan izin siswa bimbingan Anda secara praktis.</p>
+            <p class="hero-desc">Pantau riwayat kehadiran, keterlambatan, serta persetujuan izin siswa PKL secara praktis.</p>
         </div>
         
         <div class="hero-right">

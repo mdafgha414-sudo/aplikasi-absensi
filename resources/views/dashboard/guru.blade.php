@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
         <div>
             <h3 class="fw-bold text-dark mb-1">Laporan Jurnal Siswa</h3>
-            <p class="text-secondary small mb-0">Pantau, periksa, dan berikan penilaian pada jurnal harian siswa PKL.</p>
+            <p class="text-secondary small mb-0">Pantau, dan periksa, jurnal harian siswa PKL.</p>
         </div>
         
         <!-- Card Total Siswa -->
@@ -53,7 +53,9 @@
                             <th class="fw-bold py-3">KEGIATAN</th>
                             <th class="fw-bold py-3">KENDALA</th>
                             <th class="fw-bold py-3 text-center">NILAI</th>
-                            <th class="fw-bold py-3 text-end">AKSI</th>
+                            @if(Auth::user()->role === 'pembimbing')
+                                <th>AKSI</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -81,12 +83,17 @@
                                         <span class="badge bg-secondary bg-opacity-25 text-dark rounded-pill px-3">Belum</span>
                                     @endif
                                 </td>
-                                <td class="text-end">
-                                    <!-- Tombol Pemicu Modal -->
-                                    <button type="button" class="btn btn-sm btn-primary fw-semibold px-3" data-bs-toggle="modal" data-bs-target="#modalNilai{{ $jurnal->id }}">
-                                        <i class="bi bi-pencil-square me-1"></i> Beri Nilai
-                                    </button>
-                                </td>
+                                @if(Auth::user()->role === 'pembimbing')
+                                    <td class="text-end">
+                                        <!-- Tombol Pemicu Modal khusus Pembimbing -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-primary fw-semibold px-3"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalNilai{{ $jurnal->id }}">
+                                            <i class="bi bi-pencil-square me-1"></i> Beri Nilai
+                                        </button>
+                                    </td>
+                                @endif
                             </tr>
 
                             <!-- MODAL FORM PENILAIAN UNTUK SETIAP JURNAL -->
@@ -138,4 +145,4 @@
         </div>
     </div>
 </div>
-@endsectiong
+@endsection
