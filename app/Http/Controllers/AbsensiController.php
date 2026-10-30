@@ -46,7 +46,6 @@ class AbsensiController extends Controller
     {
         $hariIni = strtolower(Carbon::now()->locale('id')->dayName);
 
-        // Sabtu dan Minggu mengikuti pengaturan admin.
         if (in_array($hariIni, ['sabtu', 'minggu'])) {
             $status = Setting::where('key', $hariIni . '_aktif')->value('value');
             $default = $hariIni === 'sabtu' ? '1' : '0';
@@ -61,7 +60,7 @@ class AbsensiController extends Controller
     // =====================================================
     private function hitungJarak($lat1, $lon1, $lat2, $lon2)
     {
-        $earthRadius = 6371000; // meter
+        $earthRadius = 6371000; 
         $latFrom = deg2rad($lat1);
         $lonFrom = deg2rad($lon1);
         $latTo = deg2rad($lat2);
@@ -188,14 +187,26 @@ class AbsensiController extends Controller
             'lng' => 'required|numeric',
         ]);
 
-        // 1. Cek Validitas Token QR
-        $token = QrToken::where('token', $request->token)
-                    ->where('is_active', true)
-                    ->where('expires_at', '>', Carbon::now())
-                    ->first();
+        // 1. CEK TOKEN DENGAN PESAN ERROR DETAIL
+        $tokenDikirim = $request->token;
+        $tokenDiDatabase = QrToken::where('token', $tokenDikirim)->first();
 
-        if (!$token) {
-            return response()->json(['message' => 'QR Code tidak valid atau sudah kadaluarsa.'], 400);
+        if (!$tokenDiDatabase) {
+            return response()->json([
+                'message' => 'Token TIDAK DITEMUKAN di database. (Token yang dikirim: ' . $tokenDikirim . ')'
+            ], 400);
+        }
+
+        if (!$tokenDiDatabase->is_active) {
+            return response()->json([
+                'message' => 'Token DITEMUKAN, tetapi statusnya TIDAK AKTIF. (Mungkin sudah di-generate ulang oleh Guru).'
+            ], 400);
+        }
+
+        if (Carbon::now()->greaterThan($tokenDiDatabase->expires_at)) {
+            return response()->json([
+                'message' => 'Token DITEMUKAN & AKTIF, tetapi sudah KEDALUWARSA. Waktu Sekarang: ' . Carbon::now() . ' | Waktu Expired: ' . $tokenDiDatabase->expires_at
+            ], 400);
         }
 
         // 2. Cek Jarak Lokasi (Haversine Formula)
