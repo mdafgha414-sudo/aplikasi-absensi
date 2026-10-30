@@ -11,6 +11,7 @@ use App\Http\Controllers\GuruExportController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\AlasanKeterlambatanController;
+use App\Http\Controllers\QrAbsensiController; // <-- Tambahan untuk QR
 
 // ==========================================
 // ROUTE PUBLIK
@@ -29,7 +30,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- PENGATURAN PROFIL (USER, GURU, PEMBIMBING) ---
-    // Tambahan: Route ini agar menu Pengaturan di Sidebar tidak error/bentrok
     Route::get('/pengaturan', [SettingController::class, 'profil'])->name('pengaturan');
     Route::put('/pengaturan/update', [SettingController::class, 'updateProfil'])->name('pengaturan.update');
 
@@ -40,6 +40,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/absensi/riwayat', [AbsensiController::class, 'riwayat'])->name('absensi.riwayat');
     Route::post('/absensi/alasan-terlambat', [AlasanKeterlambatanController::class, 'simpan'])->name('absensi.alasan.simpan');
     
+    // --- FITUR SCAN QR ABSENSI (Siswa) ---
+    Route::get('/absensi/scan', [AbsensiController::class, 'showScan'])->name('absensi.scan');
+    Route::post('/absensi/proses-scan', [AbsensiController::class, 'prosesScan'])->name('absensi.proses-scan');
+    
+    // --- FITUR JURNAL & IZIN SISWA ---
     Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal.index');
     Route::post('/jurnal', [JurnalController::class, 'store'])->name('jurnal.store');
     
@@ -66,7 +71,6 @@ Route::middleware('auth')->group(function () {
 
     // --- FITUR KHUSUS PEMBIMBING PKL ---
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
-        // Dashboard Pembimbing (Menggunakan fungsi dari GuruController)
         Route::get('/dashboard', function () {
             return view('dashboard.user_pembimbing');
         })->name('dashboard');
@@ -75,14 +79,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/laporan-absensi/export-excel', [GuruExportController::class, 'exportExcelAbsensi'])->name('laporan.export.excel');
         Route::get('/laporan-absensi/export-pdf', [GuruExportController::class, 'exportPdfAbsensi'])->name('laporan.export.pdf');
         
-        // Jurnal & Nilai Pembimbing
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
 
-        // Izin & Approve
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
     });
+
+    // --- FITUR QR ABSENSI (Guru & Pembimbing) ---
+    Route::get('/qr-absensi', [QrAbsensiController::class, 'show'])->name('qr.show');
+    Route::post('/qr-absensi/generate', [QrAbsensiController::class, 'generate'])->name('qr.generate');
 }); 
 
 // ==========================================

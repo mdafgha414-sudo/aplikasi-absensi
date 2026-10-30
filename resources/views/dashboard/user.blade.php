@@ -19,11 +19,11 @@
         overflow: hidden;
         padding: 35px;
         border-radius: 22px;
-        color: #1e3a8a; /* Mengubah teks menjadi biru gelap agar kontras dengan background terang */
-        background: #e0f2fe; /* Warna biru muda (light blue) mirip dashboard guru */
-        box-shadow: 0 12px 28px rgba(14, 165, 233, .10); /* Bayangan disesuaikan ke biru */
+        color: #1e3a8a;
+        background: #e0f2fe;
+        box-shadow: 0 12px 28px rgba(14, 165, 233, .10);
         margin-bottom: 25px;
-        border: 1px solid #bae6fd; /* Tambahan border tipis */
+        border: 1px solid #bae6fd;
     }
 
     .ud-welcome::before {
@@ -32,7 +32,7 @@
         width: 220px;
         height: 220px;
         border-radius: 50%;
-        background: rgba(255,255,255,.4); /* Bulatan transparan lebih terang */
+        background: rgba(255,255,255,.4);
         right: -45px;
         top: -95px;
     }
@@ -69,7 +69,7 @@
         font-size: clamp(25px, 4vw, 36px);
         font-weight: 800;
         margin-bottom: 12px;
-        color: #0f172a; /* Teks judul lebih gelap */
+        color: #0f172a;
     }
 
     .ud-welcome p {
@@ -104,7 +104,7 @@
         top: 50%;
         transform: translateY(-50%);
         font-size: 105px;
-        opacity: .15; /* Opacity diturunkan agar tidak menutupi teks */
+        opacity: .15;
         z-index: 1;
         color: #0284c7;
     }
@@ -407,7 +407,7 @@
                 <i class="bi bi-arrow-up-right ud-menu-arrow"></i>
             </a>
 
-            {{-- MENU 3: JURNAL HARIAN (BARU) --}}
+            {{-- MENU 3: JURNAL HARIAN --}}
             <a href="{{ url('/jurnal') }}"
                class="ud-menu-card">
 
@@ -429,29 +429,47 @@
 
                 <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #0ca678;"></i>
             </a>
-            
-            <!-- TAMBAHKAN KARTU IZIN INI -->
-<a href="{{ url('/izin') }}" class="ud-menu-card">
-    <div class="ud-menu-icon" style="background: #fff1f2; color: #e11d48;">
-        <i class="bi bi-envelope-paper"></i>
-    </div>
 
-    <h5>Pengajuan Izin</h5>
+            {{-- MENU 4: PENGAJUAN IZIN --}}
+            <a href="{{ url('/izin') }}" class="ud-menu-card">
+                <div class="ud-menu-icon" style="background: #fff1f2; color: #e11d48;">
+                    <i class="bi bi-envelope-paper"></i>
+                </div>
 
-    <p>
-        Ajukan surat izin jika kamu berhalangan hadir
-        atau sakit.
-    </p>
+                <h5>Pengajuan Izin</h5>
 
-    <span class="ud-menu-link" style="color: #e11d48;">
-        Buka form izin
-        <i class="bi bi-arrow-right"></i>
-    </span>
+                <p>
+                    Ajukan surat izin jika kamu berhalangan hadir
+                    atau sakit.
+                </p>
 
-    <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #e11d48;"></i>
-</a>
+                <span class="ud-menu-link" style="color: #e11d48;">
+                    Buka form izin
+                    <i class="bi bi-arrow-right"></i>
+                </span>
 
+                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #e11d48;"></i>
+            </a>
 
+            {{-- MENU 5: SCAN QR ABSENSI (BARU) --}}
+            <a href="{{ route('absensi.scan') }}" class="ud-menu-card">
+                <div class="ud-menu-icon" style="background: #e0f2fe; color: #0284c7;">
+                    <i class="bi bi-qr-code-scan"></i>
+                </div>
+
+                <h5>Scan QR Absensi</h5>
+
+                <p>
+                    Absen dengan memindai QR Code dan validasi lokasi GPS.
+                </p>
+
+                <span class="ud-menu-link" style="color: #0284c7;">
+                    Buka scanner
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+
+                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #0284c7;"></i>
+            </a>
 
         </div>
     </section>
@@ -473,7 +491,7 @@
                 <div>
                     <strong>Isi absensi masuk</strong>
                     <small>
-                        Buka menu Isi Absensi untuk mencatat
+                        Buka menu Isi Absensi atau Scan QR untuk mencatat
                         waktu kedatanganmu.
                     </small>
                 </div>

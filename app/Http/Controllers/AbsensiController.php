@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Absensi;
 use App\Models\Setting;
+use App\Models\QrToken; // Tambahan untuk QR
 use Illuminate\Support\Facades\Auth;
 
 class AbsensiController extends Controller
@@ -70,7 +71,7 @@ class AbsensiController extends Controller
     }
 
     // =====================================================
-    // 2. PROSES ABSEN MASUK
+    // 2. PROSES ABSEN MASUK (Manual)
     // =====================================================
     public function masuk()
     {
@@ -192,5 +193,96 @@ class AbsensiController extends Controller
             'pembimbing.laporan-absensi',
             compact('laporanAbsensi')
         );
+    }
+
+    // =====================================================
+    // 6. HALAMAN SCAN QR ABSENSI
+    // =====================================================
+    public function showScan()
+    {
+        return view('absensi.scan');
+    }
+
+    // =====================================================
+    // 7. PROSES SCAN QR & VALIDASI LOKASI
+    // =====================================================
+    public function prosesScan(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
+        ]);
+
+        // 1. Cek Validitas Token QR
+        $token = QrToken::where('token', $request->token)
+                    ->where('is_active', true)
+                    ->where('expires_at', '>', Carbon::now())
+                    ->first();
+
+        if (!$token) {
+            return response()->json(['message' => 'QR Code tidak valid atau sudah kadaluarsa.'], 400);
+        }
+
+        // 2. Cek Jarak Lokasi (Haversine Formula)
+        $latSiswa = $request->lat;
+        $lngSiswa = $request->lng;
+        $latPkl = env('PKL_LATITUDE');
+        $lngPkl = env('PKL_LONGITUDE');
+        $radius = env('PKL_RADIUS', 100); // Default 100 meter
+
+        $jarak = $this->hitungJarak($latSiswa, $lngSiswa, $latPkl, $lngPkl);
+
+        if ($jarak > $radius) {
+            return response()->json([
+                'message' => 'Anda berada di luar radius PKL. Jarak Anda: ' . round($jarak) . ' meter.'
+            ], 400);
+        }
+
+        // 3. Cek apakah sudah absen hari ini
+        $hariIni = Carbon::today()->toDateString();
+        $sudahAbsen = Absensi::where('user_id', Auth::id())
+                             ->where('tanggal', $hariIni)
+                             ->first();
+
+        if ($sudahAbsen) {
+            return response()->json(['message' => 'Anda sudah absen hari ini.'], 400);
+        }
+
+        // 4. Simpan Absensi
+        $jadwal = $this->jadwalHariIni();
+        $waktuSekarang = Carbon::now();
+        $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
+
+        $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Tepat Waktu' : 'Telat';
+
+        Absensi::create([
+            'user_id' => Auth::id(),
+            'tanggal' => $hariIni,
+            'jam_masuk' => $waktuSekarang->toTimeString(),
+            'status' => $statusAbsen,
+        ]);
+
+        return response()->json(['message' => 'Absensi berhasil! Status: ' . $statusAbsen]);
+    }
+
+    // =====================================================
+    // FUNGSI BANTU: HITUNG JARAK (HAVERSINE)
+    // =====================================================
+    private function hitungJarak($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371000; // meter
+        $latFrom = deg2rad($lat1);
+        $lonFrom = deg2rad($lon1);
+        $latTo = deg2rad($lat2);
+        $lonTo = deg2rad($lon2);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+          cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+
+        return $angle * $earthRadius;
     }
 }
