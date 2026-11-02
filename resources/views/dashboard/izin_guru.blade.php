@@ -238,11 +238,14 @@
                 </form>
 
                 <!-- TOMBOL EXPORT -->
-                <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn-export btn-excel">
-                    <i class="bi bi-file-earmark-excel"></i> Excel
+                <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-success btn-sm px-3">
+                    <i class="bi bi-file-earmark-excel"></i> Export Excel
                 </a>
-                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn-export btn-pdf">
-                    <i class="bi bi-file-earmark-pdf"></i> PDF
+                <a href="{{ route('pembimbing.laporan.export.pdf', [
+                'bulan' => $bulan, 
+                'tahun' => $tahun
+                ]) }}" class="btn btn-danger">
+                    <i class="bi bi-file-pdf"></i> Export PDF
                 </a>
             </div>
         </div>
