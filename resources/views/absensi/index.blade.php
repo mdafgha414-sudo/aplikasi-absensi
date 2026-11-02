@@ -157,18 +157,6 @@
         color: white;
     }
 
-    .btn-scan {
-        background: #0ea5e9; /* Warna biru cerah untuk Scan */
-        color: white;
-        margin-bottom: 15px;
-        border: 2px dashed #bae6fd;
-    }
-
-    .btn-scan:hover {
-        background: #0284c7;
-        color: white;
-    }
-
     .btn-pulang {
         background: #ffbd45;
         color: #302500;
@@ -340,7 +328,7 @@
     <h5 class="section-title mb-1">Ringkasan Kehadiran</h5>
     <p class="section-desc">Berikut informasi absensi kamu hari ini.</p>
 
-    {{-- Info Batas Jam (Dibersihkan dari tag aneh) --}}
+    {{-- Info Batas Jam --}}
     <div class="info-box mb-4">
         <i class="bi bi-clock me-2"></i>
         Batas jam masuk hari ini: <strong>{{ $jamMasukHariIni }}</strong>. Mengikuti jadwal yang disimpan admin.
@@ -484,15 +472,8 @@
         </p>
 
         @if (!$absenHariIni)
-            {{-- Tombol Scan QR (BARU) --}}
-            <a href="{{ route('absensi.scan') }}" class="btn-absen btn-scan">
-                <i class="bi bi-qr-code-scan me-2"></i>
-                Scan QR Code (Validasi Lokasi)
-                <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-
-            <div class="text-center text-muted small mb-3">— ATAU —</div>
-
+            {{-- TOMBOL SCAN QR LAMA SUDAH DIHAPUS --}}
+            
             <form action="/absensi/masuk" method="POST">
                 @csrf
                 <button type="submit" class="btn-absen btn-masuk">

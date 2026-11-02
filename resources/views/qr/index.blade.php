@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold m-0"><i class="bi bi-qr-code"></i> Cetak Kartu QR Siswa</h3>
+        <h3 class="fw-bold m-0"><i class="bi bi-qr-code"></i> Buat Kode QR Siswa</h3>
     </div>
 
     <div class="card shadow-sm border-0">

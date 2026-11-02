@@ -32,6 +32,8 @@
             left: 0;
             background-color: var(--sidebar-bg);
             padding-top: 20px;
+            /* TAMBAHAN: Memberi ruang kosong di bawah agar Logout tidak mepet */
+            padding-bottom: 40px; 
             z-index: 1050;
             transition: all 0.3s ease;
             overflow-y: auto;
@@ -39,25 +41,15 @@
             border-right: 1px solid #bae6fd;
         }
 
-        /* --- PERBAIKAN SCROLLBAR SIDEBAR (BARU) --- */
+        /* --- PERBAIKAN SCROLLBAR (DISEMBUNYIKAN TOTAL) --- */
         .sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background-color: rgba(2, 132, 199, 0.3);
-            border-radius: 10px;
-        }
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(2, 132, 199, 0.6);
+            display: none; /* Sembunyikan scrollbar di Chrome, Safari, Edge */
         }
         .sidebar {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(2, 132, 199, 0.3) transparent;
+            -ms-overflow-style: none;  /* Sembunyikan scrollbar di IE dan Edge lama */
+            scrollbar-width: none;  /* Sembunyikan scrollbar di Firefox */
         }
-        /* ------------------------------------------- */
+        /* ------------------------------------------------ */
 
         .sidebar.collapsed { left: calc(-1 * var(--sidebar-width)); }
 
@@ -228,7 +220,7 @@
             @if (Auth::user()->role === 'admin')
                 <li><a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan Jam</a></li>
             @else
-                <li><a href="{{ route('pengaturan') }}" class="{{ request()->is('pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan Profil</a></li>
+                <li><a href="{{ route('pengaturan') }}" class="{{ request()->is('pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             @endif
          
             <li>
