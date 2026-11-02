@@ -5,142 +5,184 @@
 
 <style>
 .qr-page {
+    min-height: calc(100vh - 100px);
     padding: 24px;
-    color: #172554;
+    color: #1e293b;
+    background: #ffffff;
 }
 
-.qr-hero {
+/* Banner judul */
+.qr-page .qr-hero {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    padding: 28px 32px;
+    padding: 25px 30px;
     margin-bottom: 24px;
-    background: linear-gradient(120deg, #fff, #dbeafe);
-    border: 1px solid #dbeafe;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(37,99,235,.08);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #2684ff;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
 }
 
-.qr-hero-content {
+.qr-page .qr-hero-content {
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 18px;
 }
 
-.qr-hero-icon {
+.qr-page .qr-hero-icon {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 82px;
-    height: 82px;
-    background: linear-gradient(135deg,#38bdf8,#2563eb);
-    border-radius: 20px;
+    width: 68px;
+    height: 68px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
 }
 
-.qr-hero h2 {
-    margin: 0 0 10px;
+.qr-page .qr-hero h2 {
+    margin: 0 0 7px;
     color: #172554;
-    font-size: 28px;
-    font-weight: 750;
+    font-size: 25px;
+    font-weight: 700;
 }
 
-.qr-hero p {
+.qr-page .qr-hero p {
     margin: 0;
     color: #64748b;
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
-.qr-illustration {
-    width: 150px;
+.qr-page .qr-illustration {
+    width: 125px;
+    height: auto;
     flex-shrink: 0;
 }
 
-.qr-table-card {
-    padding: 22px;
-    background: white;
+/* Kartu tabel */
+.qr-page .qr-table-card {
+    padding: 20px;
+    background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(15,23,42,.05);
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
 }
 
-.qr-table-wrapper {
+.qr-page .qr-table-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.qr-page .qr-table-heading h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.qr-page .qr-table-heading p {
+    margin: 5px 0 0;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.qr-page .qr-table-wrapper {
     overflow-x: auto;
     border: 1px solid #e2e8f0;
-    border-radius: 15px;
+    border-radius: 12px;
 }
 
-.qr-table {
+.qr-page .qr-table {
     width: 100%;
     min-width: 650px;
     margin: 0;
     border-collapse: collapse;
 }
 
-.qr-table thead {
-    background: #eff6ff;
+.qr-page .qr-table thead {
+    background: #f1f6fd;
 }
 
-.qr-table th {
-    padding: 18px 20px;
-    color: #1e3a8a;
-    font-size: 14px;
+.qr-page .qr-table th {
+    padding: 16px 18px;
+    color: #334e7e;
+    font-size: 13px;
     font-weight: 700;
+    text-align: left;
     white-space: nowrap;
-    border-bottom: 1px solid #dbeafe;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.qr-table td {
-    padding: 18px 20px;
-    color: #334155;
+.qr-page .qr-table td {
+    padding: 17px 18px;
+    color: #475569;
     font-size: 14px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
 }
 
-.qr-table tbody tr:last-child td {
+.qr-page .qr-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.qr-table tbody tr:hover {
+.qr-page .qr-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.qr-page .qr-table tbody tr:hover {
     background: #f8fbff;
 }
 
-.qr-code-badge {
-    display: inline-block;
-    padding: 8px 14px;
-    color: white;
-    background: #64748b;
-    border-radius: 9px;
-    font-size: 12px;
-    font-weight: 700;
+.qr-page .qr-student-name {
+    color: #1e293b;
+    font-weight: 600;
 }
 
-.qr-action-btn {
+.qr-page .qr-code-badge {
+    display: inline-block;
+    padding: 7px 12px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.qr-page .qr-action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 11px 16px;
-    color: white;
-    background: linear-gradient(135deg,#3b82f6,#075cff);
-    border: none;
-    border-radius: 10px;
+    gap: 7px;
+    padding: 10px 14px;
+    color: #ffffff;
+    background: #2677f5;
+    border: 1px solid #2677f5;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(37,99,235,.18);
-    transition: .2s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.qr-action-btn:hover {
-    color: white;
-    transform: translateY(-2px);
+.qr-page .qr-action-btn:hover {
+    color: #ffffff;
+    background: #155ed1;
+    border-color: #155ed1;
+    transform: translateY(-1px);
 }
 
-.qr-empty {
+.qr-page .qr-empty {
     padding: 35px !important;
     text-align: center;
     color: #94a3b8 !important;
@@ -151,33 +193,32 @@
         padding: 14px;
     }
 
-    .qr-hero {
-        padding: 20px;
+    .qr-page .qr-hero {
+        padding: 18px;
     }
 
-    .qr-hero-content {
-        gap: 14px;
+    .qr-page .qr-hero-content {
+        gap: 12px;
     }
 
-    .qr-hero-icon {
-        width: 60px;
-        height: 60px;
+    .qr-page .qr-hero-icon {
+        width: 54px;
+        height: 54px;
     }
 
-    .qr-hero h2 {
-        font-size: 21px;
+    .qr-page .qr-hero h2 {
+        font-size: 20px;
     }
 
-    .qr-hero p {
-        font-size: 13px;
-        line-height: 1.6;
+    .qr-page .qr-hero p {
+        font-size: 12px;
     }
 
-    .qr-illustration {
-        width: 80px;
+    .qr-page .qr-illustration {
+        width: 75px;
     }
 
-    .qr-table-card {
+    .qr-page .qr-table-card {
         padding: 12px;
     }
 }
@@ -189,8 +230,8 @@
         <div class="qr-hero-content">
 
             <div class="qr-hero-icon">
-                <svg width="42" height="42" viewBox="0 0 24 24"
-                     fill="none" stroke="white" stroke-width="2">
+                <svg width="36" height="36" viewBox="0 0 24 24"
+                     fill="none" stroke="#2677f5" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
                     <rect x="3" y="14" width="7" height="7"/>
@@ -200,7 +241,7 @@
 
             <div>
                 <h2>Cetak Kartu QR Siswa</h2>
-                <p>Kelola dan cetak kartu QR untuk siswa dengan mudah dan cepat.</p>
+                <p>Kelola dan cetak kartu QR siswa dengan mudah dan cepat.</p>
             </div>
 
         </div>
@@ -208,22 +249,23 @@
         <svg class="qr-illustration" viewBox="0 0 180 120"
              xmlns="http://www.w3.org/2000/svg">
             <rect x="8" y="13" width="164" height="94"
-                  rx="14" fill="#bfdbfe"/>
+                  rx="14" fill="#dbeafe"/>
 
             <g transform="rotate(-8 90 60)">
                 <rect x="18" y="17" width="144" height="86"
-                      rx="12" fill="white" stroke="#60a5fa" stroke-width="3"/>
+                      rx="12" fill="#ffffff"
+                      stroke="#93c5fd" stroke-width="2"/>
 
-                <circle cx="51" cy="47" r="12" fill="#93c5fd"/>
-                <path d="M30 79 Q51 48 72 79" fill="#93c5fd"/>
+                <circle cx="51" cy="47" r="12" fill="#bfdbfe"/>
+                <path d="M30 79 Q51 48 72 79" fill="#bfdbfe"/>
 
-                <g transform="translate(91 32)" fill="#1e3a8a">
+                <g transform="translate(91 32)" fill="#2563eb">
                     <rect width="12" height="12"/>
-                    <rect x="4" y="4" width="4" height="4" fill="white"/>
+                    <rect x="4" y="4" width="4" height="4" fill="#ffffff"/>
                     <rect x="25" width="12" height="12"/>
-                    <rect x="29" y="4" width="4" height="4" fill="white"/>
+                    <rect x="29" y="4" width="4" height="4" fill="#ffffff"/>
                     <rect y="25" width="12" height="12"/>
-                    <rect x="4" y="29" width="4" height="4" fill="white"/>
+                    <rect x="4" y="29" width="4" height="4" fill="#ffffff"/>
                     <rect x="17" y="4" width="4" height="4"/>
                     <rect x="17" y="13" width="4" height="4"/>
                     <rect x="13" y="21" width="4" height="4"/>
@@ -234,12 +276,17 @@
                 </g>
             </g>
         </svg>
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold m-0"><i class="bi bi-qr-code"></i> Buat Kode QR Siswa</h3>
     </div>
 
     <div class="qr-table-card">
+
+        <div class="qr-table-heading">
+            <div>
+                <h3>Daftar Kartu QR Siswa</h3>
+                <p>Pilih siswa untuk membuat kartu QR.</p>
+            </div>
+        </div>
+
         <div class="qr-table-wrapper">
             <table class="qr-table">
                 <thead>
@@ -248,7 +295,7 @@
                         <th>Nama Siswa</th>
                         <th>Email</th>
                         <th>Kode Kartu</th>
-                        <th style="text-align:center">Aksi</th>
+                        <th style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
 
@@ -257,7 +304,9 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
-                                <strong>{{ $siswa->nama ?? $siswa->name }}</strong>
+                                <span class="qr-student-name">
+                                    {{ $siswa->nama ?? $siswa->name }}
+                                </span>
                             </td>
                             <td>{{ $siswa->email }}</td>
                             <td>
@@ -265,7 +314,7 @@
                                     {{ $siswa->kode_kartu }}
                                 </span>
                             </td>
-                            <td style="text-align:center">
+                            <td style="text-align: center;">
                                 <a href="{{ url('/cetak-qr/' . $siswa->id) }}"
                                    class="qr-action-btn">
                                     <svg width="16" height="16" viewBox="0 0 24 24"
@@ -289,6 +338,7 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 
 </div>
