@@ -12,7 +12,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\AlasanKeterlambatanController;
 use App\Http\Controllers\Pembimbing\ScanKartuController;
-use App\Http\Controllers\QrController; // <-- TAMBAHAN UNTUK CETAK QR
+use App\Http\Controllers\QrController;
 
 // ==========================================
 // ROUTE PUBLIK
@@ -89,14 +89,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
 
-        // IZIN
+        // IZIN (Dibersihkan, hanya 1 route)
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
 
-        // ALASAN KETERLAMBATAN
+        // ALASAN KETERLAMBATAN (Dibersihkan)
         Route::get('/alasan-keterlambatan', [AlasanKeterlambatanController::class, 'index'])->name('alasan.index');
         Route::put('/alasan-keterlambatan/{id}/terima', [AlasanKeterlambatanController::class, 'terima'])->name('alasan.terima');
         Route::put('/alasan-keterlambatan/{id}/tolak', [AlasanKeterlambatanController::class, 'tolak'])->name('alasan.tolak');
+
+        // FITUR VERIFIKASI KETERLAMBATAN (Tambahan dari file merge-mu)
+        Route::get('/keterlambatan', [AlasanKeterlambatanController::class, 'indexPembimbing'])->name('keterlambatan.index');
+        Route::post('/keterlambatan/verify/{id}', [AlasanKeterlambatanController::class, 'verifyPembimbing'])->name('keterlambatan.verify');
 
         // =====================================================
         // FITUR SCAN KARTU SISWA OLEH PEMBIMBING
@@ -116,7 +120,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::post('/admin/tambah-user', [AdminController::class, 'storeUser']);
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser']);
     Route::put('/admin/edit-user/{id}', [AdminController::class, 'updateUser']);
-    Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser']); // <-- Typo sudah diperbaiki
+    Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser']);
     
     // Pengaturan Jam (Khusus Admin)
     Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');

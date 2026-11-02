@@ -23,19 +23,35 @@ class AlasanKeterlambatanController extends Controller
             ],
             [
                 'alasan' => $data['alasan'],
-
-                // Jika alasan diedit, persetujuan harus diulang
-                'status' => 'Menunggu',
-                'reviewed_by' => null,
-                'reviewed_at' => null,
-                'catatan_pembimbing' => null,
+                'is_approved' => false, // Reset status jadi belum disetujui jika diperbarui
             ]
         );
 
-        return back()->with(
-            'success',
-            'Alasan keterlambatan berhasil disimpan.'
-        );
+        return back()->with('success', 'Alasan keterlambatan berhasil disimpan dan dikirim ke pembimbing.');
+    }
+
+    // ==========================================
+    // PEMBIMBING: MELIHAT DAFTAR (VERSI KHUSUS)
+    // ==========================================
+    public function indexPembimbing()
+    {
+        $dataKeterlambatan = AlasanKeterlambatan::with('user')->latest()->get();
+        
+        return view('pembimbing.keterlambatan', compact('dataKeterlambatan'));
+    }
+
+    // ==========================================
+    // PEMBIMBING: VERIFIKASI ALASAN
+    // ==========================================
+    public function verifyPembimbing($id)
+    {
+        $keterlambatan = AlasanKeterlambatan::findOrFail($id);
+        
+        $keterlambatan->update([
+            'is_approved' => true
+        ]);
+
+        return redirect()->back()->with('success', 'Alasan keterlambatan siswa berhasil disetujui.');
     }
 
     // ==========================================
