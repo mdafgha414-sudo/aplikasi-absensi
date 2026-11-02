@@ -51,6 +51,7 @@ class GuruController extends Controller
 
         $siswa = User::where('role', 'user')->orderBy('name', 'asc')->get();
 
+        // Ambil data absensi lengkap (termasuk foto jika nanti kolomnya sudah ada)
         $absensi = Absensi::whereMonth('tanggal', $bulan)
                           ->whereYear('tanggal', $tahun)
                           ->get()
