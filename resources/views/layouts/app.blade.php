@@ -150,6 +150,7 @@
         <ul class="sidebar-menu">
             <li class="menu-label">Menu Utama</li>
 
+            {{-- MENU SISWA --}}
             @if(Auth::user()->role === 'user')
                 <li><a href="{{ url('/dashboard') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
                 <li><a href="{{ url('/absensi') }}" class="{{ request()->is('absensi') ? 'active' : '' }}"><i class="bi bi-calendar2-check"></i> Isi Absensi</a></li>
@@ -158,26 +159,24 @@
                 <li><a href="{{ url('/izin') }}" class="{{ request()->is('izin') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Pengajuan Izin</a></li>
             @endif
 
+            {{-- MENU GURU --}}
             @if(Auth::user()->role === 'guru')
                 <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
                 <li><a href="{{ route('guru.jurnal') }}" class="{{ request()->routeIs('guru.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
                 <li><a href="{{ route('guru.izin') }}" class="{{ request()->routeIs('guru.izin*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi & Izin</a></li>
-                
-                <!-- MENU ALASAN KETERLAMBATAN GURU -->
                 <li><a href="{{ route('guru.alasan-keterlambatan') }}" class="{{ request()->routeIs('guru.alasan-keterlambatan') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Alasan Keterlambatan</a></li>
             @endif
 
+            {{-- MENU PEMBIMBING (SUDAH DIRAPIKAN & DIBERSIHKAN DARI DUPLIKASI) --}}
             @if(Auth::user()->role === 'pembimbing')
                 <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
                 
-                <!-- TAMBAHAN BARU: MENU SCAN KARTU SISWA -->
                 <li>
                     <a href="{{ route('pembimbing.scan.index') }}" class="{{ request()->routeIs('pembimbing.scan*') ? 'active' : '' }}">
                         <i class="bi bi-qr-code-scan"></i> Scan Kartu Siswa
                     </a>
                 </li>
 
-                <!-- TAMBAHAN BARU: MENU CETAK KARTU QR (PEMBIMBING) -->
                 <li>
                     <a href="{{ route('qr.index') }}" class="{{ request()->routeIs('qr.*') ? 'active' : '' }}">
                         <i class="bi bi-printer"></i> Buat Kode QR Siswa
@@ -185,36 +184,18 @@
                 </li>
 
                 <li><a href="{{ route('pembimbing.jurnal') }}" class="{{ request()->routeIs('pembimbing.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
+                
                 <li><a href="{{ route('pembimbing.laporan-absensi') }}" class="{{ request()->routeIs('pembimbing.laporan-absensi') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi</a></li>
+                
                 <li><a href="{{ route('pembimbing.izin') }}" class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
-                {{-- TAMBAHAN: Menu Keterlambatan Siswa untuk Pembimbing --}}
+
+                {{-- Menu Keterlambatan (Menggunakan route yang sudah ada di web.php) --}}
                 <li><a href="{{ route('pembimbing.keterlambatan.index') }}" class="{{ request()->routeIs('pembimbing.keterlambatan.*') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Keterlambatan Siswa</a></li>
-                <li>
-                    <a href="{{ route('pembimbing.laporan-absensi') }}"
-                       class="{{ request()->routeIs('pembimbing.laporan-absensi') ? 'active' : '' }}">
-                        <i class="bi bi-calendar-check"></i> Laporan Absensi
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ url('/pembimbing/alasan-keterlambatan') }}"
-                       class="{{ request()->is('pembimbing/alasan-keterlambatan*') ? 'active' : '' }}">
-                        <i class="bi bi-clock-history"></i> Alasan Keterlambatan
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('pembimbing.izin') }}"
-                       class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}">
-                        <i class="bi bi-envelope-paper"></i> Daftar Izin Siswa
-                    </a>
-                </li>
             @endif
 
+            {{-- MENU ADMIN --}}
             @if(Auth::user()->role === 'admin')
                 <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
-                
-                <!-- TAMBAHAN BARU: MENU CETAK KARTU QR (ADMIN) -->
                 <li>
                     <a href="{{ route('qr.index') }}" class="{{ request()->routeIs('qr.*') ? 'active' : '' }}">
                         <i class="bi bi-printer"></i> Cetak Kartu QR Siswa
@@ -317,4 +298,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
