@@ -234,7 +234,7 @@
             </div>
             
             <div class="d-flex gap-2 flex-wrap align-items-center">
-                <form action="/guru/laporan-absensi" method="GET" class="d-flex gap-2">
+                <form action="" method="GET" class="d-flex gap-2">
                     <select name="bulan" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
                         @for($i = 1; $i <= 12; $i++)
                             <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == $i ? 'selected' : '' }}>
@@ -251,10 +251,10 @@
 
                 <!-- Tombol Export -->
                 <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
-                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                    <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
                 </a>
                 <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
-                    <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                    <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
                 </a>
             </div>
         </div>
@@ -312,8 +312,8 @@
                                     } else {
                                         $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
                                         if (!$isWeekend && $tgl->isPast()) {
-                                            $cellClass = 'cell-alfa';
-                                            $label = 'A';
+                                            $cellClass = 'cell-pending';
+                                            $label = '-';
                                         }
                                     }
                                 @endphp
