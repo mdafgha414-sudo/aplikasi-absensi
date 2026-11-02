@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Http\Request; // Tambahan
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,14 +24,10 @@ class AppServiceProvider extends ServiceProvider
         // 1. Gunakan Bootstrap 5 untuk Pagination
         Paginator::useBootstrapFive();
 
-        // 2. PAKSA HTTPS DI SEMUA KONDISI (Solusi Mixed Content)
-        // Ini akan memaksa semua URL yang di-generate Laravel (termasuk route fetch) menjadi https://
-        URL::forceScheme('https');
-
-        // 3. Paksa Laravel menganggap semua request adalah secure (https)
-        // Ini penting agar session/cookie tidak diblokir browser
-        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
-            $_SERVER['HTTPS'] = 'on';
+        // 2. Paksa HTTPS HANYA JIKA di server Production (Railway)
+        // Jangan paksa HTTPS di localhost agar tidak error "Unsupported SSL request"
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
         }
     }
 }

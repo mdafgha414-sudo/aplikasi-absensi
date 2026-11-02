@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Absensi; 
 use App\Models\Izin; 
 use App\Models\Jurnal;
+use App\Models\AlasanKeterlambatan;
 use Carbon\Carbon; 
 use Illuminate\Support\Facades\Auth;
 
@@ -77,9 +78,11 @@ class GuruController extends Controller
         }
 
         $siswa = User::where('role', 'user')->orderBy('name', 'asc')->get();
+        
         $absensi = Absensi::whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get()->keyBy(function($item) {
                               return $item->user_id . '-' . date('d', strtotime($item->tanggal));
                           });
+                          
         $izin = Izin::whereMonth('tanggal_izin', $bulan)->whereYear('tanggal_izin', $tahun)->get()->keyBy(function($item) {
                         return $item->user_id . '-' . date('d', strtotime($item->tanggal_izin));
                     });
@@ -115,7 +118,9 @@ class GuruController extends Controller
             $semuaIzin = $query->paginate(10)->withQueryString();
             $jumlahMenunggu = Izin::where('status', 'Menunggu')->count();
 
-            return view('dashboard.izin_pembimbing', compact('semuaIzin', 'jumlahMenunggu'));
+            return view('dashboard.izin_pembimbing', compact(
+                'semuaIzin', 'jumlahMenunggu', 'siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun'
+            ));
         }
 
         return view('dashboard.izin_guru', compact('siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun'));
@@ -141,7 +146,6 @@ class GuruController extends Controller
         return back()->with('success', 'Status pengajuan izin berhasil diperbarui menjadi: ' . $request->status);
     }
 
-    // FUNGSI DASHBOARD PEMBIMBING (RIWAYAT JURNAL)
     public function dashboardPembimbing()
     {
         $jurnalTerbaru = Jurnal::with('user')
@@ -150,5 +154,17 @@ class GuruController extends Controller
             ->get();
 
         return view('dashboard.user_pembimbing', compact('jurnalTerbaru'));
+    }
+
+    // ==========================================
+    // FUNGSI ALASAN KETERLAMBATAN (GURU)
+    // ==========================================
+    public function alasanKeterlambatan()
+    {
+        $alasanKeterlambatan = AlasanKeterlambatan::with('user')
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+                                
+        return view('guru.alasan-keterlambatan', compact('alasanKeterlambatan'));
     }
 }
