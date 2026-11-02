@@ -39,6 +39,26 @@
             border-right: 1px solid #bae6fd;
         }
 
+        /* --- PERBAIKAN SCROLLBAR SIDEBAR (BARU) --- */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: rgba(2, 132, 199, 0.3);
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(2, 132, 199, 0.6);
+        }
+        .sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(2, 132, 199, 0.3) transparent;
+        }
+        /* ------------------------------------------- */
+
         .sidebar.collapsed { left: calc(-1 * var(--sidebar-width)); }
 
         .sidebar-brand {
@@ -167,7 +187,7 @@
                 <li><a href="{{ route('guru.alasan-keterlambatan') }}" class="{{ request()->routeIs('guru.alasan-keterlambatan') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Alasan Keterlambatan</a></li>
             @endif
 
-            {{-- MENU PEMBIMBING (SUDAH DIRAPIKAN & DIBERSIHKAN DARI DUPLIKASI) --}}
+            {{-- MENU PEMBIMBING --}}
             @if(Auth::user()->role === 'pembimbing')
                 <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
                 
@@ -189,7 +209,6 @@
                 
                 <li><a href="{{ route('pembimbing.izin') }}" class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
 
-                {{-- Menu Keterlambatan (Menggunakan route yang sudah ada di web.php) --}}
                 <li><a href="{{ route('pembimbing.keterlambatan.index') }}" class="{{ request()->routeIs('pembimbing.keterlambatan.*') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Keterlambatan Siswa</a></li>
             @endif
 

@@ -9,7 +9,7 @@ class AlasanKeterlambatan extends Model
 {
     use HasFactory;
 
-    protected $table = 'alasan_keterlambatan'; // Sesuaikan nama tabel Anda
+    protected $table = 'alasan_keterlambatan'; // Sesuaikan jika nama tabel di database berbeda
 
     protected $fillable = [
         'user_id',
@@ -22,20 +22,15 @@ class AlasanKeterlambatan extends Model
         'catatan_pembimbing',
     ];
 
+    protected $casts = [
+        'tanggal' => 'date',
+        'reviewed_at' => 'datetime',
+    ];
+
     // Relasi ke User (Siswa yang mengisi alasan)
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-        return [
-            'tanggal' => 'date',
-            'reviewed_at' => 'datetime',
-        ];
-    }
-
-    // Relasi dengan siswa
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 
     // Relasi dengan pembimbing yang memeriksa

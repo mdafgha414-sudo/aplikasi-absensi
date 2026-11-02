@@ -23,7 +23,7 @@ class AlasanKeterlambatanController extends Controller
             ],
             [
                 'alasan' => $data['alasan'],
-                'is_approved' => false, // Reset status jadi belum disetujui jika diperbarui
+                'is_approved' => false, 
             ]
         );
 
@@ -35,9 +35,10 @@ class AlasanKeterlambatanController extends Controller
     // ==========================================
     public function indexPembimbing()
     {
-        $dataKeterlambatan = AlasanKeterlambatan::with('user')->latest()->get();
+        // Diperbaiki: Variabel diubah menjadi $daftarAlasan agar sesuai dengan View
+        $daftarAlasan = AlasanKeterlambatan::with('user')->latest()->get();
         
-        return view('pembimbing.keterlambatan', compact('dataKeterlambatan'));
+        return view('dashboard.alasan_keterlambatan', compact('daftarAlasan'));
     }
 
     // ==========================================
@@ -46,11 +47,8 @@ class AlasanKeterlambatanController extends Controller
     public function verifyPembimbing($id)
     {
         $keterlambatan = AlasanKeterlambatan::findOrFail($id);
+        $keterlambatan->update(['is_approved' => true]);
         
-        $keterlambatan->update([
-            'is_approved' => true
-        ]);
-
         return redirect()->back()->with('success', 'Alasan keterlambatan siswa berhasil disetujui.');
     }
 
@@ -59,23 +57,13 @@ class AlasanKeterlambatanController extends Controller
     // ==========================================
     public function index(Request $request)
     {
-        // Izinkan Guru dan Pembimbing
-        abort_unless(
-            in_array($request->user()->role, ['guru', 'pembimbing']),
-            403
-        );
+        abort_unless(in_array($request->user()->role, ['guru', 'pembimbing']), 403);
 
         $daftarAlasan = AlasanKeterlambatan::with('user')
             ->orderByRaw("FIELD(status, 'Menunggu', 'Diterima', 'Ditolak')")
             ->orderByDesc('tanggal')
             ->get();
 
-        // KITA ARAHKAN KE FOLDER 'dashboard' KARENA FILE-NYA ADA DI SANA
-        if ($request->user()->role === 'guru') {
-            return view('dashboard.alasan_keterlambatan', compact('daftarAlasan'));
-        }
-
-        // Pembimbing
         return view('dashboard.alasan_keterlambatan', compact('daftarAlasan'));
     }
 
@@ -84,11 +72,7 @@ class AlasanKeterlambatanController extends Controller
     // ==========================================
     public function terima(Request $request, $id)
     {
-        // Izinkan Guru dan Pembimbing
-        abort_unless(
-            in_array($request->user()->role, ['guru', 'pembimbing']),
-            403
-        );
+        abort_unless(in_array($request->user()->role, ['guru', 'pembimbing']), 403);
 
         $data = $request->validate([
             'catatan_pembimbing' => ['nullable', 'string', 'max:1000'],
@@ -103,10 +87,7 @@ class AlasanKeterlambatanController extends Controller
             'catatan_pembimbing' => $data['catatan_pembimbing'] ?? null,
         ]);
 
-        return back()->with(
-            'success',
-            'Alasan keterlambatan berhasil diterima.'
-        );
+        return back()->with('success', 'Alasan keterlambatan berhasil diterima.');
     }
 
     // ==========================================
@@ -114,11 +95,7 @@ class AlasanKeterlambatanController extends Controller
     // ==========================================
     public function tolak(Request $request, $id)
     {
-        // Izinkan Guru dan Pembimbing
-        abort_unless(
-            in_array($request->user()->role, ['guru', 'pembimbing']),
-            403
-        );
+        abort_unless(in_array($request->user()->role, ['guru', 'pembimbing']), 403);
 
         $data = $request->validate([
             'catatan_pembimbing' => ['nullable', 'string', 'max:1000'],
@@ -133,9 +110,6 @@ class AlasanKeterlambatanController extends Controller
             'catatan_pembimbing' => $data['catatan_pembimbing'] ?? null,
         ]);
 
-        return back()->with(
-            'success',
-            'Alasan keterlambatan berhasil ditolak.'
-        );
+        return back()->with('success', 'Alasan keterlambatan berhasil ditolak.');
     }
 }
