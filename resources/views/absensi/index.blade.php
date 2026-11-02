@@ -157,18 +157,6 @@
         color: white;
     }
 
-    .btn-scan {
-        background: #0ea5e9; /* Warna biru cerah untuk Scan */
-        color: white;
-        margin-bottom: 15px;
-        border: 2px dashed #bae6fd;
-    }
-
-    .btn-scan:hover {
-        background: #0284c7;
-        color: white;
-    }
-
     .btn-pulang {
         background: #ffbd45;
         color: #302500;
@@ -340,7 +328,7 @@
     <h5 class="section-title mb-1">Ringkasan Kehadiran</h5>
     <p class="section-desc">Berikut informasi absensi kamu hari ini.</p>
 
-    {{-- Info Batas Jam (Dibersihkan dari tag aneh) --}}
+    {{-- Info Batas Jam --}}
     <div class="info-box mb-4">
         <i class="bi bi-clock me-2"></i>
         Batas jam masuk hari ini: <strong>{{ $jamMasukHariIni }}</strong>. Mengikuti jadwal yang disimpan admin.
@@ -475,7 +463,7 @@
 
         <p class="section-desc mb-4">
             @if (!$absenHariIni)
-                Kamu belum absen masuk hari ini. Silakan pilih metode absensi di bawah.
+                Kamu belum absen masuk hari ini. Silakan ambil foto untuk absen.
             @elseif (!$absenHariIni->jam_pulang)
                 Absen masuk sudah tercatat. Jangan lupa absen pulang.
             @else
@@ -484,33 +472,20 @@
         </p>
 
         @if (!$absenHariIni)
-            {{-- Tombol Scan QR (BARU) --}}
-            <a href="{{ route('absensi.scan') }}" class="btn-absen btn-scan">
-                <i class="bi bi-qr-code-scan me-2"></i>
-                Scan QR Code (Validasi Lokasi)
+            {{-- TOMBOL ABSEN MASUK (MEMICU KAMERA) --}}
+            <button type="button" class="btn-absen btn-masuk" onclick="openCamera('masuk')">
+                <i class="bi bi-camera me-2"></i>
+                Ambil Foto & Absen Masuk
                 <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-
-            <div class="text-center text-muted small mb-3">— ATAU —</div>
-
-            <form action="/absensi/masuk" method="POST">
-                @csrf
-                <button type="submit" class="btn-absen btn-masuk">
-                    <i class="bi bi-fingerprint me-2"></i>
-                    Absen Masuk Manual
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </button>
-            </form>
+            </button>
 
         @elseif (!$absenHariIni->jam_pulang)
-            <form action="/absensi/pulang" method="POST">
-                @csrf
-                <button type="submit" class="btn-absen btn-pulang">
-                    <i class="bi bi-box-arrow-right me-2"></i>
-                    Absen Pulang Sekarang
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </button>
-            </form>
+            {{-- TOMBOL ABSEN PULANG (MEMICU KAMERA) --}}
+            <button type="button" class="btn-absen btn-pulang" onclick="openCamera('pulang')">
+                <i class="bi bi-camera me-2"></i>
+                Ambil Foto & Absen Pulang
+                <i class="bi bi-arrow-right ms-2"></i>
+            </button>
 
         @else
             <div class="info-box">
@@ -549,4 +524,119 @@
     </div>
 
 </div>
+
+<!-- ==================================================== -->
+<!-- MODAL KAMERA & LOKASI (DITAMBAHKAN)                  -->
+<!-- ==================================================== -->
+<div class="modal fade" id="modalKamera" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalKameraTitle"><i class="bi bi-camera"></i> Ambil Foto Absensi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopCamera()"></button>
+            </div>
+            <div class="modal-body text-center p-3">
+                <div id="cameraContainer" class="position-relative bg-dark rounded overflow-hidden" style="height: 300px; width: 100%;">
+                    <video id="videoCamera" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                </div>
+                <p id="cameraStatus" class="text-muted small mt-3 mb-0">Mendeteksi lokasi Anda...</p>
+                <canvas id="canvasCamera" class="d-none"></canvas>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pb-4">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" onclick="stopCamera()">Batal</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold" id="btnAmbilFoto" onclick="ambilGambar()">
+                    <i class="bi bi-camera-fill"></i> Ambil & Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Tersembunyi untuk mengirim data -->
+<form id="formAbsenFoto" method="POST" class="d-none">
+    @csrf
+    <input type="hidden" name="lat" id="inputLat">
+    <input type="hidden" name="lng" id="inputLng">
+    <input type="hidden" name="foto" id="inputFoto">
+</form>
+
+<!-- JavaScript Kamera & Lokasi -->
+<script>
+    let videoStream = null;
+    let currentType = 'masuk'; // 'masuk' atau 'pulang'
+
+    function openCamera(type) {
+        currentType = type;
+        const modal = new bootstrap.Modal(document.getElementById('modalKamera'));
+        modal.show();
+        
+        document.getElementById('modalKameraTitle').innerText = type === 'masuk' ? 'Absen Masuk' : 'Absen Pulang';
+        document.getElementById('cameraStatus').innerText = 'Mendeteksi lokasi Anda...';
+        document.getElementById('btnAmbilFoto').disabled = true;
+
+        // 1. Minta Lokasi
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    document.getElementById('inputLat').value = position.coords.latitude;
+                    document.getElementById('inputLng').value = position.coords.longitude;
+                    document.getElementById('cameraStatus').innerText = 'Lokasi terdeteksi. Membuka kamera...';
+                    
+                    // 2. Buka Kamera (Kamera Depan)
+                    startCamera();
+                },
+                (error) => {
+                    document.getElementById('cameraStatus').innerText = 'Gagal mendeteksi lokasi. Pastikan GPS & izin lokasi menyala.';
+                    document.getElementById('cameraStatus').classList.add('text-danger');
+                }
+            );
+        } else {
+            document.getElementById('cameraStatus').innerText = 'Browser tidak mendukung Geolocation.';
+        }
+    }
+
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+            .then(stream => {
+                videoStream = stream;
+                document.getElementById('videoCamera').srcObject = stream;
+                document.getElementById('btnAmbilFoto').disabled = false;
+                document.getElementById('cameraStatus').innerText = 'Silakan ambil foto.';
+                document.getElementById('cameraStatus').classList.remove('text-danger');
+                document.getElementById('cameraStatus').classList.add('text-success');
+            })
+            .catch(err => {
+                document.getElementById('cameraStatus').innerText = 'Gagal membuka kamera: ' + err.message;
+            });
+    }
+
+    function stopCamera() {
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
+    }
+
+    function ambilGambar() {
+        const video = document.getElementById('videoCamera');
+        const canvas = document.getElementById('canvasCamera');
+        const context = canvas.getContext('2d');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Ubah ke base64 (kualitas 0.8 agar tidak terlalu besar)
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        document.getElementById('inputFoto').value = imageData;
+
+        // Atur action form berdasarkan tipe
+        const form = document.getElementById('formAbsenFoto');
+        form.action = currentType === 'masuk' ? '/absensi/masuk' : '/absensi/pulang';
+
+        // Submit form
+        stopCamera();
+        form.submit();
+    }
+</script>
 @endsection

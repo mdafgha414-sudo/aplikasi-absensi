@@ -16,6 +16,8 @@ class Absensi extends Model
         'jam_masuk',
         'jam_pulang',
         'status',
+         'foto_masuk', 
+         'foto_pulang'
     ];
 
     // Relasi: 1 data absensi milik 1 user

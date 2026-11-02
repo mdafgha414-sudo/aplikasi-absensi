@@ -111,6 +111,13 @@
         border-radius: 50%; 
         font-weight: 700; 
         font-size: 11px; 
+        cursor: pointer; /* Tambahan: agar kursor berubah jadi tangan */
+        transition: transform 0.2s;
+    }
+
+    .status-badge-cell:hover {
+        transform: scale(1.15); /* Tambahan: efek zoom saat di-hover */
+        box-shadow: 0 0 8px rgba(0,0,0,0.15);
     }
 
     .cell-hadir { background: #dcfce7; color: #15803d; }
@@ -118,7 +125,7 @@
     .cell-sakit { background: #fef9c3; color: #a16207; }
     .cell-telat { background: #ffedd5; color: #c2410c; }
     .cell-alfa { background: #ffe4e6; color: #be123c; }
-    .cell-pending { background: #f1f5f9; color: #94a3b8; }
+    .cell-pending { background: #f1f5f9; color: #94a3b8; cursor: default; }
 
     /* Legend Item & Hover Effect */
     .legend-item {
@@ -246,7 +253,7 @@
                 <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-excel me-1"></i> Excel
                 </a>
-                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-danger btn-sm px-3 rounded-3 fw-medium">
+                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-pdf me-1"></i> PDF
                 </a>
             </div>
@@ -296,10 +303,7 @@
                                     } elseif ($status == 'Sakit') {
                                         $cellClass = 'cell-sakit';
                                         $label = 'S';
-                                    } elseif ($status == 'Alpa') {
-                                        $cellClass = 'cell-alfa';
-                                        $label = 'A';
-                                    } elseif ($status == 'Alpha') {
+                                    } elseif ($status == 'Alpa' || $status == 'Alpha') {
                                         $cellClass = 'cell-alfa';
                                         $label = 'A';
                                     } elseif ($status) {
@@ -315,9 +319,25 @@
                                 @endphp
 
                                 <td>
-                                    <div class="status-badge-cell {{ $cellClass }}">
-                                        {{ $label }}
-                                    </div>
+                                    @if($absen)
+                                        {{-- TAMBAHAN: Tombol untuk memicu Modal Foto --}}
+                                        <div class="status-badge-cell {{ $cellClass }}" 
+                                             onclick="showDetailAbsensi(
+                                                '{{ $s->name }}', 
+                                                '{{ $tgl->format('d M Y') }}', 
+                                                '{{ $status }}', 
+                                                '{{ $absen->jam_masuk }}', 
+                                                '{{ $absen->jam_pulang }}', 
+                                                '{{ $absen->foto_masuk ? asset('storage/'.$absen->foto_masuk) : '' }}', 
+                                                '{{ $absen->foto_pulang ? asset('storage/'.$absen->foto_pulang) : '' }}'
+                                             )">
+                                            {{ $label }}
+                                        </div>
+                                    @else
+                                        <div class="status-badge-cell {{ $cellClass }}">
+                                            {{ $label }}
+                                        </div>
+                                    @endif
                                 </td>
                             @endforeach
                         </tr>
@@ -364,4 +384,127 @@
 
     </div>
 </div>
+
+<!-- ==================================================== -->
+<!-- MODAL DETAIL ABSENSI (FOTO & JAM)                    -->
+<!-- ==================================================== -->
+<div class="modal fade" id="modalDetailAbsensi" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modalDetailLabel"><i class="bi bi-person-badge me-2"></i>Detail Absensi Siswa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h4 class="fw-bold mb-1" id="modalNama">-</h4>
+                        <p class="text-muted mb-0"><i class="bi bi-calendar3 me-1"></i> <span id="modalTanggal">-</span></p>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                        <span class="badge fs-6 px-3 py-2" id="modalStatus">-</span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded text-center">
+                            <small class="text-muted d-block mb-1">Jam Masuk</small>
+                            <span class="fs-5 fw-bold text-success" id="modalJamMasuk">--:--</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded text-center">
+                            <small class="text-muted d-block mb-1">Jam Pulang</small>
+                            <span class="fs-5 fw-bold text-danger" id="modalJamPulang">--:--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-camera me-2"></i>Bukti Foto Absensi</h6>
+                <div class="row g-3 text-center">
+                    <div class="col-md-6">
+                        <div class="p-2 border rounded bg-white">
+                            <p class="small text-muted fw-bold mb-2">Foto Masuk</p>
+                            <img id="imgFotoMasuk" src="" alt="Foto Masuk" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
+                            <div id="noFotoMasuk" class="py-5 text-muted bg-light rounded">
+                                <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
+                                <small>Tidak ada foto</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-2 border rounded bg-white">
+                            <p class="small text-muted fw-bold mb-2">Foto Pulang</p>
+                            <img id="imgFotoPulang" src="" alt="Foto Pulang" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
+                            <div id="noFotoPulang" class="py-5 text-muted bg-light rounded">
+                                <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
+                                <small>Tidak ada foto</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- JAVASCRIPT UNTUK MODAL                               -->
+<!-- ==================================================== -->
+<script>
+    function showDetailAbsensi(nama, tanggal, status, jamMasuk, jamPulang, fotoMasuk, fotoPulang) {
+        // 1. Isi Data Teks
+        document.getElementById('modalNama').innerText = nama;
+        document.getElementById('modalTanggal').innerText = tanggal;
+        
+        let badgeStatus = document.getElementById('modalStatus');
+        badgeStatus.innerText = status;
+        
+        // Atur Warna Badge Status
+        badgeStatus.className = 'badge fs-6 px-3 py-2 ';
+        if (status === 'Hadir' || status === 'Tepat Waktu') badgeStatus.classList.add('bg-success');
+        else if (status === 'Telat') badgeStatus.classList.add('bg-warning', 'text-dark');
+        else if (status === 'Izin') badgeStatus.classList.add('bg-primary');
+        else if (status === 'Sakit') badgeStatus.classList.add('bg-info', 'text-dark');
+        else badgeStatus.classList.add('bg-danger');
+
+        // 2. Isi Jam
+        document.getElementById('modalJamMasuk').innerText = jamMasuk ? jamMasuk.substring(0, 5) : '--:--';
+        document.getElementById('modalJamPulang').innerText = jamPulang ? jamPulang.substring(0, 5) : '--:--';
+
+        // 3. Atur Foto Masuk
+        let imgMasuk = document.getElementById('imgFotoMasuk');
+        let noFotoMasuk = document.getElementById('noFotoMasuk');
+        if (fotoMasuk && fotoMasuk !== '') {
+            imgMasuk.src = fotoMasuk;
+            imgMasuk.classList.remove('d-none');
+            noFotoMasuk.classList.add('d-none');
+        } else {
+            imgMasuk.classList.add('d-none');
+            noFotoMasuk.classList.remove('d-none');
+        }
+
+        // 4. Atur Foto Pulang
+        let imgPulang = document.getElementById('imgFotoPulang');
+        let noFotoPulang = document.getElementById('noFotoPulang');
+        if (fotoPulang && fotoPulang !== '') {
+            imgPulang.src = fotoPulang;
+            imgPulang.classList.remove('d-none');
+            noFotoPulang.classList.add('d-none');
+        } else {
+            imgPulang.classList.add('d-none');
+            noFotoPulang.classList.remove('d-none');
+        }
+
+        // 5. Tampilkan Modal
+        let modal = new bootstrap.Modal(document.getElementById('modalDetailAbsensi'));
+        modal.show();
+    }
+</script>
 @endsection

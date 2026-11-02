@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Absensi;
 use App\Models\Setting;
+use App\Models\QrToken; // <-- Tambahan: Import Model QrToken
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; // <-- Tambahan: Untuk simpan foto
 
 class AbsensiController extends Controller
 {
@@ -88,12 +90,26 @@ class AbsensiController extends Controller
     }
 
     // =====================================================
-    // 2. PROSES ABSEN MASUK (Manual)
+    // 2. PROSES ABSEN MASUK (DENGAN FOTO & LOKASI)
     // =====================================================
-    public function masuk()
+    public function masuk(Request $request)
     {
         if (!$this->absensiDiizinkan()) {
             return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
+        }
+
+        // 1. Validasi Lokasi (Geofencing)
+        $latPkl = env('PKL_LATITUDE', -6.200000);
+        $lngPkl = env('PKL_LONGITUDE', 106.816666);
+        $radius = env('PKL_RADIUS', 100); // Meter
+
+        if ($request->filled('lat') && $request->filled('lng')) {
+            $jarak = $this->hitungJarak($request->lat, $request->lng, $latPkl, $lngPkl);
+            if ($jarak > $radius) {
+                return back()->with('error', 'Anda berada di luar radius PKL. Jarak Anda: ' . round($jarak) . ' meter.');
+            }
+        } else {
+            return back()->with('error', 'Lokasi GPS tidak terdeteksi. Pastikan izin lokasi menyala.');
         }
 
         $hariIni = Carbon::today()->toDateString();
@@ -103,6 +119,20 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah absen masuk hari ini!');
         }
 
+        // 2. Proses Simpan Foto (Base64)
+        $fotoPath = null;
+        if ($request->filled('foto')) {
+            $image = $request->foto;
+            // Hapus header base64
+            $image = preg_replace('#^data:image/\w+;base64,#i', '', $image);
+            $imageName = 'absensi/' . Auth::id() . '_masuk_' . time() . '.jpg';
+            
+            // Simpan ke folder storage/app/public/absensi
+            Storage::disk('public')->put($imageName, base64_decode($image));
+            $fotoPath = $imageName;
+        }
+
+        // 3. Simpan Absensi
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
@@ -113,18 +143,31 @@ class AbsensiController extends Controller
             'tanggal' => $hariIni,
             'jam_masuk' => $waktuSekarang->toTimeString(),
             'status' => $statusAbsen,
+            'foto_masuk' => $fotoPath,
         ]);
 
-        return back()->with('success', 'Absen masuk berhasil! Status Anda: ' . $statusAbsen);
+        return back()->with('success', 'Absen masuk berhasil! Status: ' . $statusAbsen);
     }
 
     // =====================================================
-    // 3. PROSES ABSEN PULANG
+    // 3. PROSES ABSEN PULANG (DENGAN FOTO & LOKASI)
     // =====================================================
-    public function pulang()
+    public function pulang(Request $request)
     {
         if (!$this->absensiDiizinkan()) {
             return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
+        }
+
+        // 1. Validasi Lokasi (Opsional, disarankan tetap aktif)
+        $latPkl = env('PKL_LATITUDE', -6.200000);
+        $lngPkl = env('PKL_LONGITUDE', 106.816666);
+        $radius = env('PKL_RADIUS', 100);
+
+        if ($request->filled('lat') && $request->filled('lng')) {
+            $jarak = $this->hitungJarak($request->lat, $request->lng, $latPkl, $lngPkl);
+            if ($jarak > $radius) {
+                return back()->with('error', 'Anda berada di luar radius PKL. Jarak Anda: ' . round($jarak) . ' meter.');
+            }
         }
 
         $hariIni = Carbon::today()->toDateString();
@@ -137,6 +180,16 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah melakukan absen pulang hari ini!');
         }
 
+        // 2. Proses Simpan Foto Pulang
+        $fotoPath = null;
+        if ($request->filled('foto')) {
+            $image = $request->foto;
+            $image = preg_replace('#^data:image/\w+;base64,#i', '', $image);
+            $imageName = 'absensi/' . Auth::id() . '_pulang_' . time() . '.jpg';
+            Storage::disk('public')->put($imageName, base64_decode($image));
+            $fotoPath = $imageName;
+        }
+
         $jadwal = $this->jadwalHariIni();
         $sekarang = Carbon::now();
         $waktuPulang = Carbon::today()->setTimeFromTimeString($jadwal['pulang']);
@@ -145,7 +198,11 @@ class AbsensiController extends Controller
             return back()->with('error', 'Absen pulang hanya dapat dilakukan mulai pukul ' . $jadwal['pulang'] . '!');
         }
 
-        $absen->update(['jam_pulang' => $sekarang->toTimeString()]);
+        $absen->update([
+            'jam_pulang' => $sekarang->toTimeString(),
+            'foto_pulang' => $fotoPath,
+        ]);
+        
         return back()->with('success', 'Absen pulang berhasil dicatat. Hati-hati di jalan!');
     }
 
@@ -168,11 +225,7 @@ class AbsensiController extends Controller
     }
 
     // =====================================================
-    // 6. HALAMAN SCAN QR ABSENSI
-    // ====================================================
-
-    // =====================================================
-    // 7. PROSES SCAN QR & VALIDASI LOKASI
+    // 6. PROSES SCAN QR & VALIDASI LOKASI (OPSIONAL)
     // =====================================================
     public function prosesScan(Request $request)
     {
@@ -182,52 +235,36 @@ class AbsensiController extends Controller
             'lng' => 'required|numeric',
         ]);
 
-        // 1. CEK TOKEN DENGAN PESAN ERROR DETAIL
+        // 1. Cek Token
         $tokenDikirim = $request->token;
         $tokenDiDatabase = QrToken::where('token', $tokenDikirim)->first();
 
         if (!$tokenDiDatabase) {
-            return response()->json([
-                'message' => 'Token TIDAK DITEMUKAN di database. (Token yang dikirim: ' . $tokenDikirim . ')'
-            ], 400);
+            return response()->json(['message' => 'Token TIDAK DITEMUKAN di database.'], 400);
         }
 
         if (!$tokenDiDatabase->is_active) {
-            return response()->json([
-                'message' => 'Token DITEMUKAN, tetapi statusnya TIDAK AKTIF. (Mungkin sudah di-generate ulang oleh Guru).'
-            ], 400);
+            return response()->json(['message' => 'Token TIDAK AKTIF.'], 400);
         }
 
         if (Carbon::now()->greaterThan($tokenDiDatabase->expires_at)) {
-            return response()->json([
-                'message' => 'Token DITEMUKAN & AKTIF, tetapi sudah KEDALUWARSA. Waktu Sekarang: ' . Carbon::now() . ' | Waktu Expired: ' . $tokenDiDatabase->expires_at
-            ], 400);
+            return response()->json(['message' => 'Token sudah KEDALUWARSA.'], 400);
         }
 
-        // 2. Cek Jarak Lokasi (Haversine Formula)
-        $latSiswa = $request->lat;
-        $lngSiswa = $request->lng;
-        $latPkl = env('PKL_LATITUDE');
-        $lngPkl = env('PKL_LONGITUDE');
-        $radius = env('PKL_RADIUS', 100);
-
-        $jarak = $this->hitungJarak($latSiswa, $lngSiswa, $latPkl, $lngPkl);
-
-        if ($jarak > $radius) {
-            return response()->json([
-                'message' => 'Anda berada di luar radius PKL. Jarak Anda: ' . round($jarak) . ' meter.'
-            ], 400);
+        // 2. Cek Jarak
+        $jarak = $this->hitungJarak($request->lat, $request->lng, env('PKL_LATITUDE'), env('PKL_LONGITUDE'));
+        if ($jarak > env('PKL_RADIUS', 100)) {
+            return response()->json(['message' => 'Anda berada di luar radius PKL. Jarak: ' . round($jarak) . ' m.'], 400);
         }
 
-        // 3. Cek apakah sudah absen hari ini
+        // 3. Cek Absen
         $hariIni = Carbon::today()->toDateString();
         $sudahAbsen = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
-
         if ($sudahAbsen) {
             return response()->json(['message' => 'Anda sudah absen hari ini.'], 400);
         }
 
-        // 4. Simpan Absensi
+        // 4. Simpan
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);

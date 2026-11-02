@@ -342,7 +342,7 @@
                                             </svg>
                                         </a>
                                     
-                                    @elseif($finalStatus == 'Alpa')
+                                    @elseif($finalStatus == 'null')
                                         <span class="status-box status-alpa">A</span>
                                     
                                     @else
