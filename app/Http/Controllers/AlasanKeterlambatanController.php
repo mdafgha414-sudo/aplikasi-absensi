@@ -60,7 +60,7 @@ class AlasanKeterlambatanController extends Controller
         abort_unless(in_array($request->user()->role, ['guru', 'pembimbing']), 403);
 
         $daftarAlasan = AlasanKeterlambatan::with('user')
-            ->orderByRaw("FIELD(status, 'Menunggu', 'Diterima', 'Ditolak')")
+           
             ->orderByDesc('tanggal')
             ->get();
 
