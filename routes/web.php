@@ -11,7 +11,8 @@ use App\Http\Controllers\GuruExportController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\AlasanKeterlambatanController;
-use App\Http\Controllers\QrAbsensiController;
+use App\Http\Controllers\Pembimbing\ScanKartuController;
+use App\Http\Controllers\QrController; // <-- TAMBAHAN UNTUK CETAK QR
 
 // ==========================================
 // ROUTE PUBLIK
@@ -28,6 +29,10 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // --- FITUR CETAK QR (ADMIN & PEMBIMBING) ---
+    Route::get('/cetak-qr', [QrController::class, 'index'])->name('qr.index');
+    Route::get('/cetak-qr/{id}', [QrController::class, 'show'])->name('qr.show');
 
     // --- PENGATURAN PROFIL ---
     Route::get('/pengaturan', [SettingController::class, 'profil'])->name('pengaturan');
@@ -64,7 +69,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
         
-        // ALASAN KETERLAMBATAN (TAMBAHAN BARU)
+        // ALASAN KETERLAMBATAN
         Route::get('/alasan-keterlambatan', [AlasanKeterlambatanController::class, 'index'])->name('alasan-keterlambatan');
         Route::put('/alasan-keterlambatan/{id}/terima', [AlasanKeterlambatanController::class, 'terima'])->name('alasan.terima');
         Route::put('/alasan-keterlambatan/{id}/tolak', [AlasanKeterlambatanController::class, 'tolak'])->name('alasan.tolak');
@@ -92,11 +97,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/alasan-keterlambatan', [AlasanKeterlambatanController::class, 'index'])->name('alasan.index');
         Route::put('/alasan-keterlambatan/{id}/terima', [AlasanKeterlambatanController::class, 'terima'])->name('alasan.terima');
         Route::put('/alasan-keterlambatan/{id}/tolak', [AlasanKeterlambatanController::class, 'tolak'])->name('alasan.tolak');
-    });
 
-    // --- FITUR QR ABSENSI (Guru & Pembimbing) ---
-    Route::get('/qr-absensi', [QrAbsensiController::class, 'show'])->name('qr.show');
-    Route::post('/qr-absensi/generate', [QrAbsensiController::class, 'generate'])->name('qr.generate');
+        // =====================================================
+        // FITUR SCAN KARTU SISWA OLEH PEMBIMBING
+        // =====================================================
+        Route::get('/scan-kartu', [ScanKartuController::class, 'index'])->name('scan.index');
+        Route::post('/scan-kartu/cek', [ScanKartuController::class, 'cekKartu'])->name('scan.cek');
+        Route::post('/scan-kartu/simpan', [ScanKartuController::class, 'simpanAbsen'])->name('scan.simpan');
+    });
 }); 
 
 // ==========================================
@@ -108,7 +116,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::post('/admin/tambah-user', [AdminController::class, 'storeUser']);
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser']);
     Route::put('/admin/edit-user/{id}', [AdminController::class, 'updateUser']);
-    Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser']);
+    Route::delete('/admin/hapus-user/{id}', [AdminController::class, 'destroyUser']); // <-- Typo sudah diperbaiki
     
     // Pengaturan Jam (Khusus Admin)
     Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');

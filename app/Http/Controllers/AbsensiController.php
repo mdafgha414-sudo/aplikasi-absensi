@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Absensi;
 use App\Models\Setting;
-use App\Models\QrToken;
 use Illuminate\Support\Facades\Auth;
 
 class AbsensiController extends Controller
@@ -170,11 +169,7 @@ class AbsensiController extends Controller
 
     // =====================================================
     // 6. HALAMAN SCAN QR ABSENSI
-    // =====================================================
-    public function showScan()
-    {
-        return view('absensi.scan');
-    }
+    // ====================================================
 
     // =====================================================
     // 7. PROSES SCAN QR & VALIDASI LOKASI

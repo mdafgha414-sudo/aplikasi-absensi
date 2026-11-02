@@ -166,12 +166,25 @@
                 
                 <!-- MENU ALASAN KETERLAMBATAN GURU -->
                 <li><a href="{{ route('guru.alasan-keterlambatan') }}" class="{{ request()->routeIs('guru.alasan-keterlambatan') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Alasan Keterlambatan</a></li>
-                
-                <li><a href="{{ route('qr.show') }}" class="{{ request()->routeIs('qr.show') ? 'active' : '' }}"><i class="bi bi-qr-code"></i> Tampilkan QR Absensi</a></li>
             @endif
 
             @if(Auth::user()->role === 'pembimbing')
                 <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
+                
+                <!-- TAMBAHAN BARU: MENU SCAN KARTU SISWA -->
+                <li>
+                    <a href="{{ route('pembimbing.scan.index') }}" class="{{ request()->routeIs('pembimbing.scan*') ? 'active' : '' }}">
+                        <i class="bi bi-qr-code-scan"></i> Scan Kartu Siswa
+                    </a>
+                </li>
+
+                <!-- TAMBAHAN BARU: MENU CETAK KARTU QR (PEMBIMBING) -->
+                <li>
+                    <a href="{{ route('qr.index') }}" class="{{ request()->routeIs('qr.*') ? 'active' : '' }}">
+                        <i class="bi bi-printer"></i> Buat Kode QR Siswa
+                    </a>
+                </li>
+
                 <li><a href="{{ route('pembimbing.jurnal') }}" class="{{ request()->routeIs('pembimbing.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
                 <li>
                     <a href="{{ route('pembimbing.laporan-absensi') }}"
@@ -193,17 +206,17 @@
                         <i class="bi bi-envelope-paper"></i> Daftar Izin Siswa
                     </a>
                 </li>
-
-                <li>
-                    <a href="{{ route('qr.show') }}"
-                       class="{{ request()->routeIs('qr.show') ? 'active' : '' }}">
-                        <i class="bi bi-qr-code"></i> Tampilkan QR Absensi
-                    </a>
-                </li>
             @endif
 
             @if(Auth::user()->role === 'admin')
                 <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
+                
+                <!-- TAMBAHAN BARU: MENU CETAK KARTU QR (ADMIN) -->
+                <li>
+                    <a href="{{ route('qr.index') }}" class="{{ request()->routeIs('qr.*') ? 'active' : '' }}">
+                        <i class="bi bi-printer"></i> Cetak Kartu QR Siswa
+                    </a>
+                </li>
             @endif
 
             <!-- MENU PENGATURAN -->
@@ -301,4 +314,4 @@
         });
     </script>
 </body>
-</html>
+</html> 

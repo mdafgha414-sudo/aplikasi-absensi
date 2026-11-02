@@ -2,37 +2,42 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash; // <-- Tambahkan ini
-use App\Models\User;                 // <-- Tambahkan ini
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
-          User::create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('123456'),
-            'role' => 'admin',
-          ]);
+        // Menggunakan updateOrCreate agar jika email sudah ada, datanya diupdate. 
+        // Jika belum ada, baru dibuat.
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'], // Kunci pencarian
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('123456'),
+                'role' => 'admin',
+            ]
+        );
 
-           User::create([
-            'name' => 'Budi Santoso',
-            'email' => 'budi@gmail.com',
-            'password' => Hash::make('123456'),
-            'role' => 'user', // <-- Pastikan ini ada
-        ]);
-        User::create([
-            'name' => 'Nadea Noervita',
-            'email' => 'nadea@gmail.com',
-            'password' => Hash::make('123456'),
-            'role' => 'user', // <-- Pastikan ini ada
-        ]);
+        User::updateOrCreate(
+            ['email' => 'budi@gmail.com'],
+            [
+                'name' => 'Budi Santoso',
+                'password' => Hash::make('123456'),
+                'role' => 'user',
+                'kode_kartu' => 'SISWA-001', 
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'nadea@gmail.com'],
+            [
+                'name' => 'Nadea Noervita',
+                'password' => Hash::make('123456'),
+                'role' => 'user',
+            ]
+        );
     }
 }

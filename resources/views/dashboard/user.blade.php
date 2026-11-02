@@ -451,25 +451,7 @@
                 <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #e11d48;"></i>
             </a>
 
-            {{-- MENU 5: SCAN QR ABSENSI (BARU) --}}
-            <a href="{{ route('absensi.scan') }}" class="ud-menu-card">
-                <div class="ud-menu-icon" style="background: #e0f2fe; color: #0284c7;">
-                    <i class="bi bi-qr-code-scan"></i>
-                </div>
-
-                <h5>Scan QR Absensi</h5>
-
-                <p>
-                    Absen dengan memindai QR Code dan validasi lokasi GPS.
-                </p>
-
-                <span class="ud-menu-link" style="color: #0284c7;">
-                    Buka scanner
-                    <i class="bi bi-arrow-right"></i>
-                </span>
-
-                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #0284c7;"></i>
-            </a>
+        
 
         </div>
     </section>

@@ -41,11 +41,31 @@ class AdminController extends Controller
             'role' => 'required|in:user,guru,pembimbing', 
         ]);
 
+        // LOGIKA OTOMATIS KODE KARTU
+        $kode_kartu = null;
+        if ($request->role === 'user') {
+            $lastSiswa = User::where('role', 'user')
+                             ->whereNotNull('kode_kartu')
+                             ->orderBy('id', 'desc')
+                             ->first();
+
+            if ($lastSiswa) {
+                // Ambil 3 digit angka terakhir dari kode (misal "SISWA-001" -> 001)
+                $lastNumber = (int) substr($lastSiswa->kode_kartu, 6); 
+                $newNumber = $lastNumber + 1;
+                $kode_kartu = 'SISWA-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+            } else {
+                // Jika ini siswa pertama
+                $kode_kartu = 'SISWA-001';
+            }
+        }
+
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role, 
+            'kode_kartu' => $kode_kartu, // Simpan kode kartu yang baru dibuat
         ]);
 
         return redirect('/admin/dashboard')->with('success', 'Pengguna baru berhasil ditambahkan!');
@@ -66,14 +86,32 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$id, 
-            'role' => 'required|in:user,guru,pembimbing', // Tambahkan validasi role
+            'role' => 'required|in:user,guru,pembimbing', 
         ]);
 
-        $pengguna->update([
+        $dataUpdate = [
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role, // Tambahkan update role
-        ]);
+            'role' => $request->role, 
+        ];
+
+        // LOGIKA TAMBAHAN: Jika role diubah jadi 'user' tapi belum punya kode_kartu
+        if ($request->role === 'user' && empty($pengguna->kode_kartu)) {
+            $lastSiswa = User::where('role', 'user')
+                             ->whereNotNull('kode_kartu')
+                             ->orderBy('id', 'desc')
+                             ->first();
+
+            if ($lastSiswa) {
+                $lastNumber = (int) substr($lastSiswa->kode_kartu, 6); 
+                $newNumber = $lastNumber + 1;
+                $dataUpdate['kode_kartu'] = 'SISWA-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+            } else {
+                $dataUpdate['kode_kartu'] = 'SISWA-001';
+            }
+        }
+
+        $pengguna->update($dataUpdate);
 
         return redirect('/admin/dashboard')->with('success', 'Data pengguna berhasil diperbarui!');
     }

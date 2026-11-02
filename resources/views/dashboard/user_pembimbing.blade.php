@@ -66,6 +66,42 @@
                     </a>
                 </div>
 
+<!-- Card Scan Kartu -->
+<div class="col-md-6 col-lg-3 mb-4">
+    <a href="{{ route('pembimbing.scan.index') }}" class="text-decoration-none">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="bg-primary text-white rounded p-3" style="background-color: #0284c7 !important;">
+                        <i class="bi bi-qr-code-scan fs-3"></i>
+                    </div>
+                    <i class="bi bi-arrow-right fs-4 text-muted"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">Scan Kartu</h5>
+                <p class="text-muted mb-0" style="font-size: 14px;">Scan QR Code pada kartu siswa untuk mencatat kehadiran.</p>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Card Cetak Kartu QR -->
+<div class="col-md-6 col-lg-3 mb-4">
+    <a href="{{ route('qr.index') }}" class="text-decoration-none">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="bg-success text-white rounded p-3" style="background-color: #10b981 !important;">
+                        <i class="bi bi-printer fs-3"></i>
+                    </div>
+                    <i class="bi bi-arrow-right fs-4 text-muted"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">Buat Kode QR</h5>
+                <p class="text-muted mb-0" style="font-size: 14px;">Buat/cetak dan unduh kode QR untuk siswa PKL.</p>
+            </div>
+        </div>
+    </a>
+</div>
+
                 <!-- Card 3: Daftar Izin -->
                 <div class="col-md-3">
                     <a href="{{ url('/pembimbing/izin') }}" class="text-decoration-none action-card-link">
