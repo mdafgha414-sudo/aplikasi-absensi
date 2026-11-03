@@ -1615,8 +1615,7 @@
                                 <input type="time"
                                        id="{{ $key }}_masuk"
                                        name="jadwal[{{ $key }}][masuk]"
-                                       value="{{ old("jadwal.$key.masuk", $schedule['masuk'] ?? '07:00') }}"
-                                       readonly >
+                                       value="{{ old("jadwal.$key.masuk", $schedule['masuk'] ?? '07:00') }}" >
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
@@ -1630,8 +1629,7 @@
                                 <input type="time"
                                        id="{{ $key }}_telat"
                                        name="jadwal[{{ $key }}][telat]"
-                                       value="{{ old("jadwal.$key.telat", $schedule['telat'] ?? '07:15') }}"
-                                       readonly>
+                                       value="{{ old("jadwal.$key.telat", $schedule['telat'] ?? '07:15') }}">
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
@@ -1645,8 +1643,7 @@
                                 <input type="time"
                                        id="{{ $key }}_pulang"
                                        name="jadwal[{{ $key }}][pulang]"
-                                       value="{{ old("jadwal.$key.pulang", $schedule['pulang'] ?? '15:00') }}"
-                                       readonly>
+                                       value="{{ old("jadwal.$key.pulang", $schedule['pulang'] ?? '15:00') }}">
                                 <i class="fa-regular fa-clock"></i>
                             </div>
                             <small class="field-hint">
@@ -1654,8 +1651,11 @@
                             </small>
                         </div>
 
-                        <button type="button" class="edit-button">
-                            <i class="fa-solid fa-pen"></i>
+                        <!-- Tombol untuk mengaktifkan mode edit jadwal -->
+                        <button type="button"
+                                class="edit-button"
+                                onclick="toggleEdit(this)">
+                            <i class="fas fa-pen"></i>
                             Edit
                         </button>
 
@@ -1687,109 +1687,198 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const searchInput = document.getElementById('searchInput');
-    // ==========================================
-    // FUNGSI PILIH SEMUA HARI
-    // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
 
-    const pilihSemua = document.getElementById('pilihSemuaHari');
-    const checkboxHari = document.querySelectorAll('.pilih-hari-jadwal');
+            // ==========================================
+            // FUNGSI EDIT JADWAL
+            // ==========================================
 
-    // Centang atau lepaskan semua checkbox hari.
-    pilihSemua.addEventListener('change', function () {
-        checkboxHari.forEach(function (checkbox) {
-            checkbox.checked = pilihSemua.checked;
-        });
-    });
+            window.toggleEdit = function (button) {
 
-    // Jika satu hari diubah, perbarui status Pilih Semua Hari.
-    checkboxHari.forEach(function (checkbox) {
-        checkbox.addEventListener('change', function () {
-            pilihSemua.checked =
-                checkboxHari.length > 0 &&
-                Array.from(checkboxHari).every(function (item) {
-                    return item.checked;
+                const dayCard = button.closest('.day-card');
+
+                if (!dayCard) {
+                    console.error('Kartu jadwal tidak ditemukan!');
+                    return;
+                }
+
+                const inputs = dayCard.querySelectorAll(
+                    'input[type="time"]'
+                );
+
+                const isEditing = dayCard.classList.toggle('editing');
+
+                inputs.forEach(function (input) {
+                    input.readOnly = !isEditing;
                 });
-        });
-    });
 
-    // Tombol garis tiga berfungsi di laptop maupun HP.
-    menuToggle.addEventListener('click', function () {
-        if (window.innerWidth <= 760) {
-            const isOpen = sidebar.classList.toggle('open');
-            overlay.classList.toggle('show', isOpen);
-            menuToggle.setAttribute('aria-expanded', String(isOpen));
-        } else {
-            document.body.classList.toggle('sidebar-collapsed');
+                button.innerHTML = isEditing
+                    ? '<i class="fas fa-check"></i> Selesai'
+                    : '<i class="fas fa-pen"></i> Edit';
+            };
 
-            const isOpen = !document.body.classList.contains('sidebar-collapsed');
-            menuToggle.setAttribute('aria-expanded', String(isOpen));
-        }
-    });
 
-    // Tutup sidebar mobile saat area gelap diklik.
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('show');
-        menuToggle.setAttribute('aria-expanded', 'false');
-    });
+            // ==========================================
+            // FUNGSI PILIH SEMUA HARI
+            // ==========================================
 
-    // Tutup sidebar mobile jika pengguna memilih menu.
-    sidebar.querySelectorAll('.nav-link').forEach(function (link) {
-        link.addEventListener('click', function () {
-            if (window.innerWidth <= 760) {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('show');
+            const pilihSemua = document.getElementById('pilihSemuaHari');
+
+            const checkboxHari = document.querySelectorAll(
+                '.pilih-hari-jadwal'
+            );
+
+            if (pilihSemua) {
+
+                // Centang atau lepaskan semua hari.
+                pilihSemua.addEventListener('change', function () {
+
+                    checkboxHari.forEach(function (checkbox) {
+                        checkbox.checked = pilihSemua.checked;
+                    });
+
+                });
+
+                // Perbarui status Pilih Semua Hari.
+                checkboxHari.forEach(function (checkbox) {
+
+                    checkbox.addEventListener('change', function () {
+
+                        pilihSemua.checked =
+                            checkboxHari.length > 0 &&
+                            Array.from(checkboxHari).every(function (item) {
+                                return item.checked;
+                            });
+
+                    });
+
+                });
+
             }
-        });
-    });
-
-    // Atur tampilan sidebar ketika ukuran jendela berubah.
-    window.addEventListener('resize', function () {
-        if (window.innerWidth > 760) {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('show');
-        }
-    });
-
-    // Fungsi Edit jadwal.
-    document.querySelectorAll('.edit-button').forEach(function (button) {
-        button.addEventListener('click', function () {
-            const card = button.closest('.day-card');
 
 
-            const inputs = card.querySelectorAll('input[type="time"]');
-            const isEditing = card.classList.toggle('editing');
+            // ==========================================
+            // FUNGSI SWITCH SABTU DAN MINGGU
+            // ==========================================
 
-            inputs.forEach(function (input) {
-                input.readOnly = !isEditing;
-            });
+            window.updateSwitchStatus = function (input) {
 
-            button.innerHTML = isEditing
-                ? '<i class="fa-solid fa-check"></i> Selesai'
-                : '<i class="fa-solid fa-pen"></i> Edit';
+                const wrapper = input.closest('.switch-wrapper');
 
-            if (isEditing) {
-                inputs[0].focus();
+                if (!wrapper) return;
+
+                const status = wrapper.querySelector('.switch-status');
+
+                if (status) {
+                    status.textContent = input.checked
+                        ? 'Aktif'
+                        : 'Nonaktif';
+                }
+
+                const card = input.closest('.day-card');
+
+                if (card) {
+
+                    const dayInfo = card.querySelector('.day-info small');
+
+                    if (dayInfo) {
+                        dayInfo.textContent = input.checked
+                            ? 'Hari Kerja'
+                            : 'Hari Libur';
+                    }
+
+                }
+
+            };
+
+
+            // ==========================================
+            // FUNGSI SIDEBAR
+            // ==========================================
+
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (menuToggle && sidebar) {
+
+                menuToggle.addEventListener('click', function () {
+
+                    if (window.innerWidth <= 760) {
+
+                        const isOpen = sidebar.classList.toggle('open');
+
+                        if (overlay) {
+                            overlay.classList.toggle('show', isOpen);
+                        }
+
+                        menuToggle.setAttribute(
+                            'aria-expanded',
+                            String(isOpen)
+                        );
+
+                    } else {
+
+                        document.body.classList.toggle('sidebar-collapsed');
+
+                        const isOpen =
+                            !document.body.classList.contains('sidebar-collapsed');
+
+                        menuToggle.setAttribute(
+                            'aria-expanded',
+                            String(isOpen)
+                        );
+
+                    }
+
+                });
+
             }
+
+            // Tutup sidebar melalui overlay.
+            if (overlay && sidebar) {
+
+                overlay.addEventListener('click', function () {
+
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('show');
+
+                    if (menuToggle) {
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                    }
+
+                });
+
+            }
+
+
+            // ==========================================
+            // FUNGSI PENCARIAN HARI
+            // ==========================================
+
+            const searchInput = document.getElementById('searchInput');
+
+            if (searchInput) {
+
+                searchInput.addEventListener('input', function () {
+
+                    const keyword = this.value.toLowerCase().trim();
+
+                    document.querySelectorAll('.day-card').forEach(function (card) {
+
+                        const dayName = (card.dataset.day || '').toLowerCase();
+
+                        card.style.display = dayName.includes(keyword)
+                            ? ''
+                            : 'none';
+
+                    });
+
+                });
+
+            }
+
         });
-    });
-
-    // Pencarian berdasarkan nama hari.
-    searchInput.addEventListener('input', function () {
-        const keyword = this.value.toLowerCase().trim();
-
-        document.querySelectorAll('.day-card').forEach(function (card) {
-            const dayName = card.dataset.day.toLowerCase();
-
-            card.style.display = dayName.includes(keyword) ? '' : 'none';
-        });
-    });
-});
 </script>
 
 </body>
