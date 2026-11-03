@@ -236,8 +236,8 @@
             </div>
             
             <div class="d-flex gap-2 flex-wrap align-items-center">
+                <!-- Form Filter (Sekolah, Bulan, Tahun) -->
                 <form action="/guru/laporan-absensi" method="GET" class="d-flex gap-2 flex-wrap">
-                    <!-- TAMBAHAN: Dropdown Filter Sekolah -->
                     <select name="sekolah" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
                         <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
                         @foreach($daftarSekolah as $sklh)
@@ -291,7 +291,7 @@
                 </thead>
                 <tbody>
                     @php
-                        // TAMBAHAN: Kelompokkan siswa berdasarkan sekolah
+                        // Kelompokkan siswa berdasarkan sekolah
                         $siswaGrouped = $siswa->groupBy('sekolah');
                     @endphp
 
