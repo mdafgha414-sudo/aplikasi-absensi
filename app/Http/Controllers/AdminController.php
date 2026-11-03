@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Absensi;
 use App\Models\User;
+use App\Models\Sekolah; // <-- TAMBAHAN: Import Model Sekolah
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
@@ -16,7 +17,8 @@ class AdminController extends Controller
         $semuaAbsensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
 
         // Ambil SEMUA user (Siswa DAN Guru) agar ditampilkan di tabel
-        $semuaPengguna = User::orderBy('role', 'asc')->orderBy('name', 'asc')->paginate(10);
+        // Tambahkan with('sekolah') agar bisa menampilkan nama sekolah di tabel
+        $semuaPengguna = User::with('sekolah')->orderBy('role', 'asc')->orderBy('name', 'asc')->paginate(10);
 
         // Hitung total user (Siswa + Guru)
         $totalUser = User::count();
@@ -28,7 +30,10 @@ class AdminController extends Controller
     // 2. Fungsi untuk menampilkan form tambah user
     public function createUser()
     {
-        return view('dashboard.tambah_user');
+        // Ambil daftar sekolah untuk isi Dropdown di form
+        $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
+        
+        return view('dashboard.tambah_user', compact('daftarSekolah'));
     }
 
     // 3. Fungsi untuk menyimpan user baru ke database
@@ -39,7 +44,7 @@ class AdminController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'required|in:user,guru,pembimbing', 
-            'sekolah' => 'nullable|string|max:255', // <-- TAMBAHAN: Validasi sekolah
+            'sekolah_id' => 'nullable|exists:sekolahs,id', // <-- DIUBAH: Validasi menggunakan ID Sekolah
         ]);
 
         // LOGIKA OTOMATIS KODE KARTU
@@ -66,7 +71,7 @@ class AdminController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role, 
-            'sekolah' => $request->sekolah, // <-- TAMBAHAN: Simpan sekolah
+            'sekolah_id' => $request->sekolah_id, // <-- DIUBAH: Simpan ID sekolah
             'kode_kartu' => $kode_kartu, 
         ]);
 
@@ -77,7 +82,11 @@ class AdminController extends Controller
     public function editUser($id)
     {
         $pengguna = User::findOrFail($id);
-        return view('dashboard.edit_user', compact('pengguna'));
+        
+        // Ambil daftar sekolah untuk isi Dropdown di form
+        $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
+        
+        return view('dashboard.edit_user', compact('pengguna', 'daftarSekolah'));
     }
 
     // 5. Menyimpan perubahan data (Termasuk Role dan Sekolah)
@@ -89,14 +98,14 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$id, 
             'role' => 'required|in:user,guru,pembimbing', 
-            'sekolah' => 'nullable|string|max:255', // <-- TAMBAHAN: Validasi sekolah
+            'sekolah_id' => 'nullable|exists:sekolahs,id', // <-- DIUBAH: Validasi menggunakan ID Sekolah
         ]);
 
         $dataUpdate = [
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role, 
-            'sekolah' => $request->sekolah, // <-- TAMBAHAN: Update sekolah
+            'sekolah_id' => $request->sekolah_id, // <-- DIUBAH: Update ID sekolah
         ];
 
         // LOGIKA TAMBAHAN: Jika role diubah jadi 'user' tapi belum punya kode_kartu

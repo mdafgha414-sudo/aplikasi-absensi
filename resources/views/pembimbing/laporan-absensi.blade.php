@@ -237,12 +237,13 @@
             
             <div class="d-flex gap-2 flex-wrap align-items-center">
                 <!-- Form Filter (Sekolah, Bulan, Tahun) -->
-                <form action="/guru/laporan-absensi" method="GET" class="d-flex gap-2 flex-wrap">
+                <form action="{{ route('pembimbing.laporan-absensi') }}" method="GET" class="d-flex gap-2 flex-wrap">
                     <select name="sekolah" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
                         <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
                         @foreach($daftarSekolah as $sklh)
-                            <option value="{{ $sklh }}" {{ $sekolahFilter == $sklh ? 'selected' : '' }}>
-                                {{ $sklh }}
+                            {{-- PERUBAHAN: Menggunakan ID dan Nama Sekolah --}}
+                            <option value="{{ $sklh->id }}" {{ $sekolahFilter == $sklh->id ? 'selected' : '' }}>
+                                {{ $sklh->nama_sekolah }}
                             </option>
                         @endforeach
                     </select>
@@ -261,11 +262,11 @@
                     </select>
                 </form>
 
-                <!-- Tombol Export -->
-                <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
+                <!-- Tombol Export (Pastikan route export pembimbing sudah ada) -->
+                <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-excel me-1"></i> Excel
                 </a>
-                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
+                <a href="{{ route('pembimbing.laporan.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-pdf me-1"></i> PDF
                 </a>
             </div>
@@ -291,15 +292,17 @@
                 </thead>
                 <tbody>
                     @php
-                        // Kelompokkan siswa berdasarkan sekolah
-                        $siswaGrouped = $siswa->groupBy('sekolah');
+                        // PERUBAHAN: Kelompokkan siswa berdasarkan sekolah_id
+                        $siswaGrouped = $siswa->groupBy('sekolah_id');
                     @endphp
 
-                    @foreach($siswaGrouped as $sekolah => $listSiswa)
+                    @foreach($siswaGrouped as $sekolahId => $listSiswa)
                         <!-- Baris Header Sekolah -->
                         <tr class="school-row">
                             <td colspan="{{ count($tanggalList) + 2 }}">
-                                <i class="bi bi-building me-2"></i> {{ $sekolah ? $sekolah : 'Sekolah Tidak Disebutkan' }}
+                                {{-- PERUBAHAN: Ambil nama sekolah dari relasi siswa pertama di grup --}}
+                                <i class="bi bi-building me-2"></i> 
+                                {{ $listSiswa->first()->sekolah->nama_sekolah ?? 'Sekolah Tidak Disebutkan' }}
                             </td>
                         </tr>
 

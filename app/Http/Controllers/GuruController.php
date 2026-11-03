@@ -8,6 +8,7 @@ use App\Models\Absensi;
 use App\Models\Izin; 
 use App\Models\Jurnal;
 use App\Models\AlasanKeterlambatan;
+use App\Models\Sekolah; // <-- TAMBAHAN: Import Model Sekolah
 use Carbon\Carbon; 
 use Illuminate\Support\Facades\Auth;
 
@@ -41,7 +42,7 @@ class GuruController extends Controller
     {
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
-        $sekolahFilter = $request->input('sekolah'); // <-- Tangkap filter sekolah
+        $sekolahFilter = $request->input('sekolah');
 
         $startDate = Carbon::createFromDate($tahun, $bulan, 1);
         $daysInMonth = $startDate->daysInMonth;
@@ -50,21 +51,17 @@ class GuruController extends Controller
             $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
         }
 
-        // 1. Ambil daftar sekolah unik untuk isi Dropdown
-        $daftarSekolah = User::where('role', 'user')
-                             ->whereNotNull('sekolah')
-                             ->distinct()
-                             ->pluck('sekolah');
+        // 1. Ambil daftar sekolah dari Master Data (Tabel sekolahs)
+        $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
 
-        // 2. Ambil siswa dengan filter sekolah (jika ada)
-        $querySiswa = User::where('role', 'user');
+        // 2. Ambil siswa dengan filter sekolah_id
+        $querySiswa = User::where('role', 'user')->with('sekolah'); // Eager load relasi sekolah
         if ($sekolahFilter && $sekolahFilter != 'Semua') {
-            $querySiswa->where('sekolah', $sekolahFilter);
+            $querySiswa->where('sekolah_id', $sekolahFilter);
         }
-        // Urutkan berdasarkan sekolah dulu, baru nama
-        $siswa = $querySiswa->orderBy('sekolah', 'asc')->orderBy('name', 'asc')->get();
+        $siswa = $querySiswa->orderBy('sekolah_id', 'asc')->orderBy('name', 'asc')->get();
 
-        // 3. Ambil data absensi lengkap (termasuk foto)
+        // 3. Ambil data absensi lengkap
         $absensi = Absensi::whereMonth('tanggal', $bulan)
                           ->whereYear('tanggal', $tahun)
                           ->get()
@@ -83,6 +80,7 @@ class GuruController extends Controller
     {
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
+        $sekolahFilter = $request->input('sekolah'); // <-- Tambahkan filter sekolah
 
         $startDate = Carbon::createFromDate($tahun, $bulan, 1);
         $daysInMonth = $startDate->daysInMonth;
@@ -91,7 +89,15 @@ class GuruController extends Controller
             $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
         }
 
-        $siswa = User::where('role', 'user')->orderBy('name', 'asc')->get();
+        // Ambil daftar sekolah untuk dropdown
+        $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
+
+        // Ambil siswa dengan filter sekolah (jika ada)
+        $querySiswa = User::where('role', 'user')->with('sekolah');
+        if ($sekolahFilter && $sekolahFilter != 'Semua') {
+            $querySiswa->where('sekolah_id', $sekolahFilter);
+        }
+        $siswa = $querySiswa->orderBy('name', 'asc')->get();
         
         $absensi = Absensi::whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->get()->keyBy(function($item) {
                               return $item->user_id . '-' . date('d', strtotime($item->tanggal));
@@ -133,11 +139,11 @@ class GuruController extends Controller
             $jumlahMenunggu = Izin::where('status', 'Menunggu')->count();
 
             return view('dashboard.izin_pembimbing', compact(
-                'semuaIzin', 'jumlahMenunggu', 'siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun'
+                'semuaIzin', 'jumlahMenunggu', 'siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'
             ));
         }
 
-        return view('dashboard.izin_guru', compact('siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun'));
+        return view('dashboard.izin_guru', compact('siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
     }
 
     public function updateIzin(Request $request, $id)

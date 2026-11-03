@@ -146,12 +146,14 @@
                         <!-- INPUT ASAL SEKOLAH (Hanya Muncul Jika Role = Siswa) -->
                         <div class="mb-4" id="sekolahContainer">
                             <label class="form-label">Asal Sekolah</label>
-                            <select name="sekolah" class="form-select">
-                                <option value="" disabled {{ old('sekolah', $pengguna->sekolah) == '' ? 'selected' : '' }}>-- Pilih Sekolah --</option>
-                                <option value="SMK Generasi Madani" {{ old('sekolah', $pengguna->sekolah) == 'SMK Generasi Madani' ? 'selected' : '' }}>SMK Generasi Madani</option>
-                                <option value="SMK Muhammadiyah 7 Tebet" {{ old('sekolah', $pengguna->sekolah) == 'SMK Muhammadiyah 7 Tebet' ? 'selected' : '' }}>SMK Muhammadiyah 7 Tebet</option>
-                                <option value="SMA Swasta X" {{ old('sekolah', $pengguna->sekolah) == 'SMA Swasta X' ? 'selected' : '' }}>SMA Swasta X</option>
-                            </select>
+                            <select name="sekolah_id" class="form-select">
+    <option value="" disabled selected>-- Pilih Sekolah --</option>
+    @foreach($daftarSekolah as $sklh)
+        <option value="{{ $sklh->id }}" {{ old('sekolah_id', $pengguna->sekolah_id ?? '') == $sklh->id ? 'selected' : '' }}>
+            {{ $sklh->nama_sekolah }}
+        </option>
+    @endforeach
+</select>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4 pt-3 border-top">

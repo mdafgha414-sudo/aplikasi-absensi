@@ -212,6 +212,12 @@
                         <i class="bi bi-printer"></i> Cetak Kartu QR Siswa
                     </a>
                 </li>
+                              <!-- TAMBAHKAN MENU INI -->
+                <li>
+                    <a href="{{ route('admin.sekolah.index') }}" class="{{ request()->routeIs('admin.sekolah.*') ? 'active' : '' }}">
+                        <i class="bi bi-building"></i> Manajemen Sekolah
+                    </a>
+                </li>
             @endif
 
             <!-- MENU PENGATURAN -->

@@ -13,6 +13,7 @@ use App\Http\Controllers\GuruController;
 use App\Http\Controllers\AlasanKeterlambatanController;
 use App\Http\Controllers\Pembimbing\ScanKartuController;
 use App\Http\Controllers\QrController;
+use App\Http\Controllers\Admin\SekolahController;
 
 // ==========================================
 // ROUTE PUBLIK
@@ -62,6 +63,7 @@ Route::middleware('auth')->group(function () {
         })->name('dashboard');
 
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
+        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         
         // IZIN
@@ -88,22 +90,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
         Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
 
-        // IZIN (Dibersihkan, hanya 1 route)
+        // IZIN
         Route::get('/izin', [GuruController::class, 'lihatIzin'])->name('izin');
         Route::put('/izin/{id}', [GuruController::class, 'updateIzin'])->name('izin.update');
 
-        // ALASAN KETERLAMBATAN (Dibersihkan)
+        // ALASAN KETERLAMBATAN
         Route::get('/alasan-keterlambatan', [AlasanKeterlambatanController::class, 'index'])->name('alasan.index');
         Route::put('/alasan-keterlambatan/{id}/terima', [AlasanKeterlambatanController::class, 'terima'])->name('alasan.terima');
         Route::put('/alasan-keterlambatan/{id}/tolak', [AlasanKeterlambatanController::class, 'tolak'])->name('alasan.tolak');
 
-        // FITUR VERIFIKASI KETERLAMBATAN (Tambahan dari file merge-mu)
+        // FITUR VERIFIKASI KETERLAMBATAN
         Route::get('/keterlambatan', [AlasanKeterlambatanController::class, 'indexPembimbing'])->name('keterlambatan.index');
         Route::post('/keterlambatan/verify/{id}', [AlasanKeterlambatanController::class, 'verifyPembimbing'])->name('keterlambatan.verify');
 
-        // =====================================================
         // FITUR SCAN KARTU SISWA OLEH PEMBIMBING
-        // =====================================================
         Route::get('/scan-kartu', [ScanKartuController::class, 'index'])->name('scan.index');
         Route::post('/scan-kartu/cek', [ScanKartuController::class, 'cekKartu'])->name('scan.cek');
         Route::post('/scan-kartu/simpan', [ScanKartuController::class, 'simpanAbsen'])->name('scan.simpan');
@@ -124,4 +124,15 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // Pengaturan Jam (Khusus Admin)
     Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
     Route::put('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
+
+    // ==========================================
+    // TAMBAHAN: ROUTE CRUD SEKOLAH (DIPERBAIKI)
+    // Menggunakan prefix admin dan name admin. agar route menjadi admin.sekolah.*
+    // ==========================================
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('sekolah', SekolahController::class)->except(['create', 'show', 'edit']);
+        // TAMBAHKAN DUA BARIS INI:
+        Route::get('sekolah/{id}/assign', [SekolahController::class, 'assignSiswaForm'])->name('sekolah.assign');
+        Route::post('sekolah/{id}/assign', [SekolahController::class, 'assignSiswaStore'])->name('sekolah.assign.store');
+    });
 });

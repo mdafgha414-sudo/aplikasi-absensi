@@ -3,24 +3,38 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-// TAMBAHKAN 'kode_kartu' DI SINI
-#[Fillable(['name', 'email', 'password', 'sekolah', 'role', 'kode_kartu'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Kolom-kolom yang boleh diisi secara massal (Mass Assignment).
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'sekolah_id', // <-- DIUBAH DARI 'sekolah' MENJADI 'sekolah_id'
+        'role',
+        'kode_kartu',
+        'foto_profil',
+    ];
+
+    /**
+     * Kolom-kolom yang disembunyikan saat data diubah menjadi JSON/Array.
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Tipe data yang di-casting.
      */
     protected function casts(): array
     {
@@ -28,5 +42,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // ==========================================
+    // RELASI
+    // ==========================================
+
+    /**
+     * Relasi ke tabel Sekolah.
+     * User (Siswa) memiliki satu Sekolah.
+     */
+    public function sekolah()
+    {
+        return $this->belongsTo(Sekolah::class, 'sekolah_id');
     }
 }

@@ -4,459 +4,459 @@
 
 <style>
     :root {
-    --admin-primary: #7da7d9;
-    --admin-primary-dark: #5f8fc9;
-    --admin-bg: #f7faff;
-    --admin-text: #40516a;
-    --admin-muted: #91a0b5;
-    --admin-border: #e8eef6;
-}
-
-.admin-dashboard {
-    color: var(--admin-text);
-    padding: 10px 0 30px;
-}
-
-/* HEADER */
-.admin-dashboard .page-title {
-    font-size: 1.65rem;
-    font-weight: 700;
-    letter-spacing: -.5px;
-    color: #40516a;
-}
-
-.admin-dashboard .page-subtitle {
-    color: #91a0b5;
-    font-size: .9rem;
-}
-
-/* Badge admin */
-.admin-dashboard .badge.text-bg-primary {
-    background: #eaf2fc !important;
-    color: #638fc5 !important;
-    font-weight: 600;
-    letter-spacing: .3px;
-}
-
-/* KARTU STATISTIK */
-.stat-card {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid #eaf0f8;
-    border-radius: 20px;
-    background: #fff;
-    padding: 24px;
-    height: 100%;
-    box-shadow: 0 3px 15px rgba(82, 125, 180, .035);
-    transition: border-color .2s ease;
-    --stat-color: #739ed1;
-    --stat-soft: #edf4fd;
-}
-
-.stat-card:hover {
-    border-color: #d8e6f7;
-}
-
-.stat-card::after {
-    content: "";
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    right: -35px;
-    top: -35px;
-    background: var(--stat-soft);
-    opacity: .8;
-}
-
-.stat-icon {
-    position: relative;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 15px;
-    background: var(--stat-soft);
-    color: var(--stat-color);
-    font-size: 1.25rem;
-}
-
-.stat-label {
-    color: #91a0b5;
-    font-size: .84rem;
-    font-weight: 500;
-    margin-top: 18px;
-    margin-bottom: 5px;
-}
-
-.stat-value {
-    font-size: 1.9rem;
-    font-weight: 700;
-    letter-spacing: -.7px;
-    margin: 0;
-    color: #40516a;
-}
-
-/* NAVIGASI TAB */
-.admin-tabs {
-    display: flex;
-    gap: 8px;
-    border: 1px solid #eaf0f8;
-    padding: 6px;
-    background: #f0f5fc;
-    border-radius: 15px;
-    width: fit-content;
-    max-width: 100%;
-}
-
-.admin-tabs .nav-link {
-    border: 0;
-    border-radius: 11px;
-    padding: 11px 18px;
-    color: #8b9bb2;
-    font-size: .88rem;
-    font-weight: 500;
-    white-space: nowrap;
-    transition: background .2s ease, color .2s ease;
-}
-
-.admin-tabs .nav-link:hover {
-    color: #628fc7;
-}
-
-.admin-tabs .nav-link.active {
-    background: #fff;
-    color: #628fc7;
-    box-shadow: 0 2px 8px rgba(82, 125, 180, .06);
-}
-
-/* PANEL */
-.admin-panel {
-    background: #fff;
-    border: 1px solid #eaf0f7;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(82, 125, 180, .025);
-}
-
-.admin-panel-header {
-    padding: 24px 26px;
-    border-bottom: 1px solid #eff3f9;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.admin-panel-title {
-    font-size: 1.02rem;
-    font-weight: 700;
-    margin: 0;
-    color: #50617a;
-}
-
-.admin-panel-title .text-primary {
-    color: #7da7d9 !important;
-}
-
-.admin-panel-description {
-    color: #9aa9bd;
-    font-size: .82rem;
-    margin: 6px 0 0;
-}
-
-.admin-panel-body {
-    padding: 24px 26px;
-}
-
-/* TOMBOL TAMBAH */
-.btn-add-employee {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 11px;
-    background: #e8f1fc;
-    border: 1px solid #e8f1fc;
-    color: #5f8fc9;
-    font-size: .85rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background .2s ease;
-}
-
-.btn-add-employee:hover {
-    background: #dceafb;
-    border-color: #dceafb;
-    color: #4d7eb9;
-}
-
-/* TOMBOL AKSI */
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    border-radius: 9px;
-    padding: 7px 11px;
-    font-size: .79rem;
-    font-weight: 500;
-    transition: background .2s ease;
-}
-
-/* Edit: biru muda */
-.btn-outline-warning {
-    color: #648fc3 !important;
-    border-color: #dce9f8 !important;
-    background: #f4f8fe !important;
-}
-
-.btn-outline-warning:hover {
-    color: #507eb5 !important;
-    background: #e7f0fc !important;
-}
-
-/* Hapus: merah lembut */
-.btn-outline-danger {
-    color: #c18491 !important;
-    border-color: #f1e1e6 !important;
-    background: #fff8f9 !important;
-}
-
-.btn-outline-danger:hover {
-    color: #ad6b7b !important;
-    background: #f9eaee !important;
-}
-
-/* TABEL */
-.admin-table {
-    margin: 0;
-    vertical-align: middle;
-    min-width: 650px;
-}
-
-.admin-table thead th {
-    background: #f8faff;
-    color: #91a1b7;
-    font-size: .7rem;
-    font-weight: 600;
-    letter-spacing: .6px;
-    text-transform: uppercase;
-    padding: 15px 18px;
-    border-bottom: 1px solid #eaf0f7;
-    white-space: nowrap;
-}
-
-.admin-table tbody td {
-    padding: 16px 18px;
-    border-bottom: 1px solid #f1f5fa;
-    color: #718198;
-    font-size: .85rem;
-}
-
-.admin-table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.admin-table tbody tr {
-    transition: background .2s ease;
-}
-
-.admin-table tbody tr:hover {
-    background: #fafdff;
-}
-
-/* AVATAR PENGGUNA */
-.employee-avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    flex-shrink: 0;
-    border-radius: 13px;
-    background: #edf4fd;
-    color: #729bd0;
-    font-weight: 600;
-    font-size: .88rem;
-}
-
-.employee-name {
-    font-weight: 600;
-    color: #52627a;
-    margin-bottom: 2px;
-}
-
-.employee-email {
-    font-size: .77rem;
-    color: #a0aec0;
-}
-
-.table-number {
-    color: #a4b1c3;
-    font-weight: 500;
-}
-
-/* BADGE STATUS ABSENSI */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 10px;
-    border-radius: 9px;
-    font-size: .74rem;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.status-success {
-    color: #679b83;
-    background: #edf7f0;
-}
-
-.status-late {
-    color: #bd7d87;
-    background: #fcf0f1;
-}
-
-.status-warning {
-    color: #9d8a61;
-    background: #fbf6e9;
-}
-
-.status-neutral {
-    color: #8b9bb0;
-    background: #f1f5fa;
-}
-
-/* DATA KOSONG */
-.empty-state {
-    text-align: center;
-    padding: 48px 20px !important;
-}
-
-.empty-state-icon {
-    display: inline-flex;
-    width: 58px;
-    height: 58px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 18px;
-    background: #eff5fd;
-    color: #91afd8;
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-}
-
-.empty-state-title {
-    font-weight: 600;
-    color: #5c6d84;
-    margin-bottom: 5px;
-}
-
-.empty-state-text {
-    color: #9baabd;
-    font-size: .83rem;
-    margin: 0;
-}
-
-/* PAGINATION */
-.admin-pagination {
-    padding-top: 22px;
-    border-top: 1px solid #f0f4f9;
-    margin-top: 10px;
-}
-
-.admin-pagination nav {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.admin-pagination .pagination {
-    gap: 5px;
-    margin-bottom: 0;
-    flex-wrap: wrap;
-}
-
-.admin-pagination .page-link {
-    border: 1px solid #e7eef7;
-    border-radius: 9px !important;
-    color: #8294ad;
-    font-size: .82rem;
-    padding: 8px 12px;
-    background: #fff;
-}
-
-.admin-pagination .page-link:hover {
-    background: #f0f6fd;
-    color: #628fc7;
-}
-
-.admin-pagination .page-item.active .page-link {
-    background: #e6f0fc;
-    border-color: #e6f0fc;
-    color: #5d88be;
-}
-
-.admin-pagination .page-item.disabled .page-link {
-    color: #cbd5e1;
-}
-
-/* NOTIFIKASI */
-.admin-alert {
-    border-radius: 12px;
-    padding: 14px 17px;
-    font-size: .86rem;
-}
-
-/* RESPONSIF */
-@media (max-width: 767.98px) {
-    .admin-dashboard .page-title {
-        font-size: 1.4rem;
+        --admin-primary: #7da7d9;
+        --admin-primary-dark: #5f8fc9;
+        --admin-bg: #f7faff;
+        --admin-text: #40516a;
+        --admin-muted: #91a0b5;
+        --admin-border: #e8eef6;
     }
 
+    .admin-dashboard {
+        color: var(--admin-text);
+        padding: 10px 0 30px;
+    }
+
+    /* HEADER */
+    .admin-dashboard .page-title {
+        font-size: 1.65rem;
+        font-weight: 700;
+        letter-spacing: -.5px;
+        color: #40516a;
+    }
+
+    .admin-dashboard .page-subtitle {
+        color: #91a0b5;
+        font-size: .9rem;
+    }
+
+    /* Badge admin */
+    .admin-dashboard .badge.text-bg-primary {
+        background: #eaf2fc !important;
+        color: #638fc5 !important;
+        font-weight: 600;
+        letter-spacing: .3px;
+    }
+
+    /* KARTU STATISTIK */
     .stat-card {
-        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #eaf0f8;
+        border-radius: 20px;
+        background: #fff;
+        padding: 24px;
+        height: 100%;
+        box-shadow: 0 3px 15px rgba(82, 125, 180, .035);
+        transition: border-color .2s ease;
+        --stat-color: #739ed1;
+        --stat-soft: #edf4fd;
+    }
+
+    .stat-card:hover {
+        border-color: #d8e6f7;
+    }
+
+    .stat-card::after {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        right: -35px;
+        top: -35px;
+        background: var(--stat-soft);
+        opacity: .8;
+    }
+
+    .stat-icon {
+        position: relative;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+        background: var(--stat-soft);
+        color: var(--stat-color);
+        font-size: 1.25rem;
+    }
+
+    .stat-label {
+        color: #91a0b5;
+        font-size: .84rem;
+        font-weight: 500;
+        margin-top: 18px;
+        margin-bottom: 5px;
     }
 
     .stat-value {
-        font-size: 1.7rem;
+        font-size: 1.9rem;
+        font-weight: 700;
+        letter-spacing: -.7px;
+        margin: 0;
+        color: #40516a;
     }
 
+    /* NAVIGASI TAB */
     .admin-tabs {
-        width: 100%;
-    }
-
-    .admin-tabs .nav-item {
-        flex: 1;
+        display: flex;
+        gap: 8px;
+        border: 1px solid #eaf0f8;
+        padding: 6px;
+        background: #f0f5fc;
+        border-radius: 15px;
+        width: fit-content;
+        max-width: 100%;
     }
 
     .admin-tabs .nav-link {
-        width: 100%;
-        padding: 11px 8px;
-        font-size: .76rem;
+        border: 0;
+        border-radius: 11px;
+        padding: 11px 18px;
+        color: #8b9bb2;
+        font-size: .88rem;
+        font-weight: 500;
+        white-space: nowrap;
+        transition: background .2s ease, color .2s ease;
+    }
+
+    .admin-tabs .nav-link:hover {
+        color: #628fc7;
+    }
+
+    .admin-tabs .nav-link.active {
+        background: #fff;
+        color: #628fc7;
+        box-shadow: 0 2px 8px rgba(82, 125, 180, .06);
+    }
+
+    /* PANEL */
+    .admin-panel {
+        background: #fff;
+        border: 1px solid #eaf0f7;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(82, 125, 180, .025);
     }
 
     .admin-panel-header {
-        padding: 20px;
+        padding: 24px 26px;
+        border-bottom: 1px solid #eff3f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .admin-panel-title {
+        font-size: 1.02rem;
+        font-weight: 700;
+        margin: 0;
+        color: #50617a;
+    }
+
+    .admin-panel-title .text-primary {
+        color: #7da7d9 !important;
+    }
+
+    .admin-panel-description {
+        color: #9aa9bd;
+        font-size: .82rem;
+        margin: 6px 0 0;
     }
 
     .admin-panel-body {
-        padding: 17px;
+        padding: 24px 26px;
     }
 
-    .admin-panel-header .btn-add-employee {
-        width: 100%;
+    /* TOMBOL TAMBAH */
+    .btn-add-employee {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 11px;
+        background: #e8f1fc;
+        border: 1px solid #e8f1fc;
+        color: #5f8fc9;
+        font-size: .85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background .2s ease;
+    }
+
+    .btn-add-employee:hover {
+        background: #dceafb;
+        border-color: #dceafb;
+        color: #4d7eb9;
+    }
+
+    /* TOMBOL AKSI */
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
+        gap: 5px;
+        border-radius: 9px;
+        padding: 7px 11px;
+        font-size: .79rem;
+        font-weight: 500;
+        transition: background .2s ease;
+    }
+
+    /* Edit: biru muda */
+    .btn-outline-warning {
+        color: #648fc3 !important;
+        border-color: #dce9f8 !important;
+        background: #f4f8fe !important;
+    }
+
+    .btn-outline-warning:hover {
+        color: #507eb5 !important;
+        background: #e7f0fc !important;
+    }
+
+    /* Hapus: merah lembut */
+    .btn-outline-danger {
+        color: #c18491 !important;
+        border-color: #f1e1e6 !important;
+        background: #fff8f9 !important;
+    }
+
+    .btn-outline-danger:hover {
+        color: #ad6b7b !important;
+        background: #f9eaee !important;
+    }
+
+    /* TABEL */
+    .admin-table {
+        margin: 0;
+        vertical-align: middle;
+        min-width: 650px;
+    }
+
+    .admin-table thead th {
+        background: #f8faff;
+        color: #91a1b7;
+        font-size: .7rem;
+        font-weight: 600;
+        letter-spacing: .6px;
+        text-transform: uppercase;
+        padding: 15px 18px;
+        border-bottom: 1px solid #eaf0f7;
+        white-space: nowrap;
+    }
+
+    .admin-table tbody td {
+        padding: 16px 18px;
+        border-bottom: 1px solid #f1f5fa;
+        color: #718198;
+        font-size: .85rem;
+    }
+
+    .admin-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .admin-table tbody tr {
+        transition: background .2s ease;
+    }
+
+    .admin-table tbody tr:hover {
+        background: #fafdff;
+    }
+
+    /* AVATAR PENGGUNA */
+    .employee-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: #edf4fd;
+        color: #729bd0;
+        font-weight: 600;
+        font-size: .88rem;
+    }
+
+    .employee-name {
+        font-weight: 600;
+        color: #52627a;
+        margin-bottom: 2px;
+    }
+
+    .employee-email {
+        font-size: .77rem;
+        color: #a0aec0;
+    }
+
+    .table-number {
+        color: #a4b1c3;
+        font-weight: 500;
+    }
+
+    /* BADGE STATUS ABSENSI */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 9px;
+        font-size: .74rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .status-success {
+        color: #679b83;
+        background: #edf7f0;
+    }
+
+    .status-late {
+        color: #bd7d87;
+        background: #fcf0f1;
+    }
+
+    .status-warning {
+        color: #9d8a61;
+        background: #fbf6e9;
+    }
+
+    .status-neutral {
+        color: #8b9bb0;
+        background: #f1f5fa;
+    }
+
+    /* DATA KOSONG */
+    .empty-state {
+        text-align: center;
+        padding: 48px 20px !important;
+    }
+
+    .empty-state-icon {
+        display: inline-flex;
+        width: 58px;
+        height: 58px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 18px;
+        background: #eff5fd;
+        color: #91afd8;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .empty-state-title {
+        font-weight: 600;
+        color: #5c6d84;
+        margin-bottom: 5px;
+    }
+
+    .empty-state-text {
+        color: #9baabd;
+        font-size: .83rem;
+        margin: 0;
+    }
+
+    /* PAGINATION */
+    .admin-pagination {
+        padding-top: 22px;
+        border-top: 1px solid #f0f4f9;
+        margin-top: 10px;
     }
 
     .admin-pagination nav {
-        justify-content: center;
+        display: flex;
+        justify-content: flex-end;
     }
-}
+
+    .admin-pagination .pagination {
+        gap: 5px;
+        margin-bottom: 0;
+        flex-wrap: wrap;
+    }
+
+    .admin-pagination .page-link {
+        border: 1px solid #e7eef7;
+        border-radius: 9px !important;
+        color: #8294ad;
+        font-size: .82rem;
+        padding: 8px 12px;
+        background: #fff;
+    }
+
+    .admin-pagination .page-link:hover {
+        background: #f0f6fd;
+        color: #628fc7;
+    }
+
+    .admin-pagination .page-item.active .page-link {
+        background: #e6f0fc;
+        border-color: #e6f0fc;
+        color: #5d88be;
+    }
+
+    .admin-pagination .page-item.disabled .page-link {
+        color: #cbd5e1;
+    }
+
+    /* NOTIFIKASI */
+    .admin-alert {
+        border-radius: 12px;
+        padding: 14px 17px;
+        font-size: .86rem;
+    }
+
+    /* RESPONSIF */
+    @media (max-width: 767.98px) {
+        .admin-dashboard .page-title {
+            font-size: 1.4rem;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-value {
+            font-size: 1.7rem;
+        }
+
+        .admin-tabs {
+            width: 100%;
+        }
+
+        .admin-tabs .nav-item {
+            flex: 1;
+        }
+
+        .admin-tabs .nav-link {
+            width: 100%;
+            padding: 11px 8px;
+            font-size: .76rem;
+        }
+
+        .admin-panel-header {
+            padding: 20px;
+        }
+
+        .admin-panel-body {
+            padding: 17px;
+        }
+
+        .admin-panel-header .btn-add-employee {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .admin-pagination nav {
+            justify-content: center;
+        }
+    }
 </style>
 
 <div class="admin-dashboard">
@@ -581,12 +581,19 @@
                         </p>
                     </div>
 
-                    <a href="{{ url('/admin/tambah-user') }}"
-                       class="btn-add-employee">
+                    <!-- Grup Tombol Aksi -->
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ url('/admin/tambah-user') }}" class="btn-add-employee">
+                            <i class="bi bi-person-plus-fill"></i>
+                            Tambah Pengguna
+                        </a>
 
-                        <i class="bi bi-person-plus-fill"></i>
-                        Tambah Pengguna
-                    </a>
+                        <!-- TAMBAHAN: Tombol Manajemen Sekolah -->
+                        <a href="{{ route('admin.sekolah.index') }}" class="btn-add-employee" style="background: #e0f2fe; border-color: #e0f2fe; color: #0369a1;">
+                            <i class="bi bi-building"></i>
+                            Manajemen Sekolah
+                        </a>
+                    </div>
                 </div>
 
                 <div class="admin-panel-body">
@@ -658,7 +665,7 @@
                                         </td>
 
                                         <td>
-                                            {{-- Menampilkan Role (DIPERBAIKI) --}}
+                                            {{-- Menampilkan Role --}}
                                             @if($pengguna->role == 'admin')
                                                 <span class="badge rounded-pill" style="background-color: #f3e8ff; color: #7e22ce;">Admin</span>
                                             @elseif($pengguna->role == 'pembimbing')

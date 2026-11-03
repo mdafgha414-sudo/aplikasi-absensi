@@ -19,15 +19,13 @@
         border: 1px solid #eef2f9;
     }
 
-    /* =========================================
-       BANNER BIRU MUDA (DISAMAKAN DENGAN DASHBOARD)
-       ========================================= */
+    /* BANNER BIRU MUDA */
     .hero-banner {
         background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
         border: 1px solid #7dd3fc;
         border-radius: 16px;
         padding: 30px;
-        color: #0f172a; /* Teks gelap agar terbaca */
+        color: #0f172a;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -40,7 +38,7 @@
     
     .hero-badge {
         display: inline-flex; align-items: center; gap: 6px;
-        background: #ffffff; color: #0284c7; /* Biru laut */
+        background: #ffffff; color: #0284c7;
         padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
         width: fit-content;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -190,7 +188,7 @@
                 <i class="bi bi-calendar-check"></i> Laporan Kehadiran
             </div>
             <h1 class="hero-title">Laporan Absensi & Izin PKL</h1>
-            <p class="hero-desc">Pantau riwayat kehadira, keterlambatan, serta persetujuan izin siswa PKL secara praktis.</p>
+            <p class="hero-desc">Pantau riwayat kehadiran, keterlambatan, serta persetujuan izin siswa PKL secara praktis.</p>
         </div>
         
         <div class="hero-right">
@@ -211,12 +209,24 @@
             <div class="header-left">
                 <div>
                     <h2 class="header-title">Detail Kehadiran Harian</h2>
-                    <p class="header-desc">Pilih bulan dan tahun untuk melihat data.</p>
+                    <p class="header-desc">Filter berdasarkan sekolah, bulan, dan tahun untuk melihat data.</p>
                 </div>
             </div>
             
             <div class="filter-actions">
-                <form action="" method="GET" class="d-flex gap-2">
+                <form action="{{ route('guru.izin') }}" method="GET" class="d-flex gap-2 flex-wrap">
+                    <!-- TAMBAHAN: Dropdown Filter Sekolah -->
+                    <div class="filter-group">
+                        <select name="sekolah" onchange="this.form.submit()">
+                            <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
+                            @foreach($daftarSekolah as $sklh)
+                                <option value="{{ $sklh->id }}" {{ $sekolahFilter == $sklh->id ? 'selected' : '' }}>
+                                    {{ $sklh->nama_sekolah }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <!-- Filter Bulan -->
                     <div class="filter-group">
                         <select name="bulan" onchange="this.form.submit()">
                             @for ($i = 1; $i <= 12; $i++)
@@ -226,6 +236,7 @@
                             @endfor
                         </select>
                     </div>
+                    <!-- Filter Tahun -->
                     <div class="filter-group">
                         <select name="tahun" onchange="this.form.submit()">
                             @for ($i = date('Y') - 2; $i <= date('Y') + 5; $i++)
@@ -238,14 +249,11 @@
                 </form>
 
                 <!-- TOMBOL EXPORT -->
-                <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-success btn-sm rounded-3 fw-medium">
-                    <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+                <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn-export btn-excel">
+                    <i class="bi bi-file-earmark-excel"></i> Export Excel
                 </a>
-                <a href="{{ route('pembimbing.laporan.export.pdf', [
-                'bulan' => $bulan, 
-                'tahun' => $tahun
-                ]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
-                    <i class="bi bi-file-earmark-excel me-1"></i> Export PDF
+                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn-export btn-pdf">
+                    <i class="bi bi-file-earmark-pdf"></i> Export PDF
                 </a>
             </div>
         </div>
@@ -275,82 +283,96 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($siswa as $index => $s)
-                        <tr class="student-row">
-                            <td>{{ $index + 1 }}</td>
-                            <td class="student-name">
-                                <div class="student-info">
-                                    <div class="avatar-circle bg-av-{{ ($index % 4) + 1 }}">
-                                        {{ strtoupper(substr($s->name, 0, 2)) }}
-                                    </div>
-                                    <span>{{ $s->name }}</span>
-                                </div>
+                    @php
+                        // Kelompokkan siswa berdasarkan sekolah
+                        $siswaGrouped = $siswa->groupBy('sekolah_id');
+                    @endphp
+
+                    @foreach($siswaGrouped as $sekolahId => $listSiswa)
+                        <!-- Baris Header Sekolah -->
+                        <tr style="background-color: #f0f4ff;">
+                            <td colspan="{{ count($tanggalList) + 2 }}" class="text-start fw-bold" style="color: #1e3a8a; padding: 10px 15px;">
+                                <i class="bi bi-building me-2"></i> {{ $listSiswa->first()->sekolah->nama_sekolah ?? 'Sekolah Tidak Disebutkan' }}
                             </td>
-                            @foreach($tanggalList as $tgl)
-                                @php
-                                    $key = $s->id . '-' . $tgl->format('d');
-                                    $statusAbsen = isset($absensi[$key]) ? $absensi[$key]->status : null;
-                                    $dataIzin = isset($izin[$key]) ? $izin[$key] : null;
-                                    
-                                    $finalStatus = null;
-
-                                    if ($dataIzin) {
-                                        if ($dataIzin->status == 'Menunggu') {
-                                            $finalStatus = 'Menunggu';
-                                        } else if ($dataIzin->status == 'Disetujui') {
-                                            $finalStatus = $dataIzin->jenis_izin; 
-                                        } else {
-                                            $finalStatus = $statusAbsen ?? 'Alpa'; 
-                                        }
-                                    } else {
-                                        $finalStatus = $statusAbsen ?? 'Alpa';
-                                    }
-
-                                    if (!$statusAbsen && !$dataIzin && $tgl->isWeekend()) {
-                                        $finalStatus = 'Libur';
-                                    }
-                                    
-                                    $jsonIzin = '';
-                                    if ($dataIzin) {
-                                        $jsonIzin = json_encode([
-                                            'nama' => $s->name,
-                                            'tanggal' => $tgl->format('d M Y'),
-                                            'jenis' => $dataIzin->jenis_izin,
-                                            'status' => $dataIzin->status,
-                                            'alasan' => $dataIzin->alasan,
-                                            'lampiran' => $dataIzin->lampiran ? asset('storage/' . $dataIzin->lampiran) : null
-                                        ]);
-                                    }
-                                @endphp
-                                <td>
-                                    @if($finalStatus == 'Hadir' || $finalStatus == 'Tepat Waktu')
-                                        <span class="status-box status-hadir"><i class="bi bi-check-lg"></i></span>
-                                    
-                                    @elseif($finalStatus == 'Telat' || $finalStatus == 'Terlambat')
-                                        <span class="status-box status-telat">T</span>
-
-                                    @elseif($finalStatus == 'Izin')
-                                        <a href="javascript:void(0)" class="status-box status-izin clickable" onclick="showDetailIzin({{ $jsonIzin }})">I</a>
-                                    
-                                    @elseif($finalStatus == 'Sakit')
-                                        <a href="javascript:void(0)" class="status-box status-sakit clickable" onclick="showDetailIzin({{ $jsonIzin }})">S</a>
-                                    
-                                    @elseif($finalStatus == 'Menunggu')
-                                        <a href="javascript:void(0)" class="status-box status-menunggu clickable" title="Menunggu Persetujuan" onclick="showDetailIzin({{ $jsonIzin }})">
-                                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"/>
-                                            </svg>
-                                        </a>
-                                    
-                                    @elseif($finalStatus == 'null')
-                                        <span class="status-box status-alpa">A</span>
-                                    
-                                    @else
-                                        <span class="status-empty">&minus;</span>
-                                    @endif
-                                </td>
-                            @endforeach
                         </tr>
+
+                        @foreach($listSiswa as $index => $s)
+                            <tr class="student-row">
+                                <td>{{ $loop->iteration }}</td>
+                                <td class="student-name">
+                                    <div class="student-info">
+                                        <div class="avatar-circle bg-av-{{ ($index % 4) + 1 }}">
+                                            {{ strtoupper(substr($s->name, 0, 2)) }}
+                                        </div>
+                                        <span>{{ $s->name }}</span>
+                                    </div>
+                                </td>
+                                @foreach($tanggalList as $tgl)
+                                    @php
+                                        $key = $s->id . '-' . $tgl->format('d');
+                                        $statusAbsen = isset($absensi[$key]) ? $absensi[$key]->status : null;
+                                        $dataIzin = isset($izin[$key]) ? $izin[$key] : null;
+                                        
+                                        $finalStatus = null;
+
+                                        if ($dataIzin) {
+                                            if ($dataIzin->status == 'Menunggu') {
+                                                $finalStatus = 'Menunggu';
+                                            } else if ($dataIzin->status == 'Disetujui') {
+                                                $finalStatus = $dataIzin->jenis_izin; 
+                                            } else {
+                                                $finalStatus = $statusAbsen ?? 'Alpa'; 
+                                            }
+                                        } else {
+                                            $finalStatus = $statusAbsen ?? 'Alpa';
+                                        }
+
+                                        if (!$statusAbsen && !$dataIzin && $tgl->isWeekend()) {
+                                            $finalStatus = 'Libur';
+                                        }
+                                        
+                                        $jsonIzin = '';
+                                        if ($dataIzin) {
+                                            $jsonIzin = json_encode([
+                                                'nama' => $s->name,
+                                                'tanggal' => $tgl->format('d M Y'),
+                                                'jenis' => $dataIzin->jenis_izin,
+                                                'status' => $dataIzin->status,
+                                                'alasan' => $dataIzin->alasan,
+                                                'lampiran' => $dataIzin->lampiran ? asset('storage/' . $dataIzin->lampiran) : null
+                                            ]);
+                                        }
+                                    @endphp
+                                    <td>
+                                        @if($finalStatus == 'Hadir' || $finalStatus == 'Tepat Waktu')
+                                            <span class="status-box status-hadir"><i class="bi bi-check-lg"></i></span>
+                                        
+                                        @elseif($finalStatus == 'Telat' || $finalStatus == 'Terlambat')
+                                            <span class="status-box status-telat">T</span>
+
+                                        @elseif($finalStatus == 'Izin')
+                                            <a href="javascript:void(0)" class="status-box status-izin clickable" onclick="showDetailIzin({{ $jsonIzin }})">I</a>
+                                        
+                                        @elseif($finalStatus == 'Sakit')
+                                            <a href="javascript:void(0)" class="status-box status-sakit clickable" onclick="showDetailIzin({{ $jsonIzin }})">S</a>
+                                        
+                                        @elseif($finalStatus == 'Menunggu')
+                                            <a href="javascript:void(0)" class="status-box status-menunggu clickable" title="Menunggu Persetujuan" onclick="showDetailIzin({{ $jsonIzin }})">
+                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"/>
+                                                </svg>
+                                            </a>
+                                        
+                                        @elseif($finalStatus == 'null')
+                                            <span class="status-box status-alpa">A</span>
+                                        
+                                        @else
+                                            <span class="status-empty">&minus;</span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
             </table>
