@@ -62,7 +62,6 @@ Route::middleware('auth')->group(function () {
         })->name('dashboard');
 
         Route::get('/jurnal', [GuruController::class, 'index'])->name('jurnal');
-        Route::post('/nilai/{id}', [GuruController::class, 'beriNilai'])->name('nilai');
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         
         // IZIN

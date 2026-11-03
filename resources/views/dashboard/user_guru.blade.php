@@ -114,7 +114,7 @@
 
                 <!-- Card 2 -->
                 <div class="col-md-6 col-lg-4">
-                    <a href="{{ url('/guru/laporan-absensi') }}" class="text-decoration-none action-card-link">
+                    <a href="{{ url('/guru/izin') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card position-relative overflow-hidden">
                             <div class="card-accent-line bg-teal"></div>
                             <div class="d-flex flex-column h-100 justify-content-between gap-4">
@@ -141,34 +141,7 @@
                     </a>
                 </div>
 
-                <!-- Card 3 -->
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ url('/guru/izin') }}" class="text-decoration-none action-card-link">
-                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card position-relative overflow-hidden">
-                            <div class="card-accent-line bg-amber"></div>
-                            <div class="d-flex flex-column h-100 justify-content-between gap-4">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="action-icon-wrapper rounded-3 bg-amber text-white d-flex align-items-center justify-content-center shadow-amber">
-                                        <i class="bi bi-envelope-paper fs-3"></i>
-                                    </div>
-                                    <span class="arrow-badge rounded-circle bg-light d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-arrow-right text-dark fs-5"></i>
-                                    </span>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold text-dark mb-2 card-title-hover">Daftar Izin Siswa</h5>
-                                    <p class="text-secondary small mb-0 leading-relaxed">
-                                        Tinjau permohonan surat izin atau sakit yang diajukan oleh siswa dan berikan persetujuan.
-                                    </p>
-                                </div>
-                                <div class="pt-2 border-top border-light d-flex align-items-center justify-content-between text-amber fw-semibold small">
-                                    <span>Tinjau Permohonan</span>
-                                    <i class="bi bi-chevron-right fs-7"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+                
 
             </div>
         </div>
