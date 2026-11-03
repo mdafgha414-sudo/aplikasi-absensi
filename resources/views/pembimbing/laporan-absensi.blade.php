@@ -111,12 +111,12 @@
         border-radius: 50%; 
         font-weight: 700; 
         font-size: 11px; 
-        cursor: pointer; /* Tambahan: agar kursor berubah jadi tangan */
+        cursor: pointer;
         transition: transform 0.2s;
     }
 
     .status-badge-cell:hover {
-        transform: scale(1.15); /* Tambahan: efek zoom saat di-hover */
+        transform: scale(1.15);
         box-shadow: 0 0 8px rgba(0,0,0,0.15);
     }
 
@@ -148,13 +148,11 @@
         font-weight: 700;
     }
 
-    /* Header kolom nama siswa juga lavender */
     .matrix-table thead .student-name {
         background-color: #E6E6FA !important;
         color: #312E5C;
     }
 
-    /* Header nomor */
     .matrix-table thead th:first-child {
         background-color: #E6E6FA !important;
     }
@@ -162,41 +160,45 @@
     /* ========================================
     WARNA STATUS KEHADIRAN
     ======================================== */
-
-    /* T = Telat, oranye */
     .cell-telat {
         background-color: #FED7AA !important;
         color: #C2410C !important;
     }
 
-    /* H = Hadir, hijau */
     .cell-hadir {
         background-color: #BBF7D0 !important;
         color: #166534 !important;
     }
 
-    /* A = Alpa, merah */
     .cell-alfa {
         background-color: #FECACA !important;
         color: #B91C1C !important;
     }
 
-    /* S = Sakit, kuning */
     .cell-sakit {
         background-color: #FEF08A !important;
         color: #854D0E !important;
     }
 
-    /* I = Izin, biru muda */
     .cell-izin {
         background-color: #BFDBFE !important;
         color: #1D4ED8 !important;
     }
 
-    /* Hari tanpa data */
     .cell-pending {
         background-color: #F1F5F9 !important;
         color: #64748B !important;
+    }
+
+    /* TAMBAHAN: Styling Baris Header Sekolah */
+    .school-row td {
+        background-color: #f0f4ff !important;
+        color: #1e3a8a;
+        font-weight: 700;
+        text-align: left;
+        padding: 10px 16px;
+        border-bottom: 2px solid #bfdbfe;
+        font-size: 13px;
     }
 </style>
 
@@ -230,11 +232,21 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <div>
                 <h5 class="fw-bold text-dark mb-0">Matriks Kehadiran Bulanan</h5>
-                <p class="text-muted small mb-0">Filter berdasarkan bulan dan tahun untuk melihat detail harian.</p>
+                <p class="text-muted small mb-0">Filter berdasarkan sekolah, bulan, dan tahun untuk melihat detail harian.</p>
             </div>
             
             <div class="d-flex gap-2 flex-wrap align-items-center">
-                <form action="/guru/laporan-absensi" method="GET" class="d-flex gap-2">
+                <form action="/guru/laporan-absensi" method="GET" class="d-flex gap-2 flex-wrap">
+                    <!-- TAMBAHAN: Dropdown Filter Sekolah -->
+                    <select name="sekolah" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
+                        <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
+                        @foreach($daftarSekolah as $sklh)
+                            <option value="{{ $sklh }}" {{ $sekolahFilter == $sklh ? 'selected' : '' }}>
+                                {{ $sklh }}
+                            </option>
+                        @endforeach
+                    </select>
+
                     <select name="bulan" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
                         @for($i = 1; $i <= 12; $i++)
                             <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == $i ? 'selected' : '' }}>
@@ -250,10 +262,10 @@
                 </form>
 
                 <!-- Tombol Export -->
-                <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
+                <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-excel me-1"></i> Excel
                 </a>
-                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
+                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-pdf me-1"></i> PDF
                 </a>
             </div>
@@ -278,75 +290,89 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($siswa as $index => $s)
-                        <tr>
-                            <td class="text-muted fw-semibold">{{ $index + 1 }}</td>
-                            <td class="student-name">{{ $s->name }}</td>
-                            
-                            @foreach($tanggalList as $tgl)
-                                @php
-                                    $tglStr = $tgl->format('d');
-                                    $key = $s->id . '-' . $tglStr;
-                                    
-                                    $absen = $absensi[$key] ?? null;
-                                    $status = $absen ? $absen->status : null;
-                                    
-                                    $cellClass = 'cell-pending';
-                                    $label = '-';
-                                    
-                                    if ($status == 'Telat') {
-                                        $cellClass = 'cell-telat';
-                                        $label = 'T';
-                                    } elseif ($status == 'Izin') {
-                                        $cellClass = 'cell-izin';
-                                        $label = 'I';
-                                    } elseif ($status == 'Sakit') {
-                                        $cellClass = 'cell-sakit';
-                                        $label = 'S';
-                                    } elseif ($status == 'Alpa' || $status == 'Alpha') {
-                                        $cellClass = 'cell-alfa';
-                                        $label = 'A';
-                                    } elseif ($status) {
-                                        $cellClass = 'cell-hadir';
-                                        $label = 'H';
-                                    } else {
-                                        $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
-                                        if (!$isWeekend && $tgl->isPast()) {
+                    @php
+                        // TAMBAHAN: Kelompokkan siswa berdasarkan sekolah
+                        $siswaGrouped = $siswa->groupBy('sekolah');
+                    @endphp
+
+                    @foreach($siswaGrouped as $sekolah => $listSiswa)
+                        <!-- Baris Header Sekolah -->
+                        <tr class="school-row">
+                            <td colspan="{{ count($tanggalList) + 2 }}">
+                                <i class="bi bi-building me-2"></i> {{ $sekolah ? $sekolah : 'Sekolah Tidak Disebutkan' }}
+                            </td>
+                        </tr>
+
+                        <!-- Looping Siswa di Sekolah tersebut -->
+                        @foreach($listSiswa as $index => $s)
+                            <tr>
+                                <td class="text-muted fw-semibold">{{ $loop->iteration }}</td>
+                                <td class="student-name">{{ $s->name }}</td>
+                                
+                                @foreach($tanggalList as $tgl)
+                                    @php
+                                        $tglStr = $tgl->format('d');
+                                        $key = $s->id . '-' . $tglStr;
+                                        
+                                        $absen = $absensi[$key] ?? null;
+                                        $status = $absen ? $absen->status : null;
+                                        
+                                        $cellClass = 'cell-pending';
+                                        $label = '-';
+                                        
+                                        if ($status == 'Telat') {
+                                            $cellClass = 'cell-telat';
+                                            $label = 'T';
+                                        } elseif ($status == 'Izin') {
+                                            $cellClass = 'cell-izin';
+                                            $label = 'I';
+                                        } elseif ($status == 'Sakit') {
+                                            $cellClass = 'cell-sakit';
+                                            $label = 'S';
+                                        } elseif ($status == 'Alpa' || $status == 'Alpha') {
                                             $cellClass = 'cell-alfa';
                                             $label = 'A';
+                                        } elseif ($status) {
+                                            $cellClass = 'cell-hadir';
+                                            $label = 'H';
+                                        } else {
+                                            $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
+                                            if (!$isWeekend && $tgl->isPast()) {
+                                                $cellClass = 'cell-alfa';
+                                                $label = 'A';
+                                            }
                                         }
-                                    }
-                                @endphp
+                                    @endphp
 
-                                <td>
-                                    @if($absen)
-                                        {{-- TAMBAHAN: Tombol untuk memicu Modal Foto --}}
-                                        <div class="status-badge-cell {{ $cellClass }}" 
-                                             onclick="showDetailAbsensi(
-                                                '{{ $s->name }}', 
-                                                '{{ $tgl->format('d M Y') }}', 
-                                                '{{ $status }}', 
-                                                '{{ $absen->jam_masuk }}', 
-                                                '{{ $absen->jam_pulang }}', 
-                                                '{{ $absen->foto_masuk ? asset('storage/'.$absen->foto_masuk) : '' }}', 
-                                                '{{ $absen->foto_pulang ? asset('storage/'.$absen->foto_pulang) : '' }}'
-                                             )">
-                                            {{ $label }}
-                                        </div>
-                                    @else
-                                        <div class="status-badge-cell {{ $cellClass }}">
-                                            {{ $label }}
-                                        </div>
-                                    @endif
-                                </td>
-                            @endforeach
-                        </tr>
+                                    <td>
+                                        @if($absen)
+                                            <div class="status-badge-cell {{ $cellClass }}" 
+                                                 onclick="showDetailAbsensi(
+                                                    '{{ addslashes($s->name) }}', 
+                                                    '{{ $tgl->format('d M Y') }}', 
+                                                    '{{ $status }}', 
+                                                    '{{ $absen->jam_masuk }}', 
+                                                    '{{ $absen->jam_pulang }}', 
+                                                    '{{ $absen->foto_masuk ? asset('storage/'.$absen->foto_masuk) : '' }}', 
+                                                    '{{ $absen->foto_pulang ? asset('storage/'.$absen->foto_pulang) : '' }}'
+                                                 )">
+                                                {{ $label }}
+                                            </div>
+                                        @else
+                                            <div class="status-badge-cell {{ $cellClass }}">
+                                                {{ $label }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
             </table>
         </div>
         
-        <!-- Legend & Keterangan (Tampilan Bawah Diperbarui Menarik) -->
+        <!-- Legend & Keterangan -->
         <div class="row g-3 align-items-center pt-2 border-top border-light">
             <div class="col-md-3">
                 <span class="fw-bold text-dark d-block">Keterangan Status</span>
@@ -385,9 +411,7 @@
     </div>
 </div>
 
-<!-- ==================================================== -->
-<!-- MODAL DETAIL ABSENSI (FOTO & JAM)                    -->
-<!-- ==================================================== -->
+<!-- MODAL DETAIL ABSENSI -->
 <div class="modal fade" id="modalDetailAbsensi" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg">
@@ -454,19 +478,15 @@
     </div>
 </div>
 
-<!-- ==================================================== -->
-<!-- JAVASCRIPT UNTUK MODAL                               -->
-<!-- ==================================================== -->
+<!-- JAVASCRIPT UNTUK MODAL -->
 <script>
     function showDetailAbsensi(nama, tanggal, status, jamMasuk, jamPulang, fotoMasuk, fotoPulang) {
-        // 1. Isi Data Teks
         document.getElementById('modalNama').innerText = nama;
         document.getElementById('modalTanggal').innerText = tanggal;
         
         let badgeStatus = document.getElementById('modalStatus');
         badgeStatus.innerText = status;
         
-        // Atur Warna Badge Status
         badgeStatus.className = 'badge fs-6 px-3 py-2 ';
         if (status === 'Hadir' || status === 'Tepat Waktu') badgeStatus.classList.add('bg-success');
         else if (status === 'Telat') badgeStatus.classList.add('bg-warning', 'text-dark');
@@ -474,11 +494,9 @@
         else if (status === 'Sakit') badgeStatus.classList.add('bg-info', 'text-dark');
         else badgeStatus.classList.add('bg-danger');
 
-        // 2. Isi Jam
         document.getElementById('modalJamMasuk').innerText = jamMasuk ? jamMasuk.substring(0, 5) : '--:--';
         document.getElementById('modalJamPulang').innerText = jamPulang ? jamPulang.substring(0, 5) : '--:--';
 
-        // 3. Atur Foto Masuk
         let imgMasuk = document.getElementById('imgFotoMasuk');
         let noFotoMasuk = document.getElementById('noFotoMasuk');
         if (fotoMasuk && fotoMasuk !== '') {
@@ -490,7 +508,6 @@
             noFotoMasuk.classList.remove('d-none');
         }
 
-        // 4. Atur Foto Pulang
         let imgPulang = document.getElementById('imgFotoPulang');
         let noFotoPulang = document.getElementById('noFotoPulang');
         if (fotoPulang && fotoPulang !== '') {
@@ -502,7 +519,6 @@
             noFotoPulang.classList.remove('d-none');
         }
 
-        // 5. Tampilkan Modal
         let modal = new bootstrap.Modal(document.getElementById('modalDetailAbsensi'));
         modal.show();
     }

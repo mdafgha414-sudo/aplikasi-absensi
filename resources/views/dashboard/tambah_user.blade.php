@@ -20,30 +20,45 @@
             <form action="/admin/tambah-user" method="POST">
                 @csrf
                 
+                {{-- Input Nama --}}
                 <div class="mb-3">
                     <label class="form-label fw-bold">Nama Lengkap</label>
-                    <input type="text" name="name" class="form-control" placeholder="Contoh: Andi Wijaya" required>
+                    <input type="text" name="name" class="form-control" placeholder="Contoh: Andi Wijaya" value="{{ old('name') }}" required>
                 </div>
 
+                {{-- Input Email --}}
                 <div class="mb-3">
                     <label class="form-label fw-bold">Alamat Email</label>
-                    <input type="email" name="email" class="form-control" placeholder="andi@gmail.com" required>
+                    <input type="email" name="email" class="form-control" placeholder="andi@gmail.com" value="{{ old('email') }}" required>
                 </div>
 
+                {{-- Input Password --}}
                 <div class="mb-3">
                     <label class="form-label fw-bold">Password</label>
                     <input type="password" name="password" class="form-control" placeholder="Minimal 6 karakter" required>
                 </div>
 
-                <!-- TAMBAHAN: Dropdown Pilihan Role -->
+                {{-- Dropdown Pilihan Role --}}
                 <div class="mb-4">
                     <label class="form-label fw-bold">Daftar Sebagai</label>
-                    <select name="role" class="form-select" required>
-                        <option value="user">Siswa (PKL)</option>
-                        <option value="guru">Guru</option>
-                          <option value="pembimbing">Pembimbing PKL</option> <!-- TAMBAHKAN INI -->
+                    <select name="role" id="roleSelect" class="form-select" required onchange="toggleSekolah()">
+                        <option value="" disabled selected>-- Pilih Role --</option>
+                        <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
+                        <option value="guru" {{ old('role') == 'guru' ? 'selected' : '' }}>Guru</option>
+                        <option value="pembimbing" {{ old('role') == 'pembimbing' ? 'selected' : '' }}>Pembimbing PKL</option>
                     </select>
                     <small class="text-muted">Pilih role agar sistem mengarahkan ke dashboard yang tepat.</small>
+                </div>
+
+                {{-- Input Asal Sekolah (Hanya Muncul Jika Role = Siswa) --}}
+                <div class="mb-4" id="sekolahContainer" style="display: none;">
+                    <label class="form-label fw-bold">Asal Sekolah</label>
+                    <select name="sekolah" class="form-select">
+                        <option value="" disabled selected>-- Pilih Sekolah --</option>
+                        <option value="SMK Generasi Madani" {{ old('sekolah') == 'SMK Generasi Madani' ? 'selected' : '' }}>SMK Generasi Madani</option>
+                        <option value="SMK Muhammadiyah 7 Tebet" {{ old('sekolah') == 'SMK Muhammadiyah 7 Tebet' ? 'selected' : '' }}>SMK Muhammadiyah 7 Tebet</option>
+                        <option value="SMA Swasta X" {{ old('sekolah') == 'SMA Swasta X' ? 'selected' : '' }}>SMA Swasta X</option>
+                    </select>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
@@ -54,4 +69,25 @@
         </div>
     </div>
 </div>
+
+{{-- JavaScript untuk menampilkan/menyembunyikan input sekolah --}}
+<script>
+    function toggleSekolah() {
+        const role = document.getElementById('roleSelect').value;
+        const sekolahContainer = document.getElementById('sekolahContainer');
+        
+        if (role === 'user') {
+            sekolahContainer.style.display = 'block';
+        } else {
+            sekolahContainer.style.display = 'none';
+            // Opsional: kosongkan value sekolah jika bukan user
+            document.querySelector('select[name="sekolah"]').value = ''; 
+        }
+    }
+
+    // Jalankan saat halaman dimuat (untuk kasus validasi gagal / old input)
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleSekolah();
+    });
+</script>
 @endsection

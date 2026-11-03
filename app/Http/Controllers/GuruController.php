@@ -41,6 +41,7 @@ class GuruController extends Controller
     {
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
+        $sekolahFilter = $request->input('sekolah'); // <-- Tangkap filter sekolah
 
         $startDate = Carbon::createFromDate($tahun, $bulan, 1);
         $daysInMonth = $startDate->daysInMonth;
@@ -49,9 +50,21 @@ class GuruController extends Controller
             $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
         }
 
-        $siswa = User::where('role', 'user')->orderBy('name', 'asc')->get();
+        // 1. Ambil daftar sekolah unik untuk isi Dropdown
+        $daftarSekolah = User::where('role', 'user')
+                             ->whereNotNull('sekolah')
+                             ->distinct()
+                             ->pluck('sekolah');
 
-        // Ambil data absensi lengkap (termasuk foto jika nanti kolomnya sudah ada)
+        // 2. Ambil siswa dengan filter sekolah (jika ada)
+        $querySiswa = User::where('role', 'user');
+        if ($sekolahFilter && $sekolahFilter != 'Semua') {
+            $querySiswa->where('sekolah', $sekolahFilter);
+        }
+        // Urutkan berdasarkan sekolah dulu, baru nama
+        $siswa = $querySiswa->orderBy('sekolah', 'asc')->orderBy('name', 'asc')->get();
+
+        // 3. Ambil data absensi lengkap (termasuk foto)
         $absensi = Absensi::whereMonth('tanggal', $bulan)
                           ->whereYear('tanggal', $tahun)
                           ->get()
@@ -60,10 +73,10 @@ class GuruController extends Controller
                           });
 
         if (Auth::user()->role === 'pembimbing') {
-            return view('pembimbing.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'bulan', 'tahun'));
+            return view('pembimbing.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
         }
 
-        return view('guru.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'bulan', 'tahun'));
+        return view('guru.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
     }
 
     public function lihatIzin(Request $request)

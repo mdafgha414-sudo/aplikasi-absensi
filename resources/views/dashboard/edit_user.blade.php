@@ -122,25 +122,36 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control" value="{{ $pengguna->name }}" required>
+                            <input type="text" name="name" class="form-control" value="{{ old('name', $pengguna->name) }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Alamat Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ $pengguna->email }}" required>
+                            <input type="email" name="email" class="form-control" value="{{ old('email', $pengguna->email) }}" required>
                         </div>
 
                         <!-- DROPDOWN ROLE -->
                         <div class="mb-4">
                             <label class="form-label">Role / Jabatan</label>
-                            <select name="role" class="form-select" required>
-                                <option value="user" {{ $pengguna->role == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
-                                <option value="guru" {{ $pengguna->role == 'guru' ? 'selected' : '' }}>Guru Pembimbing</option>
-                                 <option value="pembimbing" {{ $pengguna->role == 'pembimbing' ? 'selected' : '' }}>Guru Pembimbing PKL</option> <!-- TAMBAHKAN INI -->
+                            <select name="role" id="roleSelect" class="form-select" required onchange="toggleSekolah()">
+                                <option value="user" {{ old('role', $pengguna->role) == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
+                                <option value="guru" {{ old('role', $pengguna->role) == 'guru' ? 'selected' : '' }}>Guru Pembimbing</option>
+                                <option value="pembimbing" {{ old('role', $pengguna->role) == 'pembimbing' ? 'selected' : '' }}>Guru Pembimbing PKL</option>
                             </select>
                             <small class="text-muted mt-1 d-block" style="font-size: .78rem;">
                                 *Ubah role untuk memindahkan pengguna ke dashboard yang sesuai.
                             </small>
+                        </div>
+
+                        <!-- INPUT ASAL SEKOLAH (Hanya Muncul Jika Role = Siswa) -->
+                        <div class="mb-4" id="sekolahContainer">
+                            <label class="form-label">Asal Sekolah</label>
+                            <select name="sekolah" class="form-select">
+                                <option value="" disabled {{ old('sekolah', $pengguna->sekolah) == '' ? 'selected' : '' }}>-- Pilih Sekolah --</option>
+                                <option value="SMK Generasi Madani" {{ old('sekolah', $pengguna->sekolah) == 'SMK Generasi Madani' ? 'selected' : '' }}>SMK Generasi Madani</option>
+                                <option value="SMK Muhammadiyah 7 Tebet" {{ old('sekolah', $pengguna->sekolah) == 'SMK Muhammadiyah 7 Tebet' ? 'selected' : '' }}>SMK Muhammadiyah 7 Tebet</option>
+                                <option value="SMA Swasta X" {{ old('sekolah', $pengguna->sekolah) == 'SMA Swasta X' ? 'selected' : '' }}>SMA Swasta X</option>
+                            </select>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4 pt-3 border-top">
@@ -154,4 +165,23 @@
         </div>
     </div>
 </div>
+
+{{-- JavaScript untuk menampilkan/menyembunyikan input sekolah --}}
+<script>
+    function toggleSekolah() {
+        const role = document.getElementById('roleSelect').value;
+        const sekolahContainer = document.getElementById('sekolahContainer');
+        
+        if (role === 'user') {
+            sekolahContainer.style.display = 'block';
+        } else {
+            sekolahContainer.style.display = 'none';
+        }
+    }
+
+    // Jalankan saat halaman dimuat (untuk memastikan status awal benar)
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleSekolah();
+    });
+</script>
 @endsection

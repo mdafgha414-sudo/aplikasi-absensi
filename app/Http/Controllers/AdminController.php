@@ -39,6 +39,7 @@ class AdminController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'required|in:user,guru,pembimbing', 
+            'sekolah' => 'nullable|string|max:255', // <-- TAMBAHAN: Validasi sekolah
         ]);
 
         // LOGIKA OTOMATIS KODE KARTU
@@ -65,7 +66,8 @@ class AdminController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role, 
-            'kode_kartu' => $kode_kartu, // Simpan kode kartu yang baru dibuat
+            'sekolah' => $request->sekolah, // <-- TAMBAHAN: Simpan sekolah
+            'kode_kartu' => $kode_kartu, 
         ]);
 
         return redirect('/admin/dashboard')->with('success', 'Pengguna baru berhasil ditambahkan!');
@@ -78,7 +80,7 @@ class AdminController extends Controller
         return view('dashboard.edit_user', compact('pengguna'));
     }
 
-    // 5. Menyimpan perubahan data (Termasuk Role)
+    // 5. Menyimpan perubahan data (Termasuk Role dan Sekolah)
     public function updateUser(Request $request, $id)
     {
         $pengguna = User::findOrFail($id);
@@ -87,12 +89,14 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$id, 
             'role' => 'required|in:user,guru,pembimbing', 
+            'sekolah' => 'nullable|string|max:255', // <-- TAMBAHAN: Validasi sekolah
         ]);
 
         $dataUpdate = [
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role, 
+            'sekolah' => $request->sekolah, // <-- TAMBAHAN: Update sekolah
         ];
 
         // LOGIKA TAMBAHAN: Jika role diubah jadi 'user' tapi belum punya kode_kartu

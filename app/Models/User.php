@@ -10,7 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 // TAMBAHKAN 'kode_kartu' DI SINI
-#[Fillable(['name', 'email', 'password', 'role', 'kode_kartu'])]
+#[Fillable(['name', 'email', 'password', 'sekolah', 'role', 'kode_kartu'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
