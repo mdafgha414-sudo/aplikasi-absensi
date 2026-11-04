@@ -190,14 +190,77 @@ class GuruController extends Controller
         return back()->with('success', 'Status pengajuan izin berhasil diperbarui menjadi: ' . $request->status);
     }
 
+        // ==========================================================
+    // DASHBOARD PEMBIMBING PKL - TIMETRIX
+    // ----------------------------------------------------------
+    // Fungsi:
+    // Menampilkan halaman utama dashboard Pembimbing PKL.
+    //
+    // Data yang disediakan:
+    // 1. Lima jurnal siswa terbaru.
+    // 2. Nama siswa melalui relasi model User.
+    // 3. Data penilaian jurnal.
+    // 4. Statistik ringkasan dashboard.
+    //
+    // View:
+    // resources/views/dashboard/user_pembimbing.blade.php
+    //
+    // Catatan:
+    // Data diambil langsung dari database sehingga dashboard
+    // otomatis diperbarui ketika halaman dibuka.
+    // ==========================================================
     public function dashboardPembimbing()
     {
+        // ------------------------------------------------------
+        // BAGIAN 1: RIWAYAT JURNAL TERBARU
+        // Mengambil lima jurnal terakhir beserta data siswa.
+        // ------------------------------------------------------
         $jurnalTerbaru = Jurnal::with('user')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        return view('dashboard.user_pembimbing', compact('jurnalTerbaru'));
+
+        // ------------------------------------------------------
+        // BAGIAN 2: TOTAL SISWA
+        // Menghitung jumlah seluruh akun dengan role user.
+        // ------------------------------------------------------
+        $totalSiswa = User::where('role', 'user')->count();
+
+
+        // ------------------------------------------------------
+        // BAGIAN 3: TOTAL JURNAL
+        // Menghitung seluruh jurnal yang sudah dikirim siswa.
+        // ------------------------------------------------------
+        $totalJurnal = Jurnal::count();
+
+
+        // ------------------------------------------------------
+        // BAGIAN 4: JURNAL BELUM DINILAI
+        // Menghitung jurnal yang belum mendapatkan nilai.
+        // ------------------------------------------------------
+        $jurnalBelumDinilai = Jurnal::whereNull('nilai')->count();
+
+
+        // ------------------------------------------------------
+        // BAGIAN 5: JURNAL SUDAH DINILAI
+        // Menghitung jurnal yang sudah mendapatkan nilai.
+        // ------------------------------------------------------
+        $jurnalSudahDinilai = Jurnal::whereNotNull('nilai')->count();
+
+
+        // ------------------------------------------------------
+        // BAGIAN 6: KIRIM DATA KE HALAMAN DASHBOARD
+        // Semua variabel di atas dikirim ke Blade agar dapat
+        // ditampilkan secara otomatis pada tampilan dashboard.
+        // ------------------------------------------------------
+        return view('dashboard.user_pembimbing', compact(
+            'jurnalTerbaru',
+            'totalSiswa',
+            'totalJurnal',
+            'jurnalBelumDinilai',
+            'jurnalSudahDinilai'
+        ));
     }
 
     // ==========================================
