@@ -5,46 +5,55 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Absensi;
 use App\Models\User;
-use App\Models\Sekolah; // <-- TAMBAHAN: Import Model Sekolah
+use App\Models\Sekolah;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
     // 1. Fungsi untuk menampilkan halaman utama admin
     public function index()
     {
-        // Ambil semua data absensi
         $semuaAbsensi = Absensi::with('user')->orderBy('tanggal', 'desc')->paginate(10);
-
-        // Ambil SEMUA user (Siswa DAN Guru) agar ditampilkan di tabel
-        // Tambahkan with('sekolah') agar bisa menampilkan nama sekolah di tabel
         $semuaPengguna = User::with('sekolah')->orderBy('role', 'asc')->orderBy('name', 'asc')->paginate(10);
-
-        // Hitung total user (Siswa + Guru)
         $totalUser = User::count();
 
-        // Kirim variabel ke view
         return view('dashboard.admin', compact('semuaAbsensi', 'semuaPengguna', 'totalUser'));
     }
 
-    // 2. Fungsi untuk menampilkan form tambah user
+    // 2. FUNGSI KHUSUS PEMBIMBING: Hanya menampilkan Manajemen Siswa (Tanpa Tab Absensi)
+    public function manajemenSiswa()
+    {
+        $semuaPengguna = User::with('sekolah')->orderBy('role', 'asc')->orderBy('name', 'asc')->paginate(10);
+        $totalUser = User::count();
+
+        // Arahkan ke view baru yang lebih sederhana
+        return view('dashboard.manajemen_siswa', compact('semuaPengguna', 'totalUser'));
+    }
+
+    // 3. Fungsi untuk menampilkan form tambah user
     public function createUser()
     {
-        // Ambil daftar sekolah untuk isi Dropdown di form
         $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
-        
         return view('dashboard.tambah_user', compact('daftarSekolah'));
     }
 
-    // 3. Fungsi untuk menyimpan user baru ke database
+    // 4. Fungsi untuk menyimpan user baru ke database
     public function storeUser(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:user,guru,pembimbing', 
-            'sekolah_id' => 'nullable|exists:sekolahs,id', // <-- DIUBAH: Validasi menggunakan ID Sekolah
+            'role' => [
+                'required',
+                'string',
+                Rule::in(Auth::user()->role === 'admin' ? ['user', 'guru', 'pembimbing'] : ['user', 'guru'])
+            ],
+            'sekolah_id' => 'nullable|exists:sekolahs,id',
+        ], [
+            'role.in' => 'Anda tidak memiliki izin untuk membuat role ini.'
         ]);
 
         // LOGIKA OTOMATIS KODE KARTU
@@ -56,12 +65,10 @@ class AdminController extends Controller
                              ->first();
 
             if ($lastSiswa) {
-                // Ambil 3 digit angka terakhir dari kode (misal "SISWA-001" -> 001)
                 $lastNumber = (int) substr($lastSiswa->kode_kartu, 6); 
                 $newNumber = $lastNumber + 1;
                 $kode_kartu = 'SISWA-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
             } else {
-                // Jika ini siswa pertama
                 $kode_kartu = 'SISWA-001';
             }
         }
@@ -71,25 +78,27 @@ class AdminController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role, 
-            'sekolah_id' => $request->sekolah_id, // <-- DIUBAH: Simpan ID sekolah
+            'sekolah_id' => $request->sekolah_id,
             'kode_kartu' => $kode_kartu, 
         ]);
 
+        // Redirect dinamis
+        if (Auth::user()->role === 'pembimbing') {
+            return redirect()->route('pembimbing.siswa.index')->with('success', 'Pengguna baru berhasil ditambahkan!');
+        }
         return redirect('/admin/dashboard')->with('success', 'Pengguna baru berhasil ditambahkan!');
     }
 
-    // 4. Menampilkan form edit
+    // 5. Menampilkan form edit
     public function editUser($id)
     {
         $pengguna = User::findOrFail($id);
-        
-        // Ambil daftar sekolah untuk isi Dropdown di form
         $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
         
         return view('dashboard.edit_user', compact('pengguna', 'daftarSekolah'));
     }
 
-    // 5. Menyimpan perubahan data (Termasuk Role dan Sekolah)
+    // 6. Menyimpan perubahan data
     public function updateUser(Request $request, $id)
     {
         $pengguna = User::findOrFail($id);
@@ -97,15 +106,21 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$id, 
-            'role' => 'required|in:user,guru,pembimbing', 
-            'sekolah_id' => 'nullable|exists:sekolahs,id', // <-- DIUBAH: Validasi menggunakan ID Sekolah
+            'role' => [
+                'required',
+                'string',
+                Rule::in(Auth::user()->role === 'admin' ? ['user', 'guru', 'pembimbing'] : ['user', 'guru'])
+            ],
+            'sekolah_id' => 'nullable|exists:sekolahs,id',
+        ], [
+            'role.in' => 'Anda tidak memiliki izin untuk mengubah ke role ini.'
         ]);
 
         $dataUpdate = [
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role, 
-            'sekolah_id' => $request->sekolah_id, // <-- DIUBAH: Update ID sekolah
+            'sekolah_id' => $request->sekolah_id,
         ];
 
         // LOGIKA TAMBAHAN: Jika role diubah jadi 'user' tapi belum punya kode_kartu
@@ -126,24 +141,28 @@ class AdminController extends Controller
 
         $pengguna->update($dataUpdate);
 
+        // Redirect dinamis
+        if (Auth::user()->role === 'pembimbing') {
+            return redirect()->route('pembimbing.siswa.index')->with('success', 'Data pengguna berhasil diperbarui!');
+        }
         return redirect('/admin/dashboard')->with('success', 'Data pengguna berhasil diperbarui!');
     }
 
-    // 6. Menghapus data
+    // 7. Menghapus data
     public function destroyUser($id)
     {
         $pengguna = User::findOrFail($id);
 
         if (strtolower($pengguna->role) === 'admin') {
-            return back()->with(
-                'error',
-                'Akun Admin tidak boleh dihapus!'
-            );
+            return back()->with('error', 'Akun Admin tidak boleh dihapus!');
         }
 
-        // Lanjutkan proses penghapusan yang sudah ada.
         $pengguna->delete();
 
+        // Redirect dinamis
+        if (Auth::user()->role === 'pembimbing') {
+            return redirect()->route('pembimbing.siswa.index')->with('success', 'Pengguna berhasil dihapus!');
+        }
         return redirect('/admin/dashboard')->with('success', 'Pengguna berhasil dihapus!');
     }
 }

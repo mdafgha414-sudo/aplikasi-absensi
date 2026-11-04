@@ -17,7 +17,13 @@
                 </div>
             @endif
 
-            <form action="/admin/tambah-user" method="POST">
+            {{-- Tentukan Action URL berdasarkan Role yang Login --}}
+            @php
+                $actionUrl = Auth::user()->role === 'pembimbing' ? route('pembimbing.siswa.store') : url('/admin/tambah-user');
+                $cancelUrl = Auth::user()->role === 'pembimbing' ? route('pembimbing.siswa.index') : url('/admin/dashboard');
+            @endphp
+
+            <form action="{{ $actionUrl }}" method="POST">
                 @csrf
                 
                 {{-- Input Nama --}}
@@ -45,7 +51,11 @@
                         <option value="" disabled selected>-- Pilih Role --</option>
                         <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
                         <option value="guru" {{ old('role') == 'guru' ? 'selected' : '' }}>Guru</option>
-                        <option value="pembimbing" {{ old('role') == 'pembimbing' ? 'selected' : '' }}>Pembimbing PKL</option>
+                        
+                        {{-- Hanya Admin yang bisa membuat role Pembimbing --}}
+                        @if(Auth::user()->role === 'admin')
+                            <option value="pembimbing" {{ old('role') == 'pembimbing' ? 'selected' : '' }}>Pembimbing PKL</option>
+                        @endif
                     </select>
                     <small class="text-muted">Pilih role agar sistem mengarahkan ke dashboard yang tepat.</small>
                 </div>
@@ -53,18 +63,18 @@
                 {{-- Input Asal Sekolah (Hanya Muncul Jika Role = Siswa) --}}
                 <div class="mb-4" id="sekolahContainer" style="display: none;">
                     <label class="form-label fw-bold">Asal Sekolah</label>
-                   <select name="sekolah_id" class="form-select">
-                  <option value="" disabled selected>-- Pilih Sekolah --</option>
+                    <select name="sekolah_id" class="form-select">
+                        <option value="" disabled selected>-- Pilih Sekolah --</option>
                         @foreach($daftarSekolah as $sklh)
-                         <option value="{{ $sklh->id }}" {{ old('sekolah_id', $pengguna->sekolah_id ?? '') == $sklh->id ? 'selected' : '' }}>
-                             {{ $sklh->nama_sekolah }}
-                        </option>
-                            @endforeach
+                            <option value="{{ $sklh->id }}" {{ old('sekolah_id') == $sklh->id ? 'selected' : '' }}>
+                                {{ $sklh->nama_sekolah }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                    <a href="/admin/dashboard" class="btn btn-secondary">Batal</a>
+                    <a href="{{ $cancelUrl }}" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary">Simpan Pengguna</button>
                 </div>
             </form>
@@ -82,8 +92,9 @@
             sekolahContainer.style.display = 'block';
         } else {
             sekolahContainer.style.display = 'none';
-            // Opsional: kosongkan value sekolah jika bukan user
-            document.querySelector('select[name="sekolah"]').value = ''; 
+            // Kosongkan value sekolah jika bukan user (perbaikan selector)
+            const selectSekolah = document.querySelector('select[name="sekolah_id"]');
+            if (selectSekolah) selectSekolah.value = ''; 
         }
     }
 

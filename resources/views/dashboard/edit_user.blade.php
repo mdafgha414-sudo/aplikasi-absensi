@@ -116,7 +116,13 @@
                         </div>
                     @endif
 
-                    <form action="/admin/edit-user/{{ $pengguna->id }}" method="POST">
+                    {{-- Tentukan Action URL berdasarkan Role yang Login --}}
+                    @php
+                        $actionUrl = Auth::user()->role === 'pembimbing' ? route('pembimbing.siswa.update', $pengguna->id) : url('/admin/edit-user/'.$pengguna->id);
+                        $cancelUrl = Auth::user()->role === 'pembimbing' ? route('pembimbing.siswa.index') : url('/admin/dashboard');
+                    @endphp
+
+                    <form action="{{ $actionUrl }}" method="POST">
                         @csrf
                         @method('PUT') 
                         
@@ -136,7 +142,11 @@
                             <select name="role" id="roleSelect" class="form-select" required onchange="toggleSekolah()">
                                 <option value="user" {{ old('role', $pengguna->role) == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
                                 <option value="guru" {{ old('role', $pengguna->role) == 'guru' ? 'selected' : '' }}>Guru Pembimbing</option>
-                                <option value="pembimbing" {{ old('role', $pengguna->role) == 'pembimbing' ? 'selected' : '' }}>Guru Pembimbing PKL</option>
+                                
+                                {{-- Hanya Admin yang bisa mengubah role ke Pembimbing --}}
+                                @if(Auth::user()->role === 'admin')
+                                    <option value="pembimbing" {{ old('role', $pengguna->role) == 'pembimbing' ? 'selected' : '' }}>Guru Pembimbing PKL</option>
+                                @endif
                             </select>
                             <small class="text-muted mt-1 d-block" style="font-size: .78rem;">
                                 *Ubah role untuk memindahkan pengguna ke dashboard yang sesuai.
@@ -147,17 +157,17 @@
                         <div class="mb-4" id="sekolahContainer">
                             <label class="form-label">Asal Sekolah</label>
                             <select name="sekolah_id" class="form-select">
-    <option value="" disabled selected>-- Pilih Sekolah --</option>
-    @foreach($daftarSekolah as $sklh)
-        <option value="{{ $sklh->id }}" {{ old('sekolah_id', $pengguna->sekolah_id ?? '') == $sklh->id ? 'selected' : '' }}>
-            {{ $sklh->nama_sekolah }}
-        </option>
-    @endforeach
-</select>
+                                <option value="" disabled selected>-- Pilih Sekolah --</option>
+                                @foreach($daftarSekolah as $sklh)
+                                    <option value="{{ $sklh->id }}" {{ old('sekolah_id', $pengguna->sekolah_id ?? '') == $sklh->id ? 'selected' : '' }}>
+                                        {{ $sklh->nama_sekolah }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                            <a href="/admin/dashboard" class="btn btn-cancel">Batal</a>
+                            <a href="{{ $cancelUrl }}" class="btn btn-cancel">Batal</a>
                             <button type="submit" class="btn btn-save">Simpan Perubahan</button>
                         </div>
                     </form>
