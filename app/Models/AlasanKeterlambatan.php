@@ -9,7 +9,7 @@ class AlasanKeterlambatan extends Model
 {
     use HasFactory;
 
-    protected $table = 'alasan_keterlambatan'; // Sesuaikan jika nama tabel di database berbeda
+    protected $table = 'alasan_keterlambatans'; // Sesuaikan jika nama tabel di database berbeda
 
     protected $fillable = [
         'user_id',

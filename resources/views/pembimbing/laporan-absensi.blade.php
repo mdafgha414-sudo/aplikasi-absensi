@@ -113,6 +113,7 @@
         font-size: 11px; 
         cursor: pointer;
         transition: transform 0.2s;
+        position: relative;
     }
 
     .status-badge-cell:hover {
@@ -213,7 +214,14 @@
             <h2 class="fw-bold mb-1 text-white">Laporan Absensi PKL</h2>
             <p class="mb-0 text-white-50 small">Pantau riwayat dan kerekapan kehadiran siswa bimbingan Anda secara praktis.</p>
         </div>
-        <div>
+        
+        <div class="d-flex align-items-center gap-3">
+            <!-- TOMBOL KEMBALI KE DASHBOARD PEMBIMBING -->
+            <a href="{{ route('pembimbing.dashboard') }}" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2" style="color: #0d6efd;">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+
+            <!-- Kotak Total Siswa -->
             <div class="bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur d-flex align-items-center gap-3">
                 <div class="bg-white text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                     <i class="bi bi-person-check fs-4"></i>
@@ -241,7 +249,6 @@
                     <select name="sekolah" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
                         <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
                         @foreach($daftarSekolah as $sklh)
-                            {{-- PERUBAHAN: Menggunakan ID dan Nama Sekolah --}}
                             <option value="{{ $sklh->id }}" {{ $sekolahFilter == $sklh->id ? 'selected' : '' }}>
                                 {{ $sklh->nama_sekolah }}
                             </option>
@@ -262,7 +269,7 @@
                     </select>
                 </form>
 
-                <!-- Tombol Export (Pastikan route export pembimbing sudah ada) -->
+                <!-- Tombol Export -->
                 <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-excel me-1"></i> Excel
                 </a>
@@ -300,7 +307,6 @@
                         <!-- Baris Header Sekolah -->
                         <tr class="school-row">
                             <td colspan="{{ count($tanggalList) + 2 }}">
-                                {{-- PERUBAHAN: Ambil nama sekolah dari relasi siswa pertama di grup --}}
                                 <i class="bi bi-building me-2"></i> 
                                 {{ $listSiswa->first()->sekolah->nama_sekolah ?? 'Sekolah Tidak Disebutkan' }}
                             </td>
@@ -320,9 +326,21 @@
                                         $absen = $absensi[$key] ?? null;
                                         $status = $absen ? $absen->status : null;
                                         
+                                        // AMBIL DATA IZIN
+                                        $dataIzin = $izin[$key] ?? null;
+                                        
+                                        // AMBIL DATA ALASAN KETERLAMBATAN
+                                        $dataAlasan = isset($alasanKeterlambatan[$key]) ? $alasanKeterlambatan[$key] : null;
+                                        $teksAlasan = $dataAlasan ? $dataAlasan->alasan : null;
+                                        
                                         $cellClass = 'cell-pending';
                                         $label = '-';
+
+                                        // 1. Cek apakah hari ini sudah lewat
+                                        $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
+                                        $isPastDay = $tgl->startOfDay()->lt(\Carbon\Carbon::today()->startOfDay());
                                         
+                                        // 2. Logika penentuan status
                                         if ($status == 'Telat') {
                                             $cellClass = 'cell-telat';
                                             $label = 'T';
@@ -333,34 +351,74 @@
                                             $cellClass = 'cell-sakit';
                                             $label = 'S';
                                         } elseif ($status == 'Alpa' || $status == 'Alpha') {
-                                            $cellClass = 'cell-alfa';
-                                            $label = 'A';
+                                            if ($isPastDay) {
+                                                $cellClass = 'cell-alfa';
+                                                $label = 'A';
+                                            }
                                         } elseif ($status) {
                                             $cellClass = 'cell-hadir';
                                             $label = 'H';
                                         } else {
-                                            $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
-                                            if (!$isWeekend && $tgl->isPast()) {
+                                            if (!$isWeekend && $isPastDay) {
                                                 $cellClass = 'cell-alfa';
                                                 $label = 'A';
                                             }
                                         }
+
+                                        // Siapkan JSON untuk Modal Absensi
+                                        $jsonAbsen = '';
+                                        if ($absen) { 
+                                            $jsonAbsen = json_encode([
+                                                'nama' => $s->name,
+                                                'tanggal' => $tgl->format('d M Y'),
+                                                'status' => $status,
+                                                'jam_masuk' => $absen->jam_masuk,
+                                                'jam_pulang' => $absen->jam_pulang,
+                                                'foto_masuk' => $absen->foto_masuk ? asset('storage/' . $absen->foto_masuk) : null,
+                                                'foto_pulang' => $absen->foto_pulang ? asset('storage/' . $absen->foto_pulang) : null,
+                                                'alasan_terlambat' => $teksAlasan,
+                                            ]);
+                                        }
+
+                                        // Siapkan JSON untuk Modal Izin
+                                        $jsonIzin = '';
+                                        if ($dataIzin) {
+                                            $jsonIzin = json_encode([
+                                                'nama' => $s->name,
+                                                'tanggal' => $tgl->format('d M Y'),
+                                                'jenis' => $dataIzin->jenis_izin,
+                                                'status' => $dataIzin->status,
+                                                'alasan' => $dataIzin->alasan,
+                                                'lampiran' => $dataIzin->lampiran ? asset('storage/' . $dataIzin->lampiran) : null
+                                            ]);
+                                        }
                                     @endphp
 
                                     <td>
-                                        @if($absen)
-                                            <div class="status-badge-cell {{ $cellClass }}" 
-                                                 onclick="showDetailAbsensi(
-                                                    '{{ addslashes($s->name) }}', 
-                                                    '{{ $tgl->format('d M Y') }}', 
-                                                    '{{ $status }}', 
-                                                    '{{ $absen->jam_masuk }}', 
-                                                    '{{ $absen->jam_pulang }}', 
-                                                    '{{ $absen->foto_masuk ? asset('storage/'.$absen->foto_masuk) : '' }}', 
-                                                    '{{ $absen->foto_pulang ? asset('storage/'.$absen->foto_pulang) : '' }}'
-                                                 )">
-                                                {{ $label }}
+                                        {{-- Prioritas 1: Jika ada data Izin Disetujui, tampilkan Modal Izin --}}
+                                        @if($dataIzin && $dataIzin->status == 'Disetujui')
+                                            <div class="status-badge-cell cell-izin" onclick="showDetailIzin({{ $jsonIzin }})">
+                                                {{ $dataIzin->jenis_izin == 'Sakit' ? 'S' : 'I' }}
                                             </div>
+                                        
+                                        {{-- Prioritas 2: Jika Izin Menunggu --}}
+                                        @elseif($dataIzin && $dataIzin->status == 'Menunggu')
+                                            <div class="status-badge-cell cell-pending" onclick="showDetailIzin({{ $jsonIzin }})" style="cursor: pointer;">
+                                                <i class="bi bi-hourglass-split"></i>
+                                            </div>
+
+                                        {{-- Prioritas 3: Jika data Absensi biasa (Hadir, Telat, Alpa) --}}
+                                        @elseif($absen)
+                                            <div class="status-badge-cell {{ $cellClass }}" 
+                                                 onclick="showDetailAbsensi({{ $jsonAbsen }})">
+                                                {{ $label }}
+                                                {{-- Indikator kecil jika ada alasan --}}
+                                                @if($teksAlasan)
+                                                    <i class="bi bi-chat-left-text" style="font-size: 10px; position: absolute; top: 2px; right: 2px;"></i>
+                                                @endif
+                                            </div>
+
+                                        {{-- Prioritas 4: Jika kosong / libur --}}
                                         @else
                                             <div class="status-badge-cell {{ $cellClass }}">
                                                 {{ $label }}
@@ -414,7 +472,9 @@
     </div>
 </div>
 
-<!-- MODAL DETAIL ABSENSI -->
+<!-- ==================================================== -->
+<!-- MODAL 1: DETAIL ABSENSI                              -->
+<!-- ==================================================== -->
 <div class="modal fade" id="modalDetailAbsensi" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg">
@@ -446,6 +506,12 @@
                             <span class="fs-5 fw-bold text-danger" id="modalJamPulang">--:--</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- BLOK ALASAN KETERLAMBATAN -->
+                <div id="boxAlasanTerlambat" class="mb-4" style="display: none; background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 8px;">
+                    <h6 style="font-weight: 700; color: #d97706; margin-bottom: 5px;"><i class="bi bi-info-circle me-1"></i> Alasan Keterlambatan:</h6>
+                    <p id="teksAlasanTerlambat" style="margin: 0; color: #92400e; font-size: 14px;"></p>
                 </div>
 
                 <hr>
@@ -481,29 +547,68 @@
     </div>
 </div>
 
-<!-- JAVASCRIPT UNTUK MODAL -->
+<!-- ==================================================== -->
+<!-- MODAL 2: DETAIL IZIN                                 -->
+<!-- ==================================================== -->
+<div class="modal fade" id="modalDetailIzin" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-envelope-paper me-2"></i>Detail Pengajuan Izin</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p><strong>Nama:</strong> <span id="izNama"></span></p>
+                <p><strong>Tanggal:</strong> <span id="izTanggal"></span></p>
+                <p><strong>Jenis:</strong> <span id="izJenis"></span></p>
+                <p><strong>Status:</strong> <span id="izStatus" style="font-weight: bold;"></span></p>
+                <p><strong>Alasan:</strong> <span id="izAlasan"></span></p>
+                <div id="izBoxLampiran" class="mt-3" style="display: none;">
+                    <strong>Lampiran:</strong><br>
+                    <a id="izLinkLampiran" href="#" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                        <i class="bi bi-paperclip"></i> Lihat File
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- JAVASCRIPT UNTUK MODAL                               -->
+<!-- ==================================================== -->
 <script>
-    function showDetailAbsensi(nama, tanggal, status, jamMasuk, jamPulang, fotoMasuk, fotoPulang) {
-        document.getElementById('modalNama').innerText = nama;
-        document.getElementById('modalTanggal').innerText = tanggal;
+    function showDetailAbsensi(data) {
+        document.getElementById('modalNama').innerText = data.nama;
+        document.getElementById('modalTanggal').innerText = data.tanggal;
         
         let badgeStatus = document.getElementById('modalStatus');
-        badgeStatus.innerText = status;
+        badgeStatus.innerText = data.status;
         
         badgeStatus.className = 'badge fs-6 px-3 py-2 ';
-        if (status === 'Hadir' || status === 'Tepat Waktu') badgeStatus.classList.add('bg-success');
-        else if (status === 'Telat') badgeStatus.classList.add('bg-warning', 'text-dark');
-        else if (status === 'Izin') badgeStatus.classList.add('bg-primary');
-        else if (status === 'Sakit') badgeStatus.classList.add('bg-info', 'text-dark');
+        if (data.status === 'Hadir' || data.status === 'Tepat Waktu') badgeStatus.classList.add('bg-success');
+        else if (data.status === 'Telat') badgeStatus.classList.add('bg-warning', 'text-dark');
+        else if (data.status === 'Izin') badgeStatus.classList.add('bg-primary');
+        else if (data.status === 'Sakit') badgeStatus.classList.add('bg-info', 'text-dark');
         else badgeStatus.classList.add('bg-danger');
 
-        document.getElementById('modalJamMasuk').innerText = jamMasuk ? jamMasuk.substring(0, 5) : '--:--';
-        document.getElementById('modalJamPulang').innerText = jamPulang ? jamPulang.substring(0, 5) : '--:--';
+        document.getElementById('modalJamMasuk').innerText = data.jam_masuk ? data.jam_masuk.substring(0, 5) : '--:--';
+        document.getElementById('modalJamPulang').innerText = data.jam_pulang ? data.jam_pulang.substring(0, 5) : '--:--';
+
+        const boxAlasan = document.getElementById('boxAlasanTerlambat');
+        const teksAlasan = document.getElementById('teksAlasanTerlambat');
+        
+        if (data.alasan_terlambat) {
+            teksAlasan.innerText = data.alasan_terlambat;
+            boxAlasan.style.display = 'block';
+        } else {
+            boxAlasan.style.display = 'none';
+        }
 
         let imgMasuk = document.getElementById('imgFotoMasuk');
         let noFotoMasuk = document.getElementById('noFotoMasuk');
-        if (fotoMasuk && fotoMasuk !== '') {
-            imgMasuk.src = fotoMasuk;
+        if (data.foto_masuk && data.foto_masuk !== '') {
+            imgMasuk.src = data.foto_masuk;
             imgMasuk.classList.remove('d-none');
             noFotoMasuk.classList.add('d-none');
         } else {
@@ -513,8 +618,8 @@
 
         let imgPulang = document.getElementById('imgFotoPulang');
         let noFotoPulang = document.getElementById('noFotoPulang');
-        if (fotoPulang && fotoPulang !== '') {
-            imgPulang.src = fotoPulang;
+        if (data.foto_pulang && data.foto_pulang !== '') {
+            imgPulang.src = data.foto_pulang;
             imgPulang.classList.remove('d-none');
             noFotoPulang.classList.add('d-none');
         } else {
@@ -523,6 +628,30 @@
         }
 
         let modal = new bootstrap.Modal(document.getElementById('modalDetailAbsensi'));
+        modal.show();
+    }
+
+    function showDetailIzin(data) {
+        document.getElementById('izNama').innerText = data.nama;
+        document.getElementById('izTanggal').innerText = data.tanggal;
+        document.getElementById('izJenis').innerText = data.jenis;
+        document.getElementById('izAlasan').innerText = data.alasan;
+        
+        const statusEl = document.getElementById('izStatus');
+        statusEl.innerText = data.status;
+        statusEl.style.color = data.status === 'Disetujui' ? '#16a34a' : (data.status === 'Menunggu' ? '#ea580c' : '#dc2626');
+
+        const boxLampiran = document.getElementById('izBoxLampiran');
+        const linkLampiran = document.getElementById('izLinkLampiran');
+        
+        if (data.lampiran) {
+            linkLampiran.href = data.lampiran;
+            boxLampiran.style.display = 'block';
+        } else {
+            boxLampiran.style.display = 'none';
+        }
+
+        let modal = new bootstrap.Modal(document.getElementById('modalDetailIzin'));
         modal.show();
     }
 </script>

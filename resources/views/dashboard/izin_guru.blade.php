@@ -125,7 +125,7 @@
     .status-box {
         width: 34px; height: 34px; border-radius: 8px; display: inline-flex;
         align-items: center; justify-content: center; font-weight: 800; font-size: 15px;
-        text-decoration: none; transition: transform 0.2s;
+        text-decoration: none; transition: transform 0.2s; position: relative;
     }
     .status-box.clickable:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); cursor: pointer; }
     
@@ -177,6 +177,17 @@
     .legend-box.alpa  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     .legend-box.empty { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
     .legend-box span { font-weight: 800; font-size: 14px; }
+
+    /* MODAL OVERLAY CUSTOM */
+    .modal-custom-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); z-index: 9999; 
+        align-items: center; justify-content: center;
+    }
+    .modal-custom-box {
+        background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;
+    }
 </style>
 
 <div class="rekap-page">
@@ -215,7 +226,7 @@
             
             <div class="filter-actions">
                 <form action="{{ route('guru.izin') }}" method="GET" class="d-flex gap-2 flex-wrap">
-                    <!-- TAMBAHAN: Dropdown Filter Sekolah -->
+                    <!-- Dropdown Filter Sekolah -->
                     <div class="filter-group">
                         <select name="sekolah" onchange="this.form.submit()">
                             <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
@@ -312,25 +323,37 @@
                                         $key = $s->id . '-' . $tgl->format('d');
                                         $statusAbsen = isset($absensi[$key]) ? $absensi[$key]->status : null;
                                         $dataIzin = isset($izin[$key]) ? $izin[$key] : null;
+                                        // AMBIL DATA ALASAN KETERLAMBATAN
+                                        $dataAlasan = isset($alasanKeterlambatan[$key]) ? $alasanKeterlambatan[$key] : null;
+                                        $teksAlasan = $dataAlasan ? $dataAlasan->alasan : null;
                                         
                                         $finalStatus = null;
 
+                                        // CEK APAKAH HARI INI SUDAH LEWAT
+                                        $isWeekend = $tgl->isWeekend();
+                                        $isPastDay = $tgl->startOfDay()->lt(\Carbon\Carbon::today()->startOfDay());
+
+                                        // LOGIKA PENENTUAN STATUS
                                         if ($dataIzin) {
                                             if ($dataIzin->status == 'Menunggu') {
                                                 $finalStatus = 'Menunggu';
                                             } else if ($dataIzin->status == 'Disetujui') {
                                                 $finalStatus = $dataIzin->jenis_izin; 
                                             } else {
-                                                $finalStatus = $statusAbsen ?? 'Alpa'; 
+                                                // Jika izin ditolak, pakai status absen. Jika kosong, jadikan Alpa HANYA JIKA TANGGAL SUDAH LEWAT
+                                                $finalStatus = $statusAbsen ?? ($isPastDay ? 'Alpa' : null); 
                                             }
                                         } else {
-                                            $finalStatus = $statusAbsen ?? 'Alpa';
+                                            // Jika tidak ada izin, pakai status absen. Jika kosong, jadikan Alpa HANYA JIKA TANGGAL SUDAH LEWAT
+                                            $finalStatus = $statusAbsen ?? ($isPastDay ? 'Alpa' : null);
                                         }
 
-                                        if (!$statusAbsen && !$dataIzin && $tgl->isWeekend()) {
+                                        // Jika Weekend dan tidak ada data, jadikan Libur
+                                        if (!$statusAbsen && !$dataIzin && $isWeekend) {
                                             $finalStatus = 'Libur';
                                         }
                                         
+                                        // Siapkan JSON untuk Modal Izin
                                         $jsonIzin = '';
                                         if ($dataIzin) {
                                             $jsonIzin = json_encode([
@@ -342,13 +365,44 @@
                                                 'lampiran' => $dataIzin->lampiran ? asset('storage/' . $dataIzin->lampiran) : null
                                             ]);
                                         }
+
+                                        // Siapkan JSON untuk Modal Absensi (Foto, Jam, & ALASAN KETERLAMBATAN)
+                                        $jsonAbsen = '';
+                                        if ($statusAbsen) { 
+                                            $absenDetail = $absensi[$key]; 
+                                            $jsonAbsen = json_encode([
+                                                'nama' => $s->name,
+                                                'tanggal' => $tgl->format('d M Y'),
+                                                'status' => $absenDetail->status,
+                                                'jam_masuk' => $absenDetail->jam_masuk,
+                                                'jam_pulang' => $absenDetail->jam_pulang,
+                                                'foto_masuk' => $absenDetail->foto_masuk ? asset('storage/' . $absenDetail->foto_masuk) : null,
+                                                'foto_pulang' => $absenDetail->foto_pulang ? asset('storage/' . $absenDetail->foto_pulang) : null,
+                                                'alasan_terlambat' => $teksAlasan,
+                                            ]);
+                                        }
                                     @endphp
                                     <td>
                                         @if($finalStatus == 'Hadir' || $finalStatus == 'Tepat Waktu')
-                                            <span class="status-box status-hadir"><i class="bi bi-check-lg"></i></span>
+                                            @if($jsonAbsen)
+                                                <a href="javascript:void(0)" class="status-box status-hadir clickable" onclick="showDetailAbsensi({{ $jsonAbsen }})">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </a>
+                                            @else
+                                                <span class="status-box status-hadir"><i class="bi bi-check-lg"></i></span>
+                                            @endif
                                         
                                         @elseif($finalStatus == 'Telat' || $finalStatus == 'Terlambat')
-                                            <span class="status-box status-telat">T</span>
+                                            @if($jsonAbsen)
+                                                <a href="javascript:void(0)" class="status-box status-telat clickable" onclick="showDetailAbsensi({{ $jsonAbsen }})">
+                                                    T
+                                                    @if($teksAlasan)
+                                                        <i class="bi bi-chat-left-text" style="font-size: 10px; position: absolute; top: 2px; right: 2px;"></i>
+                                                    @endif
+                                                </a>
+                                            @else
+                                                <span class="status-box status-telat">T</span>
+                                            @endif
 
                                         @elseif($finalStatus == 'Izin')
                                             <a href="javascript:void(0)" class="status-box status-izin clickable" onclick="showDetailIzin({{ $jsonIzin }})">I</a>
@@ -363,8 +417,12 @@
                                                 </svg>
                                             </a>
                                         
-                                        @elseif($finalStatus == 'null')
-                                            <span class="status-box status-alpa">A</span>
+                                        @elseif($finalStatus == 'Alpa')
+                                            @if($jsonAbsen)
+                                                <a href="javascript:void(0)" class="status-box status-alpa clickable" onclick="showDetailAbsensi({{ $jsonAbsen }})">A</a>
+                                            @else
+                                                <span class="status-box status-alpa">A</span>
+                                            @endif
                                         
                                         @else
                                             <span class="status-empty">&minus;</span>
@@ -397,12 +455,12 @@
     </div>
 </div>
 
-<!-- MODAL POP-UP UNTUK LAMPIRAN -->
-<div id="modalIzin" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); z-index: 9999; align-items: center; justify-content: center;">
-    <div style="background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+<!-- MODAL 1: DETAIL IZIN -->
+<div id="modalIzin" class="modal-custom-overlay">
+    <div class="modal-custom-box">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px;">
-            <h3 style="margin: 0; font-size: 20px; color: #1e293b; font-weight: 700;">Detail Pengajuan</h3>
-            <button onclick="closeModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #94a3b8;">&times;</button>
+            <h3 style="margin: 0; font-size: 20px; color: #1e293b; font-weight: 700;">Detail Pengajuan Izin</h3>
+            <button onclick="closeModalIzin()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #94a3b8;">&times;</button>
         </div>
         
         <div style="font-size: 15px; color: #334155; line-height: 1.8;">
@@ -422,7 +480,63 @@
         </div>
         
         <div style="margin-top: 25px; text-align: right;">
-            <button onclick="closeModal()" style="padding: 12px 28px; background: #f1f5f9; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s;">Tutup</button>
+            <button onclick="closeModalIzin()" style="padding: 12px 28px; background: #f1f5f9; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s;">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 2: DETAIL ABSENSI -->
+<div id="modalAbsensi" class="modal-custom-overlay">
+    <div class="modal-custom-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 20px; color: #1e293b; font-weight: 700;">Detail Absensi & Bukti Foto</h3>
+            <button onclick="closeModalAbsensi()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #94a3b8;">&times;</button>
+        </div>
+        
+        <div style="font-size: 15px; color: #334155; line-height: 1.8;">
+            <h4 id="modalNamaAbsen" style="font-weight: 700; margin: 0 0 5px 0;"></h4>
+            <p style="margin: 0 0 15px 0; color: #64748b;"><i class="bi bi-calendar3 me-1"></i> <span id="modalTanggalAbsen"></span></p>
+            
+            <div class="row text-center mb-4">
+                <div class="col-6">
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+                        <small style="color: #64748b;">Jam Masuk</small><br>
+                        <strong style="font-size: 18px; color: #16a34a;" id="modalJamMasuk">--:--</strong>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+                        <small style="color: #64748b;">Jam Pulang</small><br>
+                        <strong style="font-size: 18px; color: #dc2626;" id="modalJamPulang">--:--</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLOK ALASAN KETERLAMBATAN -->
+            <div id="boxAlasanTerlambat" class="mb-4" style="display: none; background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 8px;">
+                <h6 style="font-weight: 700; color: #d97706; margin-bottom: 5px;"><i class="bi bi-info-circle me-1"></i> Alasan Keterlambatan:</h6>
+                <p id="teksAlasanTerlambat" style="margin: 0; color: #92400e; font-size: 14px;"></p>
+            </div>
+
+            <hr style="border-color: #e2e8f0;">
+            
+            <h6 style="font-weight: 700; margin-bottom: 15px;"><i class="bi bi-camera me-2"></i>Bukti Foto Absensi</h6>
+            <div class="row text-center">
+                <div class="col-6">
+                    <p style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Foto Masuk</p>
+                    <img id="imgFotoMasuk" src="" style="width: 100%; border-radius: 8px; object-fit: cover; max-height: 200px; display: none;">
+                    <div id="noFotoMasuk" style="background: #f8fafc; padding: 30px 10px; border-radius: 8px; color: #94a3b8; font-size: 13px;">Tidak ada foto</div>
+                </div>
+                <div class="col-6">
+                    <p style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Foto Pulang</p>
+                    <img id="imgFotoPulang" src="" style="width: 100%; border-radius: 8px; object-fit: cover; max-height: 200px; display: none;">
+                    <div id="noFotoPulang" style="background: #f8fafc; padding: 30px 10px; border-radius: 8px; color: #94a3b8; font-size: 13px;">Tidak ada foto</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 25px; text-align: right;">
+            <button onclick="closeModalAbsensi()" style="padding: 12px 28px; background: #f1f5f9; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s;">Tutup</button>
         </div>
     </div>
 </div>
@@ -472,12 +586,57 @@ function showDetailIzin(data) {
         textNoLampiran.style.display = 'inline-block';
     }
 
-    const modal = document.getElementById('modalIzin');
-    modal.style.display = 'flex';
+    document.getElementById('modalIzin').style.display = 'flex';
 }
 
-function closeModal() {
+function closeModalIzin() {
     document.getElementById('modalIzin').style.display = 'none';
+}
+
+function showDetailAbsensi(data) {
+    document.getElementById('modalNamaAbsen').innerText = data.nama;
+    document.getElementById('modalTanggalAbsen').innerText = data.tanggal;
+    document.getElementById('modalJamMasuk').innerText = data.jam_masuk ? data.jam_masuk.substring(0,5) : '--:--';
+    document.getElementById('modalJamPulang').innerText = data.jam_pulang ? data.jam_pulang.substring(0,5) : '--:--';
+
+    // TAMPILKAN ALASAN KETERLAMBATAN
+    const boxAlasan = document.getElementById('boxAlasanTerlambat');
+    const teksAlasan = document.getElementById('teksAlasanTerlambat');
+    
+    if (data.alasan_terlambat) {
+        teksAlasan.innerText = data.alasan_terlambat;
+        boxAlasan.style.display = 'block';
+    } else {
+        boxAlasan.style.display = 'none';
+    }
+
+    let imgM = document.getElementById('imgFotoMasuk');
+    let noM = document.getElementById('noFotoMasuk');
+    if (data.foto_masuk) { 
+        imgM.src = data.foto_masuk; 
+        imgM.style.display = 'block'; 
+        noM.style.display = 'none'; 
+    } else { 
+        imgM.style.display = 'none'; 
+        noM.style.display = 'block'; 
+    }
+    
+    let imgP = document.getElementById('imgFotoPulang');
+    let noP = document.getElementById('noFotoPulang');
+    if (data.foto_pulang) { 
+        imgP.src = data.foto_pulang; 
+        imgP.style.display = 'block'; 
+        noP.style.display = 'none'; 
+    } else { 
+        imgP.style.display = 'none'; 
+        noP.style.display = 'block'; 
+    }
+
+    document.getElementById('modalAbsensi').style.display = 'flex';
+}
+
+function closeModalAbsensi() {
+    document.getElementById('modalAbsensi').style.display = 'none';
 }
 </script>
 

@@ -8,7 +8,7 @@ use App\Models\Absensi;
 use App\Models\Izin; 
 use App\Models\Jurnal;
 use App\Models\AlasanKeterlambatan;
-use App\Models\Sekolah; // <-- TAMBAHAN: Import Model Sekolah
+use App\Models\Sekolah;
 use Carbon\Carbon; 
 use Illuminate\Support\Facades\Auth;
 
@@ -51,11 +51,11 @@ class GuruController extends Controller
             $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
         }
 
-        // 1. Ambil daftar sekolah dari Master Data (Tabel sekolahs)
+        // 1. Ambil daftar sekolah dari Master Data
         $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
 
         // 2. Ambil siswa dengan filter sekolah_id
-        $querySiswa = User::where('role', 'user')->with('sekolah'); // Eager load relasi sekolah
+        $querySiswa = User::where('role', 'user')->with('sekolah');
         if ($sekolahFilter && $sekolahFilter != 'Semua') {
             $querySiswa->where('sekolah_id', $sekolahFilter);
         }
@@ -69,18 +69,34 @@ class GuruController extends Controller
                               return $item->user_id . '-' . date('d', strtotime($item->tanggal));
                           });
 
+        // 4. Ambil data izin (TAMBAHAN BARU)
+        $izin = Izin::whereMonth('tanggal_izin', $bulan)
+                    ->whereYear('tanggal_izin', $tahun)
+                    ->get()
+                    ->keyBy(function($item) {
+                        return $item->user_id . '-' . date('d', strtotime($item->tanggal_izin));
+                    });
+
+        // 5. Ambil data alasan keterlambatan
+        $alasanKeterlambatan = AlasanKeterlambatan::whereMonth('tanggal', $bulan)
+                                                  ->whereYear('tanggal', $tahun)
+                                                  ->get()
+                                                  ->keyBy(function($item) {
+                                                      return $item->user_id . '-' . date('d', strtotime($item->tanggal));
+                                                  });
+
         if (Auth::user()->role === 'pembimbing') {
-            return view('pembimbing.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
+            return view('pembimbing.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'izin', 'alasanKeterlambatan', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
         }
 
-        return view('guru.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
+        return view('guru.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'izin', 'alasanKeterlambatan', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
     }
 
     public function lihatIzin(Request $request)
     {
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
-        $sekolahFilter = $request->input('sekolah'); // <-- Tambahkan filter sekolah
+        $sekolahFilter = $request->input('sekolah');
 
         $startDate = Carbon::createFromDate($tahun, $bulan, 1);
         $daysInMonth = $startDate->daysInMonth;
@@ -106,6 +122,14 @@ class GuruController extends Controller
         $izin = Izin::whereMonth('tanggal_izin', $bulan)->whereYear('tanggal_izin', $tahun)->get()->keyBy(function($item) {
                         return $item->user_id . '-' . date('d', strtotime($item->tanggal_izin));
                     });
+
+        // TAMBAHAN BARU: Ambil data alasan keterlambatan
+        $alasanKeterlambatan = AlasanKeterlambatan::whereMonth('tanggal', $bulan)
+                                                  ->whereYear('tanggal', $tahun)
+                                                  ->get()
+                                                  ->keyBy(function($item) {
+                                                      return $item->user_id . '-' . date('d', strtotime($item->tanggal));
+                                                  });
 
         if (Auth::user()->role === 'pembimbing') {
             $query = Izin::with('user')->orderBy('created_at', 'desc');
@@ -139,11 +163,11 @@ class GuruController extends Controller
             $jumlahMenunggu = Izin::where('status', 'Menunggu')->count();
 
             return view('dashboard.izin_pembimbing', compact(
-                'semuaIzin', 'jumlahMenunggu', 'siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'
+                'semuaIzin', 'jumlahMenunggu', 'siswa', 'tanggalList', 'absensi', 'izin', 'alasanKeterlambatan', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'
             ));
         }
 
-        return view('dashboard.izin_guru', compact('siswa', 'tanggalList', 'absensi', 'izin', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
+        return view('dashboard.izin_guru', compact('siswa', 'tanggalList', 'absensi', 'izin', 'alasanKeterlambatan', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
     }
 
     public function updateIzin(Request $request, $id)
