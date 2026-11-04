@@ -174,7 +174,7 @@
             {{-- MENU GURU --}}
             @if(Auth::user()->role === 'guru')
                 <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Guru</a></li>
-                <li><a href="{{ route('guru.jurnal') }}" class="{{ request()->routeIs('guru.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Nilai Jurnal Siswa</a></li>
+                <li><a href="{{ route('guru.jurnal') }}" class="{{ request()->routeIs('guru.jurnal') ? 'active' : '' }}"><i class="bi bi-journal-check"></i> Lihat Jurnal Siswa</a></li>
                 <li><a href="{{ route('guru.izin') }}" class="{{ request()->routeIs('guru.izin*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi & Izin</a></li>
                 <li><a href="{{ route('guru.alasan-keterlambatan') }}" class="{{ request()->routeIs('guru.alasan-keterlambatan') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Alasan Keterlambatan</a></li>
             @endif

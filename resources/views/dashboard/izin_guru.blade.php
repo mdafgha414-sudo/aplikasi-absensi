@@ -260,10 +260,10 @@
                 </form>
 
                 <!-- TOMBOL EXPORT -->
-                <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn-export btn-excel">
+                <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-excel"></i> Export Excel
                 </a>
-                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn-export btn-pdf">
+                <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-danger btn-sm px-3 rounded-3 fw-medium">
                     <i class="bi bi-file-earmark-pdf"></i> Export PDF
                 </a>
             </div>

@@ -35,10 +35,10 @@
                 </h5>
                 <div class="d-flex gap-2">
                     <a href="{{ route('guru.export.excel', ['bulan' => date('m'), 'tahun' => date('Y')]) }}" class="btn btn-outline-success btn-sm fw-semibold px-3 rounded-2">
-                        <i class="bi bi-file-earmark-excel me-1"></i> Ekspor Excel
+                        <i class="bi bi-file-earmark-excel me-1"></i> Eksport Excel
                     </a>
                     <a href="{{ route('guru.export.pdf', ['bulan' => date('m'), 'tahun' => date('Y')]) }}" class="btn btn-outline-danger btn-sm fw-semibold px-3 rounded-2">
-                        <i class="bi bi-file-earmark-pdf me-1"></i> Ekspor PDF
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Eksport PDF
                     </a>
                 </div>
             </div>
