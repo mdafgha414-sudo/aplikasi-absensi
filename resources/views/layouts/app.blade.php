@@ -113,33 +113,114 @@
             border: 1px solid #e2e8f0;
         }
 
+        /* =========================================
+        TOMBOL HAMBURGER SIDEBAR
+        Tombol untuk membuka dan menutup sidebar.
+        Tetap terlihat selama topbar ditampilkan.
+        ========================================= */
+
         .btn-toggle-sidebar {
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
             color: #1e293b;
-            border-radius: 8px;
+
+            /* Ukuran tombol agar nyaman diklik */
             width: 42px;
             height: 42px;
+            border-radius: 8px;
+
+            /* Memposisikan ikon tepat di tengah */
             display: flex;
             align-items: center;
             justify-content: center;
+
             font-size: 20px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            cursor: pointer;
+
+            transition: background-color 0.2s ease,
+                        border-color 0.2s ease,
+                        color 0.2s ease;
+
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
         }
-        .btn-toggle-sidebar:hover { background-color: #f8fafc; }
+
+        /* Efek ketika tombol disentuh atau diarahkan mouse */
+        .btn-toggle-sidebar:hover {
+            background-color: #f0f9ff;
+            border-color: #bae6fd;
+            color: #0284c7;
+        }
+
+        /* Efek ketika tombol sedang ditekan */
+        .btn-toggle-sidebar:active {
+            transform: scale(0.96);
+        }
+
+        /* Fokus keyboard untuk aksesibilitas */
+        .btn-toggle-sidebar:focus-visible {
+            outline: 3px solid rgba(2, 132, 199, 0.3);
+            outline-offset: 3px;
+        }
+
+        /* =========================================
+        RESPONSIVE SIDEBAR
+        Mengatur sidebar pada layar tablet dan HP.
+        ========================================= */
 
         @media (max-width: 991px) {
-            .sidebar { left: calc(-1 * var(--sidebar-width)); }
-            .sidebar.show-mobile { left: 0; }
-            .main-content { margin-left: 0; padding: 15px; }
-            .main-content.full-screen { padding: 15px; }
-            .sidebar-overlay {
-                display: none; position: fixed; top: 0; left: 0;
-                width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.5);
-                z-index: 1040; backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.3s ease;
+
+            /* Sidebar disembunyikan di luar layar */
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+                width: var(--sidebar-width);
+                z-index: 1050;
             }
-            .sidebar-overlay.show { display: block; opacity: 1; }
+
+            /* Sidebar muncul ketika tombol hamburger diklik */
+            .sidebar.show-mobile {
+                left: 0;
+            }
+
+            /* Konten memenuhi layar tanpa ruang sidebar */
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            /* Padding khusus halaman full-screen */
+            .main-content.full-screen {
+                padding: 15px;
+            }
+
+            /* =====================================
+            OVERLAY SIDEBAR MOBILE
+            Lapisan gelap di belakang sidebar.
+            ===================================== */
+
+            .sidebar-overlay {
+                display: none;
+
+                position: fixed;
+                top: 0;
+                left: 0;
+
+                width: 100vw;
+                height: 100vh;
+
+                background: rgba(15, 23, 42, 0.5);
+                backdrop-filter: blur(2px);
+
+                z-index: 1040;
+
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            /* Overlay aktif ketika sidebar dibuka */
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -250,9 +331,24 @@
         <div class="topbar">
             <div class="d-flex align-items-center">
                 @auth
-                <button class="btn-toggle-sidebar me-3" id="toggleSidebar">
-                    <i class="bi bi-list"></i>
-                </button>
+                {{-- =========================================
+                TOMBOL HAMBURGER SIDEBAR
+                Membuka dan menutup menu navigasi.
+                Tampil pada halaman yang menggunakan topbar.
+                ========================================= --}}
+
+            <button
+                class="btn-toggle-sidebar me-3"
+                id="toggleSidebar"
+                type="button"
+                aria-label="Buka atau tutup menu navigasi"
+                aria-controls="sidebar"
+                aria-expanded="false">
+
+                {{-- Ikon hamburger dari Bootstrap Icons --}}
+                <i class="bi bi-list"></i>
+
+            </button>
                 <h5 class="mb-0 fw-bold text-dark d-none d-sm-block">Dashboard</h5>
                 @endauth
             </div>
@@ -279,39 +375,196 @@
         @yield('content') 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <script>
+        /* =========================================
+        TIMETRIX - SIDEBAR CONTROLLER
+        Mengatur buka/tutup sidebar pada laptop,
+        tablet, dan HP.
+        ========================================= */
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Mengambil elemen yang digunakan untuk sidebar
             const toggleBtn = document.getElementById('toggleSidebar');
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
             const overlay = document.getElementById('sidebarOverlay');
 
+            // Memastikan elemen sidebar tersedia sebelum menjalankan fungsi
+            // Ini mencegah JavaScript error pada halaman tanpa sidebar.
+            if (!sidebar || !mainContent) {
+                return;
+            }
+
+            // Memeriksa apakah perangkat menggunakan tampilan mobile
+            function isMobile() {
+                return window.innerWidth < 992;
+            }
+
+            // =====================================
+            // FUNGSI MEMBUKA SIDEBAR MOBILE
+            // =====================================
+
+            function openMobileSidebar() {
+
+                // Menampilkan sidebar dari sisi kiri layar
+                sidebar.classList.add('show-mobile');
+
+                // Menampilkan overlay gelap di belakang sidebar
+                if (overlay) {
+                    overlay.classList.add('show');
+                }
+
+                // Mengunci scroll halaman ketika sidebar terbuka
+                document.body.style.overflow = 'hidden';
+
+                // Memperbarui status tombol hamburger
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            // =====================================
+            // FUNGSI MENUTUP SIDEBAR MOBILE
+            // =====================================
+
+            function closeMobileSidebar() {
+
+                // Menyembunyikan sidebar dari layar
+                sidebar.classList.remove('show-mobile');
+
+                // Menghilangkan overlay
+                if (overlay) {
+                    overlay.classList.remove('show');
+                }
+
+                // Mengembalikan scroll halaman
+                document.body.style.overflow = '';
+
+                // Memperbarui status tombol hamburger
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                }
+            }
+
+            // =====================================
+            // FUNGSI TOGGLE SIDEBAR
+            // Dipanggil ketika tombol hamburger diklik.
+            // =====================================
+
             if (toggleBtn) {
-                toggleBtn.addEventListener('click', function() {
-                    if (window.innerWidth < 992) {
-                        sidebar.classList.toggle('show-mobile');
-                        overlay.classList.toggle('show');
+
+                toggleBtn.addEventListener('click', function () {
+
+                    if (isMobile()) {
+
+                        // MOBILE:
+                        // Membuka atau menutup sidebar menggunakan overlay.
+                        if (sidebar.classList.contains('show-mobile')) {
+                            closeMobileSidebar();
+                        } else {
+                            openMobileSidebar();
+                        }
+
                     } else {
+
+                        // DESKTOP:
+                        // Menutup atau membuka sidebar dengan menggeser posisinya.
                         sidebar.classList.toggle('collapsed');
+
+                        // Konten utama menyesuaikan ruang sidebar.
                         mainContent.classList.toggle('expanded');
-                        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+
+                        // Menyimpan kondisi sidebar agar tetap sama
+                        // ketika halaman dimuat ulang.
+                        localStorage.setItem(
+                            'sidebarCollapsed',
+                            sidebar.classList.contains('collapsed')
+                        );
                     }
                 });
             }
 
+            // =====================================
+            // MENUTUP SIDEBAR KETIKA OVERLAY DIKLIK
+            // =====================================
+
             if (overlay) {
-                overlay.addEventListener('click', function() {
-                    sidebar.classList.remove('show-mobile');
-                    overlay.classList.remove('show');
+
+                overlay.addEventListener('click', function () {
+                    closeMobileSidebar();
                 });
             }
 
-            if (window.innerWidth >= 992 && localStorage.getItem('sidebarCollapsed') === 'true') {
-                if (sidebar) sidebar.classList.add('collapsed');
-                mainContent.classList.add('expanded');
+            // =====================================
+            // MENUTUP SIDEBAR DENGAN TOMBOL ESC
+            // =====================================
+
+            document.addEventListener('keydown', function (event) {
+
+                if (event.key === 'Escape' && isMobile()) {
+                    closeMobileSidebar();
+                }
+            });
+
+            // =====================================
+            // MEMULIHKAN KONDISI SIDEBAR DESKTOP
+            // =====================================
+
+            if (!isMobile()) {
+
+                // Membaca kondisi sidebar yang tersimpan sebelumnya.
+                const savedState = localStorage.getItem('sidebarCollapsed');
+
+                if (savedState === 'true') {
+
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('expanded');
+
+                } else {
+
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                }
             }
+
+            // =====================================
+            // MENYESUAIKAN SIDEBAR KETIKA UKURAN
+            // LAYAR BERUBAH
+            // =====================================
+
+            window.addEventListener('resize', function () {
+
+                if (isMobile()) {
+
+                    // Ketika berpindah ke tampilan mobile,
+                    // sidebar desktop tidak boleh memengaruhi layout.
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+
+                } else {
+
+                    // Ketika kembali ke desktop, sidebar mobile ditutup.
+                    closeMobileSidebar();
+
+                    // Mengembalikan kondisi sidebar desktop.
+                    const savedState = localStorage.getItem('sidebarCollapsed');
+
+                    if (savedState === 'true') {
+
+                        sidebar.classList.add('collapsed');
+                        mainContent.classList.add('expanded');
+
+                    } else {
+
+                        sidebar.classList.remove('collapsed');
+                        mainContent.classList.remove('expanded');
+                    }
+                }
+            });
+
         });
     </script>
 </body>
