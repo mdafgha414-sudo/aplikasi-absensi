@@ -28,48 +28,6 @@
     ========================================================= --}}
 <div class="timetrix-dashboard">
 
-
-    {{-- =====================================================
-        1.1 HEADER DASHBOARD
-        Menampilkan judul halaman, tanggal, dan avatar user.
-        ===================================================== --}}
-    <div class="dashboard-heading">
-
-        {{-- Judul dan tanggal dashboard --}}
-        <div>
-            <h4>Dashboard Pembimbing</h4>
-
-            <p>
-                {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
-            </p>
-        </div>
-
-        {{-- Informasi pembimbing yang sedang login --}}
-        <div class="dashboard-user">
-
-            <span>
-                Halo, {{ Auth::user()->name }}
-            </span>
-
-            {{-- Avatar menggunakan foto profil jika tersedia --}}
-            <div class="dashboard-avatar">
-
-                @if(Auth::user()->foto_profil)
-                    <img
-                        src="{{ asset('storage/' . Auth::user()->foto_profil) }}"
-                        alt="Foto Profil Pembimbing"
-                    >
-                @else
-                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                @endif
-
-            </div>
-
-        </div>
-
-    </div>
-
-
     {{-- =====================================================
         2. WELCOME BANNER
         Menampilkan sambutan dan ringkasan penilaian jurnal.
@@ -443,9 +401,8 @@
             table-responsive menjaga tabel tetap nyaman
             digunakan pada layar HP.
             ----------------------------------------------- --}}
-        <div class="table-responsive">
-
-            <table class="activity-table">
+        <div class="jurnal-table-wrapper">
+            <table class="table jurnal-table align-middle">
 
                 {{-- Header kolom tabel --}}
                 <thead>
@@ -1625,6 +1582,33 @@
         font-size: 10px;
     }
 
+}
+
+/* Mengunci tabel agar tidak melebar */
+.jurnal-table-wrapper {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+.jurnal-table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+.jurnal-table th,
+.jurnal-table td {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Mencegah isi tabel memaksa lebar */
+.jurnal-table td > * {
+    max-width: 100%;
 }
 
 </style>
