@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Izin;
+use App\Models\Jurnal;
+use App\Models\AlasanKeterlambatan;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,31 +26,49 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // 1. Gunakan Bootstrap 5 untuk Pagination
+        // Pagination Bootstrap 5
         Paginator::useBootstrapFive();
 
-        // 2. Paksa HTTPS hanya di server Production
+        // HTTPS hanya untuk production
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
 
-        // 3. NOTIFIKASI IZIN SISWA PEMBIMBING
-        // Menghitung izin yang masih menunggu persetujuan
-        // dan menyediakan jumlahnya ke seluruh halaman Blade.
+        // ==========================================
+        // NOTIFIKASI SIDEBAR PEMBIMBING
+        // ==========================================
 
-        View::composer('*', function ($view) {
+        View::composer('layouts.app', function ($view) {
 
+            // Default notifikasi
+            $jumlahJurnalPending = 0;
+            $jumlahTerlambatPending = 0;
             $jumlahIzinPending = 0;
 
+            // Hanya hitung jika user adalah pembimbing
             if (Auth::check() && Auth::user()->role === 'pembimbing') {
 
-                $jumlahIzinPending = Izin::where('status', 'Menunggu')
+                // 1. JURNAL YANG BELUM DINILAI
+                $jumlahJurnalPending = Jurnal::whereNull('nilai')
                     ->count();
 
+                // 2. ALASAN KETERLAMBATAN YANG BELUM DITINDAKLANJUTI
+                $jumlahTerlambatPending = AlasanKeterlambatan::where(function ($query) {
+                    $query->whereNull('status')
+                        ->orWhere('status', 'Menunggu');
+                })->count();
+
+                // 3. IZIN SISWA YANG MASIH MENUNGGU
+                $jumlahIzinPending = Izin::where('status', 'Menunggu')
+                    ->count();
             }
 
-            $view->with('jumlahIzinPending', $jumlahIzinPending);
-
+            // Kirim variabel ke sidebar
+            $view->with([
+                'jumlahJurnalPending' => $jumlahJurnalPending,
+                'jumlahTerlambatPending' => $jumlahTerlambatPending,
+                'jumlahIzinPending' => $jumlahIzinPending,
+            ]);
         });
     }
 }

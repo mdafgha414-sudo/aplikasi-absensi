@@ -401,9 +401,8 @@
             table-responsive menjaga tabel tetap nyaman
             digunakan pada layar HP.
             ----------------------------------------------- --}}
-        <div class="table-responsive">
-
-            <table class="activity-table">
+        <div class="jurnal-table-wrapper">
+            <table class="table jurnal-table align-middle">
 
                 {{-- Header kolom tabel --}}
                 <thead>
@@ -1583,6 +1582,33 @@
         font-size: 10px;
     }
 
+}
+
+/* Mengunci tabel agar tidak melebar */
+.jurnal-table-wrapper {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+.jurnal-table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+.jurnal-table th,
+.jurnal-table td {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Mencegah isi tabel memaksa lebar */
+.jurnal-table td > * {
+    max-width: 100%;
 }
 
 </style>
