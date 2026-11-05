@@ -34,8 +34,9 @@
 
         <div class="col-12">
             <div class="row g-3">
-                <!-- Card 1: Jurnal -->
-                <div class="col-md-3">
+                
+                <!-- Card 1: Nilai Jurnal -->
+                <div class="col-md-6 col-lg-3">
                     <a href="{{ url('/pembimbing/jurnal') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -51,14 +52,14 @@
                 </div>
 
                 <!-- Card 2: Laporan Absensi -->
-                <div class="col-md-3">
+                <div class="col-md-6 col-lg-3">
                     <a href="{{ url('/pembimbing/laporan-absensi') }}" class="text-decoration-none action-card-link">
-                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card border-primary" style="border: 1px solid #bfdbfe !important;">
+                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
                             <div class="d-flex align-items-center justify-content-between mb-3">
                                 <div class="action-icon-wrapper rounded-3 bg-primary text-white d-flex align-items-center justify-content-center">
                                     <i class="bi bi-calendar-check fs-3"></i>
                                 </div>
-                                <i class="bi bi-arrow-right text-primary fs-5"></i>
+                                <i class="bi bi-arrow-right text-muted fs-5"></i>
                             </div>
                             <h5 class="fw-bold text-dark mb-2">Laporan Absensi</h5>
                             <p class="text-secondary small mb-0">Pantau rekapitulasi kehadiran dan status siswa.</p>
@@ -66,44 +67,40 @@
                     </a>
                 </div>
 
-<!-- Card Scan Kartu -->
-<div class="col-md-6 col-lg-3 mb-4">
-    <a href="{{ route('pembimbing.scan.index') }}" class="text-decoration-none">
-        <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="bg-primary text-white rounded p-3" style="background-color: #0284c7 !important;">
-                        <i class="bi bi-qr-code-scan fs-3"></i>
-                    </div>
-                    <i class="bi bi-arrow-right fs-4 text-muted"></i>
+                <!-- Card 3: Scan Kartu -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ route('pembimbing.scan.index') }}" class="text-decoration-none action-card-link">
+                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="action-icon-wrapper rounded-3 bg-primary text-white d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-qr-code-scan fs-3"></i>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted fs-5"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Scan Kartu</h5>
+                            <p class="text-secondary small mb-0">Scan QR Code pada kartu siswa untuk mencatat kehadiran.</p>
+                        </div>
+                    </a>
                 </div>
-                <h5 class="fw-bold text-dark mb-2">Scan Kartu</h5>
-                <p class="text-muted mb-0" style="font-size: 14px;">Scan QR Code pada kartu siswa untuk mencatat kehadiran.</p>
-            </div>
-        </div>
-    </a>
-</div>
 
-<!-- Card Cetak Kartu QR -->
-<div class="col-md-6 col-lg-3 mb-4">
-    <a href="{{ route('qr.index') }}" class="text-decoration-none">
-        <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="bg-success text-white rounded p-3" style="background-color: #10b981 !important;">
-                        <i class="bi bi-printer fs-3"></i>
-                    </div>
-                    <i class="bi bi-arrow-right fs-4 text-muted"></i>
+                <!-- Card 4: Buat Kode QR -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ route('qr.index') }}" class="text-decoration-none action-card-link">
+                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="action-icon-wrapper rounded-3 bg-success text-white d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-printer fs-3"></i>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted fs-5"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Buat Kode QR</h5>
+                            <p class="text-secondary small mb-0">Buat/cetak dan unduh kode QR untuk siswa PKL.</p>
+                        </div>
+                    </a>
                 </div>
-                <h5 class="fw-bold text-dark mb-2">Buat Kode QR</h5>
-                <p class="text-muted mb-0" style="font-size: 14px;">Buat/cetak dan unduh kode QR untuk siswa PKL.</p>
-            </div>
-        </div>
-    </a>
-</div>
 
-                <!-- Card 3: Daftar Izin -->
-                <div class="col-md-3">
+                <!-- Card 5: Daftar Izin -->
+                <div class="col-md-6 col-lg-3">
                     <a href="{{ url('/pembimbing/izin') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -117,35 +114,55 @@
                         </div>
                     </a>
                 </div>
-                <!-- Card 4: Alasan Keterlambatan -->
-                <div class="col-md-3">
-                    <a href="{{ url('/pembimbing/alasan-keterlambatan') }}"
-                    class="text-decoration-none action-card-link">
 
+                <!-- Card 6: Alasan Keterlambatan -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ url('/pembimbing/alasan-keterlambatan') }}" class="text-decoration-none action-card-link">
                         <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
-
                             <div class="d-flex align-items-center justify-content-between mb-3">
-
                                 <div class="action-icon-wrapper rounded-3 bg-primary text-white d-flex align-items-center justify-content-center">
                                     <i class="bi bi-clock-history fs-3"></i>
                                 </div>
-
                                 <i class="bi bi-arrow-right text-muted fs-5"></i>
-
                             </div>
-
-                            <h5 class="fw-bold text-dark mb-2">
-                                Alasan Keterlambatan
-                            </h5>
-
-                            <p class="text-secondary small mb-0">
-                                Kelola dan atur alasan keterlambatan siswa.
-                            </p>
-
+                            <h5 class="fw-bold text-dark mb-2">Alasan Keterlambatan</h5>
+                            <p class="text-secondary small mb-0">Kelola dan atur alasan keterlambatan siswa.</p>
                         </div>
-
                     </a>
                 </div>
+
+                <!-- Card 7: Manajemen Siswa (BARU) -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ route('pembimbing.siswa.index') }}" class="text-decoration-none action-card-link">
+                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="action-icon-wrapper rounded-3 bg-info text-white d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-people-fill fs-3"></i>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted fs-5"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Manajemen Siswa</h5>
+                            <p class="text-secondary small mb-0">Kelola data siswa dan guru bimbingan PKL Anda.</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 8: Manajemen Sekolah (BARU) -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ route('pembimbing.sekolah.index') }}" class="text-decoration-none action-card-link">
+                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="action-icon-wrapper rounded-3 bg-info text-white d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-building fs-3"></i>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted fs-5"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Manajemen Sekolah</h5>
+                            <p class="text-secondary small mb-0">Kelola daftar sekolah asal siswa PKL Anda.</p>
+                        </div>
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>

@@ -10,8 +10,13 @@ class PerusahaanController extends Controller
 {
     public function index()
     {
-        $perusahaans = Perusahaan::orderBy('nama_perusahaan', 'asc')->get();
+        // Ambil perusahaan beserta user-nya (Eager Loading)
+        $perusahaans = Perusahaan::with(['users' => function($query) {
+            $query->orderBy('role', 'asc')->orderBy('name', 'asc');
+        }])->orderBy('nama_perusahaan', 'asc')->get();
+        
         return view('dashboard.perusahaan.index', compact('perusahaans'));
+    
     }
 
     public function store(Request $request)

@@ -133,6 +133,8 @@ Route::middleware('auth')->group(function () {
 // ROUTE ADMIN
 // ==========================================
 Route::middleware(['auth', 'isAdmin'])->group(function () {
+          Route::get('/admin/manajemen-siswa', [AdminController::class, 'manajemenSiswaAdmin'])->name('admin.siswa.index');
+    Route::get('/admin/perusahaan/{id}/detail', [AdminController::class, 'detailPerusahaan'])->name('admin.perusahaan.detail');
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
     Route::get('/admin/tambah-user', [AdminController::class, 'createUser']);
     Route::post('/admin/tambah-user', [AdminController::class, 'storeUser']);

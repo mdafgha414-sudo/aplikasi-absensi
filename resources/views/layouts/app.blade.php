@@ -227,7 +227,11 @@
                         <i class="bi bi-buildings"></i> Manajemen Perusahaan
                     </a>
                 </li>
-                
+                <li>
+    <a href="{{ route('admin.siswa.index') }}" class="{{ request()->routeIs('admin.siswa*') ? 'active' : '' }}">
+        <i class="bi bi-people-fill"></i> Manajemen Siswa
+    </a>
+</li>
                 <li>
                     <a href="{{ route('qr.index') }}" class="{{ request()->routeIs('qr.*') ? 'active' : '' }}">
                         <i class="bi bi-printer"></i> Cetak Kartu QR Siswa

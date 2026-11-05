@@ -47,7 +47,7 @@
                 {{-- Dropdown Pilihan Role --}}
                 <div class="mb-4">
                     <label class="form-label fw-bold">Daftar Sebagai</label>
-                    <select name="role" id="roleSelect" class="form-select" required onchange="toggleSekolah()">
+                    <select name="role" id="roleSelect" class="form-select" required onchange="toggleForm()">
                         <option value="" disabled selected>-- Pilih Role --</option>
                         <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
                         <option value="guru" {{ old('role') == 'guru' ? 'selected' : '' }}>Guru</option>
@@ -58,6 +58,19 @@
                         @endif
                     </select>
                     <small class="text-muted">Pilih role agar sistem mengarahkan ke dashboard yang tepat.</small>
+                </div>
+
+                {{-- Input Perusahaan (Muncul jika role = user atau pembimbing) --}}
+                <div class="mb-4" id="perusahaanContainer" style="display: none;">
+                    <label class="form-label fw-bold">Tempat PKL (Perusahaan)</label>
+                    <select name="perusahaan_id" class="form-select">
+                        <option value="" disabled selected>-- Pilih Perusahaan --</option>
+                        @foreach($daftarPerusahaan as $prs)
+                            <option value="{{ $prs->id }}" {{ old('perusahaan_id') == $prs->id ? 'selected' : '' }}>
+                                {{ $prs->nama_perusahaan }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 {{-- Input Asal Sekolah (Hanya Muncul Jika Role = Siswa) --}}
@@ -82,25 +95,35 @@
     </div>
 </div>
 
-{{-- JavaScript untuk menampilkan/menyembunyikan input sekolah --}}
+{{-- JavaScript untuk menampilkan/menyembunyikan input --}}
 <script>
-    function toggleSekolah() {
+    function toggleForm() {
         const role = document.getElementById('roleSelect').value;
         const sekolahContainer = document.getElementById('sekolahContainer');
+        const perusahaanContainer = document.getElementById('perusahaanContainer');
         
+        // Logika Sekolah (Hanya Siswa)
         if (role === 'user') {
             sekolahContainer.style.display = 'block';
         } else {
             sekolahContainer.style.display = 'none';
-            // Kosongkan value sekolah jika bukan user (perbaikan selector)
             const selectSekolah = document.querySelector('select[name="sekolah_id"]');
             if (selectSekolah) selectSekolah.value = ''; 
         }
+
+        // Logika Perusahaan (Siswa & Pembimbing)
+        if (role === 'user' || role === 'pembimbing') {
+            if (perusahaanContainer) perusahaanContainer.style.display = 'block';
+        } else {
+            if (perusahaanContainer) perusahaanContainer.style.display = 'none';
+            const selectPerusahaan = document.querySelector('select[name="perusahaan_id"]');
+            if (selectPerusahaan) selectPerusahaan.value = '';
+        }
     }
 
-    // Jalankan saat halaman dimuat (untuk kasus validasi gagal / old input)
+    // Jalankan saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
-        toggleSekolah();
+        toggleForm();
     });
 </script>
 @endsection

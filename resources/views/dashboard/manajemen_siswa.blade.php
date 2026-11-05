@@ -1,205 +1,133 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    :root {
-        --admin-primary: #7da7d9;
-        --admin-bg: #f7faff;
-        --admin-text: #40516a;
-        --admin-border: #e8eef6;
-    }
-
-    .admin-dashboard {
-        color: var(--admin-text);
-        padding: 10px 0 30px;
-    }
-
-    .page-title { font-size: 1.65rem; font-weight: 700; color: #40516a; }
-    .page-subtitle { color: #91a0b5; font-size: .9rem; }
-
-    .stat-card {
-        border: 1px solid #eaf0f8;
-        border-radius: 20px;
-        background: #fff;
-        padding: 24px;
-        box-shadow: 0 3px 15px rgba(82, 125, 180, .035);
-        margin-bottom: 24px;
-    }
-    .stat-icon {
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 46px; height: 46px; border-radius: 15px;
-        background: #edf4fd; color: #739ed1; font-size: 1.25rem;
-    }
-    .stat-label { color: #91a0b5; font-size: .84rem; margin-top: 18px; margin-bottom: 5px; }
-    .stat-value { font-size: 1.9rem; font-weight: 700; color: #40516a; margin: 0; }
-
-    .admin-panel {
-        background: #fff;
-        border: 1px solid #eaf0f7;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(82, 125, 180, .025);
-        overflow: hidden;
-    }
-    .admin-panel-header {
-        padding: 24px 26px;
-        border-bottom: 1px solid #eff3f9;
-        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
-    }
-    .admin-panel-title { font-size: 1.02rem; font-weight: 700; margin: 0; color: #50617a; }
-    .admin-panel-description { color: #9aa9bd; font-size: .82rem; margin: 6px 0 0; }
-    .admin-panel-body { padding: 24px 26px; }
-
-    .btn-add-employee {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 10px 16px; border-radius: 11px;
-        background: #e8f1fc; border: 1px solid #e8f1fc;
-        color: #5f8fc9; font-size: .85rem; font-weight: 600;
-        text-decoration: none; transition: .2s;
-    }
-    .btn-add-employee:hover { background: #dceafb; color: #4d7eb9; }
-
-    .btn-action {
-        display: inline-flex; align-items: center; gap: 5px;
-        border-radius: 9px; padding: 7px 11px;
-        font-size: .79rem; font-weight: 500;
-    }
-    .btn-outline-warning { color: #648fc3 !important; border-color: #dce9f8 !important; background: #f4f8fe !important; }
-    .btn-outline-warning:hover { background: #e7f0fc !important; }
-    .btn-outline-danger { color: #c18491 !important; border-color: #f1e1e6 !important; background: #fff8f9 !important; }
-    .btn-outline-danger:hover { background: #f9eaee !important; }
-
-    .admin-table { margin: 0; vertical-align: middle; min-width: 650px; }
-    .admin-table thead th { background: #f8faff; color: #91a1b7; font-size: .7rem; padding: 15px 18px; border-bottom: 1px solid #eaf0f7; text-transform: uppercase; }
-    .admin-table tbody td { padding: 16px 18px; border-bottom: 1px solid #f1f5fa; color: #718198; font-size: .85rem; }
-    .admin-table tbody tr:hover { background: #fafdff; }
-
-    .employee-avatar {
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 38px; height: 38px; border-radius: 13px;
-        background: #edf4fd; color: #729bd0; font-weight: 600; font-size: .88rem;
-    }
-    .employee-name { font-weight: 600; color: #52627a; margin-bottom: 2px; }
-    .employee-email { font-size: .77rem; color: #a0aec0; }
-
-    .admin-pagination { padding-top: 22px; border-top: 1px solid #f0f4f9; margin-top: 10px; }
-    .admin-pagination nav { display: flex; justify-content: flex-end; }
-</style>
-
-<div class="admin-dashboard">
-
-    {{-- HEADER --}}
+<div class="container py-4">
+    
+    {{-- HEADER HALAMAN --}}
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h2 class="page-title mb-1">Manajemen Siswa</h2>
-            <p class="page-subtitle mb-0">Kelola data siswa bimbingan PKL Anda.</p>
+            <h3 class="fw-bold mb-1">Data Siswa & Guru</h3>
+            <p class="text-muted mb-0">
+                Kelola anggota untuk: 
+                <span class="badge bg-primary px-2 py-1" style="font-size: 0.9rem;">
+                    <i class="bi bi-building me-1"></i> {{ Auth::user()->perusahaan->nama_perusahaan ?? 'Perusahaan Anda' }}
+                </span>
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('pembimbing.sekolah.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-building"></i> Data Sekolah
+            </a>
+            <a href="{{ route('pembimbing.siswa.create') }}" class="btn btn-primary">
+                <i class="bi bi-person-plus-fill"></i> Tambah Pengguna
+            </a>
         </div>
     </div>
 
-    {{-- STATISTIK --}}
-    <div class="row g-3">
-        <div class="col-12 col-sm-6 col-lg-4">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- KARTU RINGKASAN (SIMPLE) --}}
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd);">
+                <div class="card-body p-4 d-flex align-items-center gap-3">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 55px; height: 55px;">
+                        <i class="bi bi-people-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-dark fw-bold text-uppercase small" style="opacity: 0.7;">Total Anggota</div>
+                        <h2 class="fw-bold mb-0 text-dark">{{ $totalUser }} <span class="fs-6 fw-normal">Orang</span></h2>
+                    </div>
                 </div>
-                <p class="stat-label">Total Pengguna</p>
-                <h3 class="stat-value">{{ $totalUser }} <span class="fs-6 fw-semibold text-muted">Orang</span></h3>
             </div>
         </div>
     </div>
 
-    {{-- TABEL DAFTAR SISWA --}}
-    <div class="admin-panel">
-        <div class="admin-panel-header">
-            <div>
-                <h5 class="admin-panel-title"><i class="bi bi-person-lines-fill text-primary me-2"></i> Daftar Pengguna</h5>
-                <p class="admin-panel-description">Informasi dan pengelolaan data Siswa & Guru.</p>
-            </div>
-
-            <div class="d-flex gap-2 flex-wrap">
-                <a href="{{ route('pembimbing.siswa.create') }}" class="btn-add-employee">
-                    <i class="bi bi-person-plus-fill"></i> Tambah Pengguna
-                </a>
-                <a href="{{ route('pembimbing.sekolah.index') }}" class="btn-add-employee" style="background: #e0f2fe; border-color: #e0f2fe; color: #0369a1;">
-                    <i class="bi bi-building"></i> Manajemen Sekolah
-                </a>
-            </div>
-        </div>
-
-        <div class="admin-panel-body">
-            @if(session('success'))
-                <div class="alert alert-success border-0 mb-4">{{ session('success') }}</div>
-            @endif
-            @if(session('error'))
-                <div class="alert alert-danger border-0 mb-4">{{ session('error') }}</div>
-            @endif
-
+    {{-- TABEL DATA ANGGOTA --}}
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table admin-table">
-                    <thead>
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <th width="70">No.</th>
+                            <th class="ps-4" width="70">No.</th>
                             <th>Nama Pengguna</th>
                             <th>Email</th>
                             <th>Sekolah</th>
                             <th>Role</th>
-                            <th class="text-center" style="min-width:190px;">Aksi</th>
+                            <th class="text-center" width="180">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($semuaPengguna as $index => $pengguna)
+                        @forelse($semuaPengguna as $index => $pengguna)
                             <tr>
-                                <td>{{ $semuaPengguna->firstItem() + $index }}</td>
+                                <td class="ps-4 text-muted fw-bold">{{ $semuaPengguna->firstItem() + $index }}</td>
                                 <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="employee-avatar">{{ strtoupper(substr($pengguna->name, 0, 1)) }}</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-weight: bold;">
+                                            {{ strtoupper(substr($pengguna->name, 0, 1)) }}
+                                        </div>
                                         <div>
-                                            <div class="employee-name">{{ $pengguna->name }}</div>
-                                            <div class="employee-email">ID Pengguna #{{ $pengguna->id }}</div>
+                                            <div class="fw-bold text-dark">{{ $pengguna->name }}</div>
+                                            <div class="text-muted small">ID #{{ $pengguna->id }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>{{ $pengguna->email }}</td>
-                                <td>{{ $pengguna->sekolah->nama_sekolah ?? '-' }}</td>
                                 <td>
-                                    @if($pengguna->role == 'admin')
-                                        <span class="badge rounded-pill" style="background-color: #f3e8ff; color: #7e22ce;">Admin</span>
-                                    @elseif($pengguna->role == 'pembimbing')
-                                        <span class="badge rounded-pill" style="background-color: #fef3c7; color: #b45309;">Pembimbing</span>
+                                    <span class="text-muted">{{ $pengguna->sekolah->nama_sekolah ?? '-' }}</span>
+                                </td>
+                                <td>
+                                    @if($pengguna->role == 'pembimbing')
+                                        <span class="badge bg-warning text-dark">Pembimbing</span>
                                     @elseif($pengguna->role == 'guru')
-                                        <span class="badge rounded-pill" style="background-color: #e0f2fe; color: #0369a1;">Guru</span>
+                                        <span class="badge bg-info text-dark">Guru</span>
                                     @else
-                                        <span class="badge rounded-pill" style="background-color: #f1f5f9; color: #475569;">Siswa</span>
+                                        <span class="badge bg-secondary">Siswa</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
-                                        <a href="{{ route('pembimbing.siswa.edit', $pengguna->id) }}" class="btn btn-outline-warning btn-action">
-                                            <i class="bi bi-pencil-square"></i> Edit
-                                        </a>
-                                        @if (strtolower($pengguna->role) !== 'admin')
-                                            <form action="{{ route('pembimbing.siswa.destroy', $pengguna->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pengguna ini?');">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-action">
-                                                    <i class="bi bi-trash3"></i> Hapus
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
+                                    <a href="{{ route('pembimbing.siswa.edit', $pengguna->id) }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                    @if(strtolower($pengguna->role) !== 'admin')
+                                        <form action="{{ route('pembimbing.siswa.destroy', $pengguna->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pengguna ini?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash3"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="text-center text-muted py-4">Belum ada data pengguna.</td></tr>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <i class="bi bi-person-x fs-1 d-block mb-3 text-secondary"></i>
+                                    Belum ada anggota di perusahaan ini. <br> Klik tombol <strong>Tambah Pengguna</strong> di atas.
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-
-            @if($semuaPengguna->hasPages())
-                <div class="admin-pagination">
-                    {{ $semuaPengguna->links() }}
-                </div>
-            @endif
+            
+            {{-- PAGINATION --}}
+            <div class="p-3 border-top">
+                {{ $semuaPengguna->links() }}
+            </div>
         </div>
     </div>
 </div>

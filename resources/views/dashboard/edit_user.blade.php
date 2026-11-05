@@ -139,7 +139,7 @@
                         <!-- DROPDOWN ROLE -->
                         <div class="mb-4">
                             <label class="form-label">Role / Jabatan</label>
-                            <select name="role" id="roleSelect" class="form-select" required onchange="toggleSekolah()">
+                            <select name="role" id="roleSelect" class="form-select" required onchange="toggleForm()">
                                 <option value="user" {{ old('role', $pengguna->role) == 'user' ? 'selected' : '' }}>Siswa (PKL)</option>
                                 <option value="guru" {{ old('role', $pengguna->role) == 'guru' ? 'selected' : '' }}>Guru Pembimbing</option>
                                 
@@ -154,13 +154,26 @@
                         </div>
 
                         <!-- INPUT ASAL SEKOLAH (Hanya Muncul Jika Role = Siswa) -->
-                        <div class="mb-4" id="sekolahContainer">
+                        <div class="mb-4" id="sekolahContainer" style="display: none;">
                             <label class="form-label">Asal Sekolah</label>
                             <select name="sekolah_id" class="form-select">
                                 <option value="" disabled selected>-- Pilih Sekolah --</option>
                                 @foreach($daftarSekolah as $sklh)
                                     <option value="{{ $sklh->id }}" {{ old('sekolah_id', $pengguna->sekolah_id ?? '') == $sklh->id ? 'selected' : '' }}>
                                         {{ $sklh->nama_sekolah }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- INPUT PERUSAHAAN (Muncul untuk Siswa, Guru, & Pembimbing) -->
+                        <div class="mb-4" id="perusahaanContainer" style="display: none;">
+                            <label class="form-label">Tempat PKL (Perusahaan)</label>
+                            <select name="perusahaan_id" class="form-select">
+                                <option value="" disabled selected>-- Pilih Perusahaan --</option>
+                                @foreach($daftarPerusahaan as $prs)
+                                    <option value="{{ $prs->id }}" {{ old('perusahaan_id', $pengguna->perusahaan_id ?? '') == $prs->id ? 'selected' : '' }}>
+                                        {{ $prs->nama_perusahaan }}
                                     </option>
                                 @endforeach
                             </select>
@@ -178,22 +191,31 @@
     </div>
 </div>
 
-{{-- JavaScript untuk menampilkan/menyembunyikan input sekolah --}}
+{{-- JavaScript untuk menampilkan/menyembunyikan input --}}
 <script>
-    function toggleSekolah() {
+    function toggleForm() {
         const role = document.getElementById('roleSelect').value;
         const sekolahContainer = document.getElementById('sekolahContainer');
+        const perusahaanContainer = document.getElementById('perusahaanContainer');
         
+        // Logika Sekolah (Hanya Siswa)
         if (role === 'user') {
-            sekolahContainer.style.display = 'block';
+            if(sekolahContainer) sekolahContainer.style.display = 'block';
         } else {
-            sekolahContainer.style.display = 'none';
+            if(sekolahContainer) sekolahContainer.style.display = 'none';
+        }
+
+        // Logika Perusahaan (Siswa, Guru, Pembimbing)
+        if (role === 'user' || role === 'guru' || role === 'pembimbing') {
+            if(perusahaanContainer) perusahaanContainer.style.display = 'block';
+        } else {
+            if(perusahaanContainer) perusahaanContainer.style.display = 'none';
         }
     }
 
-    // Jalankan saat halaman dimuat (untuk memastikan status awal benar)
+    // Jalankan saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
-        toggleSekolah();
+        toggleForm();
     });
 </script>
 @endsection
