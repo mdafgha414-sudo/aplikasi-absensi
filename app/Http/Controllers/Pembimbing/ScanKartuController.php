@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Absensi;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth; // <-- TAMBAHAN
 
 class ScanKartuController extends Controller
 {
@@ -20,10 +21,18 @@ class ScanKartuController extends Controller
     {
         $request->validate(['kode_kartu' => 'required|string']);
 
-        $siswa = User::where('kode_kartu', $request->kode_kartu)->first();
+        $user = Auth::user(); // Pembimbing yang sedang scan
+
+        // KEAMANAN: Cari siswa berdasarkan kode kartu DAN perusahaan yang sama
+        $siswa = User::where('kode_kartu', $request->kode_kartu)
+                     ->where('perusahaan_id', $user->perusahaan_id) // <-- FILTER PENTING
+                     ->first();
 
         if (!$siswa) {
-            return response()->json(['status' => 'error', 'message' => 'Kartu tidak dikenali!'], 404);
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Kartu tidak dikenali atau bukan siswa perusahaan Anda!'
+            ], 404);
         }
 
         $hariIni = Carbon::today()->toDateString();
@@ -63,6 +72,15 @@ class ScanKartuController extends Controller
         ]);
 
         $siswa = User::findOrFail($request->user_id);
+
+        // KEAMANAN TAMBAHAN: Pastikan siswa yang disimpan benar-benar milik perusahaan Pembimbing
+        if ($siswa->perusahaan_id !== Auth::user()->perusahaan_id) {
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Anda tidak memiliki akses untuk mencatat absensi siswa ini.'
+            ], 403);
+        }
+
         $hariIni = Carbon::today()->toDateString();
         $sekarang = Carbon::now();
 
@@ -89,4 +107,4 @@ class ScanKartuController extends Controller
 
         return response()->json(['status' => 'success', 'message' => $msg]);
     }
-}
+}   

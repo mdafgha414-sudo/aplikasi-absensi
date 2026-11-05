@@ -17,6 +17,15 @@ class Sekolah extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Relasi ke User (Siswa yang terdaftar di sekolah ini)
+     * TAMBAHAN BARU
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class);
     }
 }

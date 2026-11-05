@@ -7,7 +7,12 @@
             <h3 class="fw-bold mb-1">Atur Siswa ke Sekolah</h3>
             <p class="text-muted mb-0">Pilih siswa yang akan dimasukkan ke <strong>{{ $sekolah->nama_sekolah }}</strong>.</p>
         </div>
-        <a href="{{ route('admin.sekolah.index') }}" class="btn btn-secondary">Kembali</a>
+        
+        @php
+            // Tentukan route kembali berdasarkan role
+            $backRoute = Auth::user()->role === 'pembimbing' ? route('pembimbing.sekolah.index') : route('admin.sekolah.index');
+        @endphp
+        <a href="{{ $backRoute }}" class="btn btn-secondary">Kembali</a>
     </div>
 
     @if(session('success'))
@@ -16,7 +21,12 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form action="{{ route('admin.sekolah.assign.store', $sekolah->id) }}" method="POST">
+            @php
+                // Tentukan route action berdasarkan role
+                $actionRoute = Auth::user()->role === 'pembimbing' ? route('pembimbing.sekolah.assign.store', $sekolah->id) : route('admin.sekolah.assign.store', $sekolah->id);
+            @endphp
+
+            <form action="{{ $actionRoute }}" method="POST">
                 @csrf
                 
                 <div class="mb-3">

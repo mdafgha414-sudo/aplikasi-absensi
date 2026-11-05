@@ -14,7 +14,7 @@ use App\Http\Controllers\AlasanKeterlambatanController;
 use App\Http\Controllers\Pembimbing\ScanKartuController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\Admin\SekolahController;
-use App\Http\Controllers\Admin\PerusahaanController; // <-- TAMBAHAN
+use App\Http\Controllers\Admin\PerusahaanController;
 
 // ==========================================
 // ROUTE PUBLIK
@@ -133,7 +133,7 @@ Route::middleware('auth')->group(function () {
 // ROUTE ADMIN
 // ==========================================
 Route::middleware(['auth', 'isAdmin'])->group(function () {
-          Route::get('/admin/manajemen-siswa', [AdminController::class, 'manajemenSiswaAdmin'])->name('admin.siswa.index');
+    Route::get('/admin/manajemen-siswa', [AdminController::class, 'manajemenSiswaAdmin'])->name('admin.siswa.index');
     Route::get('/admin/perusahaan/{id}/detail', [AdminController::class, 'detailPerusahaan'])->name('admin.perusahaan.detail');
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
     Route::get('/admin/tambah-user', [AdminController::class, 'createUser']);

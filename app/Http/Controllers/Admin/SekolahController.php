@@ -5,23 +5,27 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Sekolah;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // <-- TAMBAHAN
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class SekolahController extends Controller
 {
     public function index()
     {
-        // 1. Cek role user yang login
-        if (Auth::user()->role === 'pembimbing') {
-            // Pembimbing: Hanya lihat sekolah yang DIA buat
-            $sekolahs = Sekolah::where('user_id', Auth::id())
-                               ->orderBy('nama_sekolah', 'asc')
-                               ->get();
+        $user = Auth::user();
+
+        if ($user->role === 'pembimbing') {
+            $sekolahs = Sekolah::where(function($query) use ($user) {
+                            $query->where('user_id', $user->id)
+                                  ->orWhereHas('users', function($q) use ($user) {
+                                      $q->where('perusahaan_id', $user->perusahaan_id);
+                                  });
+                        })
+                        ->with('user')
+                        ->orderBy('nama_sekolah', 'asc')
+                        ->get();
         } else {
-            // Admin: Lihat SEMUA sekolah beserta nama pembuatnya
-            $sekolahs = Sekolah::with('user')
-                               ->orderBy('nama_sekolah', 'asc')
-                               ->get();
+            $sekolahs = Sekolah::with('user')->orderBy('nama_sekolah', 'asc')->get();
         }
 
         return view('dashboard.sekolah.index', compact('sekolahs'));
@@ -31,10 +35,9 @@ class SekolahController extends Controller
     {
         $request->validate(['nama_sekolah' => 'required|string|unique:sekolahs,nama_sekolah']);
         
-        // 2. Simpan nama sekolah beserta user_id pembuatnya
         Sekolah::create([
             'nama_sekolah' => $request->nama_sekolah,
-            'user_id' => Auth::id(), // <-- Penting!
+            'user_id' => Auth::id(),
         ]);
         
         return back()->with('success', 'Sekolah berhasil ditambahkan!');
@@ -44,7 +47,6 @@ class SekolahController extends Controller
     {
         $sekolah = Sekolah::findOrFail($id);
 
-        // 3. KEAMANAN: Pembimbing tidak boleh edit sekolah buatan orang lain
         if (Auth::user()->role === 'pembimbing' && $sekolah->user_id !== Auth::id()) {
             return back()->with('error', 'Anda tidak berhak mengedit sekolah ini.');
         }
@@ -60,7 +62,6 @@ class SekolahController extends Controller
     {
         $sekolah = Sekolah::findOrFail($id);
 
-        // 4. KEAMANAN: Pembimbing tidak boleh hapus sekolah buatan orang lain
         if (Auth::user()->role === 'pembimbing' && $sekolah->user_id !== Auth::id()) {
             return back()->with('error', 'Anda tidak berhak menghapus sekolah ini.');
         }
@@ -72,14 +73,15 @@ class SekolahController extends Controller
     public function assignSiswaForm($id)
     {
         $sekolah = Sekolah::findOrFail($id);
+        $user = Auth::user();
 
-        // KEAMANAN: Pastikan hanya pembuatnya yang bisa atur siswa
-        if (Auth::user()->role === 'pembimbing' && $sekolah->user_id !== Auth::id()) {
-            return back()->with('error', 'Anda tidak berhak mengatur siswa di sekolah ini.');
+        $querySiswa = User::where('role', 'user');
+
+        if ($user->role === 'pembimbing') {
+            $querySiswa->where('perusahaan_id', $user->perusahaan_id);
         }
 
-        $siswas = \App\Models\User::where('role', 'user')
-                    ->orderByRaw('sekolah_id IS NOT NULL ASC')
+        $siswas = $querySiswa->orderByRaw('sekolah_id IS NOT NULL ASC')
                     ->orderBy('name', 'asc')
                     ->get();
                     
@@ -89,28 +91,41 @@ class SekolahController extends Controller
     public function assignSiswaStore(Request $request, $id)
     {
         $sekolah = Sekolah::findOrFail($id);
-
-        // KEAMANAN
-        if (Auth::user()->role === 'pembimbing' && $sekolah->user_id !== Auth::id()) {
-            return back()->with('error', 'Anda tidak berhak mengatur siswa di sekolah ini.');
-        }
+        $user = Auth::user();
         
         $request->validate([
             'siswa_ids' => 'nullable|array',
             'siswa_ids.*' => 'exists:users,id'
         ]);
 
-        \App\Models\User::where('sekolah_id', $id)->update(['sekolah_id' => null]);
-
+        $validSiswaIds = [];
         if ($request->has('siswa_ids')) {
-            \App\Models\User::whereIn('id', $request->siswa_ids)
-                            ->update(['sekolah_id' => $id]);
+            $validSiswaIds = User::whereIn('id', $request->siswa_ids)
+                                 ->where('role', 'user')
+                                 ->when($user->role === 'pembimbing', function($q) use ($user) {
+                                     return $q->where('perusahaan_id', $user->perusahaan_id);
+                                 })
+                                 ->pluck('id')
+                                 ->toArray();
         }
 
-        // Redirect dinamis (karena admin dan pembimbing punya route index sendiri)
-        if (Auth::user()->role === 'pembimbing') {
-            return redirect()->route('pembimbing.sekolah.index')->with('success', 'Data siswa berhasil diperbarui.');
+        User::where('sekolah_id', $id)
+            ->when($user->role === 'pembimbing', function($q) use ($user) {
+                return $q->where('perusahaan_id', $user->perusahaan_id);
+            })
+            ->update(['sekolah_id' => null]);
+
+        if (!empty($validSiswaIds)) {
+            User::whereIn('id', $validSiswaIds)
+                ->update(['sekolah_id' => $id]);
         }
-        return redirect()->route('admin.sekolah.index')->with('success', 'Data siswa berhasil diperbarui untuk sekolah ' . $sekolah->nama_sekolah);
+
+        // ===============================================
+        // INI BAGIAN YANG SAYA UBAH (PAKAI URL LANGSUNG)
+        // ===============================================
+        if ($user->role === 'pembimbing') {
+            return redirect('/pembimbing/sekolah')->with('success', 'Data siswa berhasil diperbarui.');
+        }
+        return redirect('/admin/sekolah')->with('success', 'Data siswa berhasil diperbarui untuk sekolah ' . $sekolah->nama_sekolah);
     }
 }

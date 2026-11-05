@@ -16,8 +16,23 @@ class GuruController extends Controller
 {
     public function index()
     {
-        $semuaJurnal = Jurnal::with('user')->orderBy('tanggal', 'desc')->get();
-        $totalSiswa = User::where('role', 'user')->count();
+        $user = Auth::user();
+
+        // Filter Jurnal berdasarkan Perusahaan Pembimbing (jika pembimbing)
+        $queryJurnal = Jurnal::with('user');
+        if ($user->role === 'pembimbing') {
+            $queryJurnal->whereHas('user', function($q) use ($user) {
+                $q->where('perusahaan_id', $user->perusahaan_id);
+            });
+        }
+        $semuaJurnal = $queryJurnal->orderBy('tanggal', 'desc')->get();
+
+        // Hitung total siswa (jika pembimbing, filter perusahaannya)
+        $querySiswa = User::where('role', 'user');
+        if ($user->role === 'pembimbing') {
+            $querySiswa->where('perusahaan_id', $user->perusahaan_id);
+        }
+        $totalSiswa = $querySiswa->count();
         
         return view('dashboard.guru', compact('semuaJurnal', 'totalSiswa'));
     }
@@ -30,6 +45,12 @@ class GuruController extends Controller
         ]);
 
         $jurnal = Jurnal::findOrFail($id);
+        
+        // Keamanan: Pembimbing tidak boleh menilai jurnal dari perusahaan lain
+        if (Auth::user()->role === 'pembimbing' && $jurnal->user->perusahaan_id !== Auth::user()->perusahaan_id) {
+            return back()->with('error', 'Anda tidak memiliki akses ke jurnal ini.');
+        }
+
         $jurnal->update([
             'nilai' => $request->nilai,
             'catatan_guru' => $request->catatan_guru,
@@ -43,6 +64,7 @@ class GuruController extends Controller
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
         $sekolahFilter = $request->input('sekolah');
+        $user = Auth::user();
 
         $startDate = Carbon::createFromDate($tahun, $bulan, 1);
         $daysInMonth = $startDate->daysInMonth;
@@ -51,17 +73,18 @@ class GuruController extends Controller
             $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
         }
 
-        // 1. Ambil daftar sekolah dari Master Data
         $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
 
-        // 2. Ambil siswa dengan filter sekolah_id
+        // Filter Siswa
         $querySiswa = User::where('role', 'user')->with('sekolah');
+        if ($user->role === 'pembimbing') {
+            $querySiswa->where('perusahaan_id', $user->perusahaan_id); // Filter Perusahaan
+        }
         if ($sekolahFilter && $sekolahFilter != 'Semua') {
             $querySiswa->where('sekolah_id', $sekolahFilter);
         }
         $siswa = $querySiswa->orderBy('sekolah_id', 'asc')->orderBy('name', 'asc')->get();
 
-        // 3. Ambil data absensi lengkap
         $absensi = Absensi::whereMonth('tanggal', $bulan)
                           ->whereYear('tanggal', $tahun)
                           ->get()
@@ -69,7 +92,6 @@ class GuruController extends Controller
                               return $item->user_id . '-' . date('d', strtotime($item->tanggal));
                           });
 
-        // 4. Ambil data izin (TAMBAHAN BARU)
         $izin = Izin::whereMonth('tanggal_izin', $bulan)
                     ->whereYear('tanggal_izin', $tahun)
                     ->get()
@@ -77,7 +99,6 @@ class GuruController extends Controller
                         return $item->user_id . '-' . date('d', strtotime($item->tanggal_izin));
                     });
 
-        // 5. Ambil data alasan keterlambatan
         $alasanKeterlambatan = AlasanKeterlambatan::whereMonth('tanggal', $bulan)
                                                   ->whereYear('tanggal', $tahun)
                                                   ->get()
@@ -85,7 +106,7 @@ class GuruController extends Controller
                                                       return $item->user_id . '-' . date('d', strtotime($item->tanggal));
                                                   });
 
-        if (Auth::user()->role === 'pembimbing') {
+        if ($user->role === 'pembimbing') {
             return view('pembimbing.laporan-absensi', compact('siswa', 'tanggalList', 'absensi', 'izin', 'alasanKeterlambatan', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'));
         }
 
@@ -97,6 +118,7 @@ class GuruController extends Controller
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
         $sekolahFilter = $request->input('sekolah');
+        $user = Auth::user();
 
         $startDate = Carbon::createFromDate($tahun, $bulan, 1);
         $daysInMonth = $startDate->daysInMonth;
@@ -105,11 +127,12 @@ class GuruController extends Controller
             $tanggalList[] = Carbon::createFromDate($tahun, $bulan, $i);
         }
 
-        // Ambil daftar sekolah untuk dropdown
         $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
 
-        // Ambil siswa dengan filter sekolah (jika ada)
         $querySiswa = User::where('role', 'user')->with('sekolah');
+        if ($user->role === 'pembimbing') {
+            $querySiswa->where('perusahaan_id', $user->perusahaan_id); // Filter Perusahaan
+        }
         if ($sekolahFilter && $sekolahFilter != 'Semua') {
             $querySiswa->where('sekolah_id', $sekolahFilter);
         }
@@ -123,7 +146,6 @@ class GuruController extends Controller
                         return $item->user_id . '-' . date('d', strtotime($item->tanggal_izin));
                     });
 
-        // TAMBAHAN BARU: Ambil data alasan keterlambatan
         $alasanKeterlambatan = AlasanKeterlambatan::whereMonth('tanggal', $bulan)
                                                   ->whereYear('tanggal', $tahun)
                                                   ->get()
@@ -131,8 +153,13 @@ class GuruController extends Controller
                                                       return $item->user_id . '-' . date('d', strtotime($item->tanggal));
                                                   });
 
-        if (Auth::user()->role === 'pembimbing') {
+        if ($user->role === 'pembimbing') {
             $query = Izin::with('user')->orderBy('created_at', 'desc');
+
+            // FILTER: Hanya Izin dari perusahaan pembimbing
+            $query->whereHas('user', function($q) use ($user) {
+                $q->where('perusahaan_id', $user->perusahaan_id);
+            });
 
             if ($request->filled('search')) {
                 $search = $request->search;
@@ -160,7 +187,12 @@ class GuruController extends Controller
             }
 
             $semuaIzin = $query->paginate(10)->withQueryString();
-            $jumlahMenunggu = Izin::where('status', 'Menunggu')->count();
+            
+            // Hitung jumlah menunggu HANYA dari perusahaan ini
+            $jumlahMenunggu = Izin::where('status', 'Menunggu')
+                                  ->whereHas('user', function($q) use ($user) {
+                                      $q->where('perusahaan_id', $user->perusahaan_id);
+                                  })->count();
 
             return view('dashboard.izin_pembimbing', compact(
                 'semuaIzin', 'jumlahMenunggu', 'siswa', 'tanggalList', 'absensi', 'izin', 'alasanKeterlambatan', 'bulan', 'tahun', 'daftarSekolah', 'sekolahFilter'
@@ -174,6 +206,12 @@ class GuruController extends Controller
     {
         $request->validate(['status' => 'required|in:Disetujui,Ditolak']);
         $izin = Izin::findOrFail($id);
+
+        // KEAMANAN: Pastikan pembimbing hanya bisa update izin perusahaannya
+        if (Auth::user()->role === 'pembimbing' && $izin->user->perusahaan_id !== Auth::user()->perusahaan_id) {
+            return back()->with('error', 'Anda tidak memiliki akses ke pengajuan izin ini.');
+        }
+
         $izin->update(['status' => $request->status]);
 
         if ($request->status == 'Disetujui') {
@@ -190,70 +228,41 @@ class GuruController extends Controller
         return back()->with('success', 'Status pengajuan izin berhasil diperbarui menjadi: ' . $request->status);
     }
 
-        // ==========================================================
-    // DASHBOARD PEMBIMBING PKL - TIMETRIX
-    // ----------------------------------------------------------
-    // Fungsi:
-    // Menampilkan halaman utama dashboard Pembimbing PKL.
-    //
-    // Data yang disediakan:
-    // 1. Lima jurnal siswa terbaru.
-    // 2. Nama siswa melalui relasi model User.
-    // 3. Data penilaian jurnal.
-    // 4. Statistik ringkasan dashboard.
-    //
-    // View:
-    // resources/views/dashboard/user_pembimbing.blade.php
-    //
-    // Catatan:
-    // Data diambil langsung dari database sehingga dashboard
-    // otomatis diperbarui ketika halaman dibuka.
-    // ==========================================================
     public function dashboardPembimbing()
     {
-        // ------------------------------------------------------
-        // BAGIAN 1: RIWAYAT JURNAL TERBARU
-        // Mengambil lima jurnal terakhir beserta data siswa.
-        // ------------------------------------------------------
+        $user = Auth::user(); // Pembimbing yang login
+
+        // 1. Ambil jurnal terbaru HANYA dari perusahaan ini
         $jurnalTerbaru = Jurnal::with('user')
+            ->whereHas('user', function($q) use ($user) {
+                $q->where('perusahaan_id', $user->perusahaan_id);
+            })
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
+        // 2. Total Siswa (Hanya dari perusahaan ini)
+        $totalSiswa = User::where('role', 'user')
+                          ->where('perusahaan_id', $user->perusahaan_id)
+                          ->count();
 
-        // ------------------------------------------------------
-        // BAGIAN 2: TOTAL SISWA
-        // Menghitung jumlah seluruh akun dengan role user.
-        // ------------------------------------------------------
-        $totalSiswa = User::where('role', 'user')->count();
+        // 3. Total Jurnal (Hanya dari perusahaan ini)
+        $totalJurnal = Jurnal::whereHas('user', function($q) use ($user) {
+            $q->where('perusahaan_id', $user->perusahaan_id);
+        })->count();
 
+        // 4. Jurnal Belum Dinilai (Hanya dari perusahaan ini)
+        $jurnalBelumDinilai = Jurnal::whereNull('nilai')
+                                    ->whereHas('user', function($q) use ($user) {
+                                        $q->where('perusahaan_id', $user->perusahaan_id);
+                                    })->count();
 
-        // ------------------------------------------------------
-        // BAGIAN 3: TOTAL JURNAL
-        // Menghitung seluruh jurnal yang sudah dikirim siswa.
-        // ------------------------------------------------------
-        $totalJurnal = Jurnal::count();
+        // 5. Jurnal Sudah Dinilai (Hanya dari perusahaan ini)
+        $jurnalSudahDinilai = Jurnal::whereNotNull('nilai')
+                                    ->whereHas('user', function($q) use ($user) {
+                                        $q->where('perusahaan_id', $user->perusahaan_id);
+                                    })->count();
 
-
-        // ------------------------------------------------------
-        // BAGIAN 4: JURNAL BELUM DINILAI
-        // Menghitung jurnal yang belum mendapatkan nilai.
-        // ------------------------------------------------------
-        $jurnalBelumDinilai = Jurnal::whereNull('nilai')->count();
-
-
-        // ------------------------------------------------------
-        // BAGIAN 5: JURNAL SUDAH DINILAI
-        // Menghitung jurnal yang sudah mendapatkan nilai.
-        // ------------------------------------------------------
-        $jurnalSudahDinilai = Jurnal::whereNotNull('nilai')->count();
-
-
-        // ------------------------------------------------------
-        // BAGIAN 6: KIRIM DATA KE HALAMAN DASHBOARD
-        // Semua variabel di atas dikirim ke Blade agar dapat
-        // ditampilkan secara otomatis pada tampilan dashboard.
-        // ------------------------------------------------------
         return view('dashboard.user_pembimbing', compact(
             'jurnalTerbaru',
             'totalSiswa',
@@ -263,14 +272,20 @@ class GuruController extends Controller
         ));
     }
 
-    // ==========================================
-    // FUNGSI ALASAN KETERLAMBATAN (GURU)
-    // ==========================================
     public function alasanKeterlambatan()
     {
-        $alasanKeterlambatan = AlasanKeterlambatan::with('user')
-                                ->orderBy('created_at', 'desc')
-                                ->get();
+        $user = Auth::user();
+        
+        $query = AlasanKeterlambatan::with('user');
+        
+        // Filter untuk Pembimbing
+        if ($user->role === 'pembimbing') {
+            $query->whereHas('user', function($q) use ($user) {
+                $q->where('perusahaan_id', $user->perusahaan_id);
+            });
+        }
+
+        $alasanKeterlambatan = $query->orderBy('created_at', 'desc')->get();
                                 
         return view('guru.alasan-keterlambatan', compact('alasanKeterlambatan'));
     }

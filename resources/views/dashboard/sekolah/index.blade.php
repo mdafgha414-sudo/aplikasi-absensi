@@ -81,18 +81,26 @@
                                     <td class="ps-4 fw-bold text-muted">{{ $index + 1 }}</td>
                                     <td>
                                         @php
-                                            // Tentukan route update berdasarkan role
-                                            $updateRoute = Auth::user()->role === 'pembimbing' ? route('pembimbing.sekolah.update', $s->id) : route('admin.sekolah.update', $s->id);
+                                            // Cek apakah user berhak mengedit nama sekolah ini
+                                            $isOwner = Auth::user()->role === 'admin' || $s->user_id === Auth::id();
                                         @endphp
 
-                                        <!-- Form Edit Inline -->
-                                        <form action="{{ $updateRoute }}" method="POST" class="d-flex align-items-center">
-                                            @csrf @method('PUT')
-                                            <input type="text" name="nama_sekolah" class="form-control form-control-sm bg-transparent border-0 fw-bold text-dark px-0" value="{{ $s->nama_sekolah }}" required style="box-shadow: none;">
-                                            <button type="submit" class="btn btn-sm btn-outline-primary ms-2" title="Update Nama">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                        </form>
+                                        @if($isOwner)
+                                            <!-- Form Edit Inline (Hanya muncul jika pemilik/admin) -->
+                                            @php
+                                                $updateRoute = Auth::user()->role === 'pembimbing' ? route('pembimbing.sekolah.update', $s->id) : route('admin.sekolah.update', $s->id);
+                                            @endphp
+                                            <form action="{{ $updateRoute }}" method="POST" class="d-flex align-items-center">
+                                                @csrf @method('PUT')
+                                                <input type="text" name="nama_sekolah" class="form-control form-control-sm bg-transparent border-0 fw-bold text-dark px-0" value="{{ $s->nama_sekolah }}" required style="box-shadow: none;">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary ms-2" title="Update Nama">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <!-- Teks Biasa (Jika bukan pemilik, misal Pembimbing melihat sekolah buatan Admin) -->
+                                            <span class="fw-bold text-dark">{{ $s->nama_sekolah }}</span>
+                                        @endif
                                     </td>
 
                                     {{-- Tampilkan pembuat HANYA untuk Admin --}}
@@ -109,16 +117,20 @@
                                                 $destroyRoute = Auth::user()->role === 'pembimbing' ? route('pembimbing.sekolah.destroy', $s->id) : route('admin.sekolah.destroy', $s->id);
                                             @endphp
 
+                                            <!-- Tombol Atur Siswa (Muncul untuk semua sekolah) -->
                                             <a href="{{ $assignRoute }}" class="btn btn-sm btn-info text-white" title="Atur Siswa">
                                                 <i class="bi bi-people-fill"></i> Atur
                                             </a>
 
-                                            <form action="{{ $destroyRoute }}" method="POST" onsubmit="return confirm('Hapus sekolah ini?')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
+                                            <!-- Tombol Hapus (Hanya muncul jika pemilik/admin) -->
+                                            @if($isOwner)
+                                                <form action="{{ $destroyRoute }}" method="POST" onsubmit="return confirm('Hapus sekolah ini?')">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
