@@ -137,7 +137,7 @@
 
 <div class="container-fluid py-4 px-lg-5">
     
-    <!-- AREA DASHBOARD -->
+    <!-- 1. AREA DASHBOARD -->
     <div class="row g-4 mb-5">
         <!-- Banner Kiri -->
         <div class="col-lg-8">
@@ -174,27 +174,10 @@
         </div>
     </div>
 
-    <!-- Card Tabel Jurnal -->
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-4">
-            
-            <!-- Header Tabel & Tombol Export -->
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                    <i class="bi bi-journal-text text-secondary"></i> Daftar Jurnal Siswa
-                </h5>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('guru.export.excel', ['bulan' => date('m'), 'tahun' => date('Y')]) }}" class="btn btn-outline-success btn-sm fw-semibold px-3 rounded-2">
-                        <i class="bi bi-file-earmark-excel me-1"></i> Eksport Excel
-                    </a>
-                    <a href="{{ route('guru.export.pdf', ['bulan' => date('m'), 'tahun' => date('Y')]) }}" class="btn btn-outline-danger btn-sm fw-semibold px-3 rounded-2">
-                        <i class="bi bi-file-earmark-pdf me-1"></i> Eksport PDF
-                    </a>
-                </div>
-    <!-- AREA TABEL JURNAL -->
+    <!-- 2. AREA TABEL JURNAL -->
     <div class="dash-card p-4 p-md-5">
         
-        <!-- Header Tabel & Tombol Export (Tombol Export TIDAK diubah) -->
+        <!-- Header Tabel & Tombol Export (Hanya Satu Set) -->
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h5 class="fw-bolder mb-0 d-flex align-items-center gap-2" style="color: #0f172a; font-size: 18px;">
                 <i class="bi bi-journal-text text-primary fs-4"></i> Daftar Jurnal Siswa
