@@ -16,31 +16,27 @@ class AdminController extends Controller
     // 1. Fungsi untuk menampilkan halaman utama admin (Daftar Perusahaan)
     public function index()
     {
-        // Hanya hitung total user untuk ditampilkan di header
         $totalUser = User::count();
-
         return view('dashboard.admin', compact('totalUser'));
     }
 
-    // 2. FUNGSI BARU: Menampilkan Detail Perusahaan (Anggota & Absensi)
+    // 2. Menampilkan Detail Perusahaan (Anggota & Absensi)
     public function detailPerusahaan($id)
     {
         $perusahaan = Perusahaan::findOrFail($id);
         
-        // Ambil user HANYA dari perusahaan ini
         $semuaPengguna = User::with('sekolah')
                              ->where('perusahaan_id', $id)
                              ->orderBy('role', 'asc')
                              ->orderBy('name', 'asc')
-                             ->paginate(10, ['*'], 'page_pengguna'); // Pagination terpisah
+                             ->paginate(10, ['*'], 'page_pengguna');
 
-        // Ambil data absensi user di perusahaan ini
         $semuaAbsensi = Absensi::whereHas('user', function($q) use ($id) {
                                 $q->where('perusahaan_id', $id);
                              })
                              ->with('user')
                              ->orderBy('tanggal', 'desc')
-                             ->paginate(10, ['*'], 'page_absensi'); // Pagination terpisah
+                             ->paginate(10, ['*'], 'page_absensi');
 
         $totalUser = User::where('perusahaan_id', $id)->count();
 
@@ -63,27 +59,23 @@ class AdminController extends Controller
         return view('dashboard.manajemen_siswa', compact('semuaPengguna', 'totalUser'));
     }
 
-        // FUNGSI BARU: Manajemen Siswa Global (Khusus Admin)
+    // 4. Manajemen Siswa Global (Khusus Admin)
     public function manajemenSiswaAdmin(Request $request)
     {
         $query = User::with('sekolah', 'perusahaan');
 
-        // Filter berdasarkan Role
         if ($request->filled('role') && $request->role != 'Semua') {
             $query->where('role', $request->role);
         }
 
-        // Filter berdasarkan Sekolah
         if ($request->filled('sekolah') && $request->sekolah != 'Semua') {
             $query->where('sekolah_id', $request->sekolah);
         }
 
-        // Filter berdasarkan Perusahaan
         if ($request->filled('perusahaan') && $request->perusahaan != 'Semua') {
             $query->where('perusahaan_id', $request->perusahaan);
         }
 
-        // Pencarian Nama
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
@@ -97,7 +89,7 @@ class AdminController extends Controller
         return view('dashboard.manajemen_siswa_admin', compact('semuaPengguna', 'totalUser', 'daftarSekolah', 'daftarPerusahaan'));
     }
 
-    // 4. Fungsi untuk menampilkan form tambah user
+    // 5. Menampilkan form tambah user
     public function createUser()
     {
         $daftarSekolah = Sekolah::orderBy('nama_sekolah', 'asc')->get();
@@ -105,7 +97,7 @@ class AdminController extends Controller
         return view('dashboard.tambah_user', compact('daftarSekolah', 'daftarPerusahaan'));
     }
 
-    // 5. Fungsi untuk menyimpan user baru ke database
+    // 6. Menyimpan user baru ke database
     public function storeUser(Request $request)
     {
         $request->validate([
@@ -123,7 +115,6 @@ class AdminController extends Controller
             'role.in' => 'Anda tidak memiliki izin untuk membuat role ini.'
         ]);
 
-        // LOGIKA OTOMATIS KODE KARTU
         $kode_kartu = null;
         if ($request->role === 'user') {
             $lastSiswa = User::where('role', 'user')
@@ -140,7 +131,6 @@ class AdminController extends Controller
             }
         }
 
-        // KEAMANAN: Paksa perusahaan_id sesuai role yang login
         $perusahaanId = Auth::user()->role === 'pembimbing' 
                         ? Auth::user()->perusahaan_id 
                         : $request->perusahaan_id;
@@ -155,19 +145,17 @@ class AdminController extends Controller
             'kode_kartu' => $kode_kartu, 
         ]);
 
-        // Redirect dinamis
         if (Auth::user()->role === 'pembimbing') {
             return redirect()->route('pembimbing.siswa.index')->with('success', 'Pengguna baru berhasil ditambahkan!');
         }
         return redirect('/admin/dashboard')->with('success', 'Pengguna baru berhasil ditambahkan!');
     }
 
-    // 6. Menampilkan form edit
+    // 7. Menampilkan form edit
     public function editUser($id)
     {
         $pengguna = User::findOrFail($id);
         
-        // KEAMANAN: Pembimbing tidak boleh mengedit user dari perusahaan lain
         if (Auth::user()->role === 'pembimbing' && $pengguna->perusahaan_id !== Auth::user()->perusahaan_id) {
             return back()->with('error', 'Anda tidak memiliki akses ke user ini.');
         }
@@ -178,12 +166,11 @@ class AdminController extends Controller
         return view('dashboard.edit_user', compact('pengguna', 'daftarSekolah', 'daftarPerusahaan'));
     }
 
-    // 7. Menyimpan perubahan data
+    // 8. Menyimpan perubahan data
     public function updateUser(Request $request, $id)
     {
         $pengguna = User::findOrFail($id);
 
-        // KEAMANAN: Pembimbing tidak boleh mengedit user dari perusahaan lain
         if (Auth::user()->role === 'pembimbing' && $pengguna->perusahaan_id !== Auth::user()->perusahaan_id) {
             return back()->with('error', 'Anda tidak memiliki akses ke user ini.');
         }
@@ -198,11 +185,14 @@ class AdminController extends Controller
             ],
             'sekolah_id' => 'nullable|exists:sekolahs,id',
             'perusahaan_id' => 'nullable|exists:perusahaans,id',
+            // TAMBAHAN: Validasi password opsional
+            'password' => 'nullable|string|min:6|confirmed',
         ], [
-            'role.in' => 'Anda tidak memiliki izin untuk mengubah ke role ini.'
+            'role.in' => 'Anda tidak memiliki izin untuk mengubah ke role ini.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.min' => 'Password minimal 6 karakter.',
         ]);
 
-        // KEAMANAN: Paksa perusahaan_id sesuai role yang login
         $perusahaanId = Auth::user()->role === 'pembimbing' 
                         ? Auth::user()->perusahaan_id 
                         : $request->perusahaan_id;
@@ -215,7 +205,11 @@ class AdminController extends Controller
             'perusahaan_id' => $perusahaanId,
         ];
 
-        // LOGIKA TAMBAHAN: Jika role diubah jadi 'user' tapi belum punya kode_kartu
+        // TAMBAHAN: Jika password diisi, update password
+        if ($request->filled('password')) {
+            $dataUpdate['password'] = Hash::make($request->password);
+        }
+
         if ($request->role === 'user' && empty($pengguna->kode_kartu)) {
             $lastSiswa = User::where('role', 'user')
                              ->whereNotNull('kode_kartu')
@@ -233,19 +227,17 @@ class AdminController extends Controller
 
         $pengguna->update($dataUpdate);
 
-        // Redirect dinamis
         if (Auth::user()->role === 'pembimbing') {
             return redirect()->route('pembimbing.siswa.index')->with('success', 'Data pengguna berhasil diperbarui!');
         }
         return redirect('/admin/dashboard')->with('success', 'Data pengguna berhasil diperbarui!');
     }
 
-    // 8. Menghapus data
+    // 9. Menghapus data
     public function destroyUser($id)
     {
         $pengguna = User::findOrFail($id);
 
-        // KEAMANAN: Pembimbing tidak boleh menghapus user dari perusahaan lain
         if (Auth::user()->role === 'pembimbing' && $pengguna->perusahaan_id !== Auth::user()->perusahaan_id) {
             return back()->with('error', 'Anda tidak memiliki akses ke user ini.');
         }
@@ -256,7 +248,6 @@ class AdminController extends Controller
 
         $pengguna->delete();
 
-        // Redirect dinamis
         if (Auth::user()->role === 'pembimbing') {
             return redirect()->route('pembimbing.siswa.index')->with('success', 'Pengguna berhasil dihapus!');
         }

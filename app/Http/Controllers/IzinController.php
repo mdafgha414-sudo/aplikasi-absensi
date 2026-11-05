@@ -30,6 +30,25 @@ class IzinController extends Controller
             'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
+            // CEK APAKAH SUDAH ADA ABSEN DI TANGGAL TERSEBUT
+        $cekAbsen = \App\Models\Absensi::where('user_id', Auth::id())
+                                       ->where('tanggal', $request->tanggal_izin)
+                                       ->first();
+                                       
+        if ($cekAbsen) {
+            return back()->with('error', 'Anda sudah melakukan absensi di tanggal tersebut. Pengajuan izin dibatalkan.');
+        }
+
+          // CEK APAKAH SUDAH ADA PENGAJUAN IZIN DI TANGGAL TERSEBUT
+        $cekIzin = \App\Models\Izin::where('user_id', Auth::id())
+                                   ->where('tanggal_izin', $request->tanggal_izin)
+                                   ->first();
+
+        if ($cekIzin) {
+            return back()->with('error', 'Anda sudah mengajukan izin untuk tanggal tersebut.');
+        }
+
+
         if ($request->hasFile('lampiran')) {
             $data['lampiran'] = $request->file('lampiran')
                 ->store('lampiran-izin', 'public');

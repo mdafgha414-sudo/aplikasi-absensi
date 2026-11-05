@@ -136,6 +136,19 @@
                             <input type="email" name="email" class="form-control" value="{{ old('email', $pengguna->email) }}" required>
                         </div>
 
+                        <!-- TAMBAHAN: Password Baru (Opsional) -->
+                        <div class="mb-3">
+                            <label class="form-label">Password Baru <span class="text-muted fw-normal">(Opsional)</span></label>
+                            <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                            <small class="text-muted" style="font-size: 0.75rem;">*Biarkan kosong jika tidak ingin mengganti password lama.</small>
+                        </div>
+
+                        <!-- TAMBAHAN: Konfirmasi Password Baru -->
+                        <div class="mb-4">
+                            <label class="form-label">Konfirmasi Password Baru</label>
+                            <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password baru">
+                        </div>
+
                         <!-- DROPDOWN ROLE -->
                         <div class="mb-4">
                             <label class="form-label">Role / Jabatan</label>
