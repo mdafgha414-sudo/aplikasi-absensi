@@ -1,230 +1,369 @@
+
 @extends('layouts.app')
 
 @section('content')
-<div class="dashboard-wrapper py-4 px-3 px-lg-5">
-    
-    <!-- 1. Header Banner Welcome -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <!-- Banner Biru Muda -->
-            <div class="welcome-banner p-4 p-lg-5 rounded-4 position-relative overflow-hidden shadow-sm">
-                <div class="banner-overlay"></div>
-                <div class="row align-items-center position-relative z-2">
-                    <div class="col-lg-8 mb-3 mb-lg-0">
-                        <!-- Badge -->
-                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white text-primary fw-medium small mb-3">
-                            <span class="status-pulse"></span> Teacher Workspace
-                        </div>
-                        <!-- Judul & Teks -->
-                        <h2 class="fw-bold fs-2 text-dark mb-2 tracking-tight">
-                            Selamat Datang, {{ Auth::user()->name }} 
-                        </h2>
-                        <p class="text-secondary mb-0 fs-6 leading-relaxed">
-                            Kelola jurnal harian, beri penilaian aktivitas, dan setujui pengajuan izin siswa bimbingan PKL Anda dalam satu tempat.
-                        </p>
-                    </div>
-                    
-                    <!-- Kotak Status Kanan -->
-                    <div class="col-lg-4 text-lg-end">
-                        <div class="bg-white bg-opacity-50 rounded-4 p-3 d-inline-block text-center text-lg-start border border-white">
-                            <div class="small text-secondary fw-medium mb-1">Status Akun</div>
-                            <div class="fw-bold fs-6 text-primary"><i class="bi bi-shield-check me-1"></i> Guru</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. Ringkasan Statistik -->
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-sm-6 col-xl-4">
-            <div class="stat-card p-3 rounded-4 bg-white border border-slate-200 shadow-sm d-flex align-items-center gap-3">
-                <div class="stat-icon rounded-3 bg-primary-subtle text-primary p-3">
-                    <i class="bi bi-people-fill fs-4"></i>
-                </div>
-                <div>
-                    <span class="text-secondary small fw-medium d-block">Siswa Bimbingan</span>
-                    <h4 class="fw-bold mb-0 text-dark">Aktif PKL</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-4">
-            <div class="stat-card p-3 rounded-4 bg-white border border-slate-200 shadow-sm d-flex align-items-center gap-3">
-                <div class="stat-icon rounded-3 bg-warning-subtle text-warning p-3">
-                    <i class="bi bi-journal-text fs-4"></i>
-                </div>
-                <div>
-                    <span class="text-secondary small fw-medium d-block">Jurnal Aktivitas</span>
-                    <h4 class="fw-bold mb-0 text-dark">Periksa Harian</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-4">
-            <div class="stat-card p-3 rounded-4 bg-white border border-slate-200 shadow-sm d-flex align-items-center gap-3">
-                <div class="stat-icon rounded-3 bg-info-subtle text-info p-3">
-                    <i class="bi bi-envelope-paper-fill fs-4"></i>
-                </div>
-                <div>
-                    <span class="text-secondary small fw-medium d-block">Perizinan Siswa</span>
-                    <h4 class="fw-bold mb-0 text-dark">Validasi Surat</h4>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. Section Menu Utama Navigasi -->
-    <div class="row">
-        <div class="col-12 mb-3">
-            <h5 class="fw-bold text-dark mb-1">Menu Utama Navigasi</h5>
-            <p class="text-secondary small mb-0">Pilih salah satu tindakan di bawah untuk mulai mengelola siswa bimbingan</p>
-        </div>
-
-        <div class="col-12">
-            <div class="row g-4">
-
-                <!-- Card 1 -->
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ url('/guru/jurnal') }}" class="text-decoration-none action-card-link">
-                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card position-relative overflow-hidden">
-                            <div class="card-accent-line bg-indigo"></div>
-                            <div class="d-flex flex-column h-100 justify-content-between gap-4">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="action-icon-wrapper rounded-3 bg-indigo text-white d-flex align-items-center justify-content-center shadow-indigo">
-                                        <i class="bi bi-journal-check fs-3"></i>
-                                    </div>
-                                    <span class="arrow-badge rounded-circle bg-light d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-arrow-right text-dark fs-5"></i>
-                                    </span>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold text-dark mb-2 card-title-hover">Lihat Jurnal Siswa</h5>
-                                    <p class="text-secondary small mb-0 leading-relaxed">
-                                        Periksa catatan aktivitas harian siswa PKL, berikan ulasan, dan input nilai secara langsung.
-                                    </p>
-                                </div>
-                                <div class="pt-2 border-top border-light d-flex align-items-center justify-content-between text-indigo fw-semibold small">
-                                    <span>Buka Menu Jurnal</span>
-                                    <i class="bi bi-chevron-right fs-7"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ url('/guru/izin') }}" class="text-decoration-none action-card-link">
-                        <div class="card h-100 border-0 rounded-4 p-4 bg-white shadow-sm custom-action-card position-relative overflow-hidden">
-                            <div class="card-accent-line bg-teal"></div>
-                            <div class="d-flex flex-column h-100 justify-content-between gap-4">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="action-icon-wrapper rounded-3 bg-teal text-white d-flex align-items-center justify-content-center shadow-teal">
-                                        <i class="bi bi-calendar-check fs-3"></i>
-                                    </div>
-                                    <span class="arrow-badge rounded-circle bg-light d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-arrow-right text-dark fs-5"></i>
-                                    </span>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold text-dark mb-2 card-title-hover">Laporan Absensi</h5>
-                                    <p class="text-secondary small mb-0 leading-relaxed">
-                                        Pantau rekapitulasi kehadiran harian, ketidakhadiran, dan status akumulasi siswa.
-                                    </p>
-                                </div>
-                                <div class="pt-2 border-top border-light d-flex align-items-center justify-content-between text-teal fw-semibold small">
-                                    <span>Cek Rekap Absensi</span>
-                                    <i class="bi bi-chevron-right fs-7"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                
-
-            </div>
-        </div>
-    </div>
-</div>
 
 <style>
-    /* Global Container Background */
-    .dashboard-wrapper {
-        background-color: #f8fafc;
+    .guru-dashboard {
+        padding: 28px;
+        background: #f5f8fc;
         min-height: 100vh;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    /* Warna Biru Muda (Tanpa merusak teks) */
+    /* Banner Selamat Datang */
     .welcome-banner {
-        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-        border: 1px solid #7dd3fc;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(120deg, #e0f2fe, #bae6fd);
+        border: 1px solid #bae6fd;
+        border-radius: 20px;
+        padding: 42px 46px;
+        margin-bottom: 26px;
     }
 
-    .banner-overlay {
+    .welcome-banner::before {
+        content: "";
         position: absolute;
-        top: 0; right: 0; bottom: 0; left: 0;
-        background-image: 
-            radial-gradient(circle at 95% 10%, rgba(255, 255, 255, 0.4) 0%, transparent 40%),
-            radial-gradient(circle at 10% 90%, rgba(255, 255, 255, 0.3) 0%, transparent 35%);
-        pointer-events: none;
-    }
-
-    /* Live Pulse Indicator */
-    .status-pulse {
-        width: 8px; height: 8px;
-        background-color: #0284c7; /* Biru tua */
+        width: 230px;
+        height: 230px;
+        right: -50px;
+        top: -100px;
         border-radius: 50%;
+        background: rgba(255,255,255,.28);
+    }
+
+    .welcome-banner h2 {
+        font-size: 30px;
+        font-weight: 800;
+        color: #14233d;
+        margin-bottom: 10px;
+    }
+
+    .welcome-banner p {
+        color: #53677f;
+        font-size: 15px;
+        max-width: 700px;
+        margin: 0;
+    }
+
+    .welcome-label {
         display: inline-block;
-        box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7);
-        animation: pulse 1.8s infinite;
+        padding: 6px 15px;
+        border-radius: 30px;
+        background: white;
+        color: #0875df;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 15px;
     }
 
-    @keyframes pulse {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
-        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(2, 132, 199, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+    .welcome-icon {
+        width: 78px;
+        height: 78px;
+        background: rgba(255,255,255,.85);
+        color: #0784cf;
+        border-radius: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 36px;
+        box-shadow: 0 5px 18px rgba(0,0,0,.05);
+        position: relative;
+        z-index: 1;
     }
 
-    /* Stats Cards */
-    .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.04) !important; }
-
-    /* Custom Action Cards */
-    .custom-action-card {
-        border: 1px solid #e2e8f0 !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Judul Navigasi */
+    .navigation-heading {
+        margin: 32px 0 18px;
     }
 
-    .card-accent-line {
-        position: absolute; top: 0; left: 0; right: 0; height: 4px;
-        opacity: 0; transition: opacity 0.25s ease;
+    .navigation-heading h4 {
+        font-weight: 800;
+        color: #192b45;
+        font-size: 21px;
+        margin-bottom: 5px;
     }
 
-    .action-card-link:hover .custom-action-card {
+    .navigation-heading p {
+        color: #78889d;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    /* Kartu Navigasi */
+    .navigation-card {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background: #fff;
+        border: 1px solid #e7edf5;
+        border-radius: 18px;
+        padding: 24px;
+        min-height: 235px;
+        height: 100%;
+        text-decoration: none !important;
+        transition: all .25s ease;
+        box-shadow: 0 3px 9px rgba(30,50,80,.04);
+    }
+
+    .navigation-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.06), 0 10px 10px rgba(0, 0, 0, 0.04) !important;
+        box-shadow: 0 12px 28px rgba(30,50,80,.10);
+        border-color: #cbdcf3;
     }
 
-    .action-card-link:hover .card-accent-line { opacity: 1; }
-    .action-card-link:hover .arrow-badge { background-color: #4f46e5 !important; color: #ffffff !important; transform: translateX(3px); }
-    .action-card-link:hover .arrow-badge i { color: #ffffff !important; }
+    .navigation-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        margin-bottom: 22px;
+    }
 
-    .arrow-badge { width: 38px; height: 38px; transition: all 0.25s ease; }
-    .action-icon-wrapper { width: 52px; height: 52px; }
+    .icon-jurnal {
+        background: #ede9fe;
+        color: #5744e8;
+    }
 
-    /* Custom Color Accents */
-    .bg-indigo { background-color: #4f46e5 !important; }
-    .text-indigo { color: #4f46e5 !important; }
-    .shadow-indigo { box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25); }
+    .icon-absensi {
+        background: #ccfbf1;
+        color: #0d9488;
+    }
 
-    .bg-teal { background-color: #0d9488 !important; }
-    .text-teal { color: #0d9488 !important; }
-    .shadow-teal { box-shadow: 0 6px 16px rgba(13, 148, 136, 0.25); }
+    .icon-keterlambatan {
+        background: #ffedd5;
+        color: #ea850c;
+    }
 
-    .bg-amber { background-color: #d97706 !important; }
-    .text-amber { color: #d97706 !important; }
-    .shadow-amber { box-shadow: 0 6px 16px rgba(217, 119, 6, 0.25); }
+    .navigation-arrow {
+        position: absolute;
+        top: 28px;
+        right: 25px;
+        width: 37px;
+        height: 37px;
+        border-radius: 50%;
+        background: #f5f7fa;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        transition: all .2s ease;
+    }
+
+    .navigation-card:hover .navigation-arrow {
+        background: #eaf2ff;
+        color: #1769e8;
+        transform: translateX(3px);
+    }
+
+    .navigation-card h5 {
+        font-size: 19px;
+        font-weight: 800;
+        color: #17263d;
+        margin-bottom: 9px;
+    }
+
+    .navigation-card p {
+        font-size: 14px;
+        line-height: 1.7;
+        color: #78879a;
+        margin-bottom: 20px;
+    }
+
+    .navigation-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #f0f2f6;
+        padding-top: 14px;
+        margin-top: auto;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .link-jurnal {
+        color: #5744e8;
+    }
+
+    .link-absensi {
+        color: #0d9488;
+    }
+
+    .link-keterlambatan {
+        color: #ea850c;
+    }
+
+    /* Kartu ketiga */
+    .card-keterlambatan {
+        min-height: 190px;
+    }
+
+    @media(max-width: 768px) {
+        .guru-dashboard {
+            padding: 15px;
+        }
+
+        .welcome-banner {
+            padding: 28px 23px;
+        }
+
+        .welcome-banner h2 {
+            font-size: 23px;
+        }
+
+        .welcome-icon {
+            display: none;
+        }
+
+        .navigation-heading h4 {
+            font-size: 19px;
+        }
+
+        .navigation-card {
+            min-height: 215px;
+        }
+    }
 </style>
+
+<div class="guru-dashboard">
+
+    {{-- BANNER SELAMAT DATANG --}}
+    <div class="welcome-banner d-flex justify-content-between align-items-center">
+
+        <div style="position: relative; z-index: 1;">
+
+            <span class="welcome-label">
+                <i class="bi bi-circle-fill me-1" style="font-size: 9px;"></i>
+                Teacher Workspace
+            </span>
+
+            <h2>Selamat Datang, guru</h2>
+
+            <p>
+                Kelola jurnal harian, pantau kehadiran, dan periksa
+                alasan keterlambatan siswa PKL Anda dalam satu tempat.
+            </p>
+
+        </div>
+
+        <div class="welcome-icon">
+            <i class="bi bi-clipboard-check"></i>
+        </div>
+
+    </div>
+
+
+    {{-- JUDUL NAVIGASI --}}
+    <div class="navigation-heading">
+        <h4>Menu Utama Navigasi</h4>
+        <p>
+            Pilih salah satu tindakan di bawah untuk mulai mengelola
+            siswa bimbingan PKL Anda.
+        </p>
+    </div>
+
+
+    {{-- BARIS PERTAMA: JURNAL DAN ABSENSI --}}
+    <div class="row g-4">
+
+        {{-- KARTU JURNAL --}}
+        <div class="col-lg-4 col-md-6">
+
+            <a href="{{ url('/guru/jurnal') }}"
+               class="navigation-card">
+
+                <div class="navigation-icon icon-jurnal">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+
+                <div class="navigation-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+
+                <h5>Lihat Jurnal Siswa</h5>
+
+                <p>
+                    Periksa catatan aktivitas harian siswa PKL,
+                    berikan ulasan, dan input nilai secara langsung.
+                </p>
+
+                <div class="navigation-link link-jurnal">
+                    <span>Buka Menu Jurnal</span>
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+
+            </a>
+
+        </div>
+
+
+        {{-- KARTU ABSENSI --}}
+        <div class="col-lg-4 col-md-6">
+
+            <a href="{{ url('/guru/laporan-absensi-izin') }}"
+               class="navigation-card">
+
+                <div class="navigation-icon icon-absensi">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+
+                <div class="navigation-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+
+                <h5>Laporan Absensi</h5>
+
+                <p>
+                    Pantau rekapitulasi kehadiran harian,
+                    ketidakhadiran, dan status akumulasi siswa.
+                </p>
+
+                <div class="navigation-link link-absensi">
+                    <span>Cek Rekap Absensi</span>
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+
+            </a>
+
+        </div>
+
+
+        {{-- KARTU ALASAN KETERLAMBATAN --}}
+        <div class="col-lg-4 col-md-6">
+
+            <a href="{{ url('/guru/alasan-keterlambatan') }}"
+               class="navigation-card card-keterlambatan">
+
+                <div class="navigation-icon icon-keterlambatan">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div class="navigation-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+
+                <h5>Alasan Keterlambatan</h5>
+
+                <p>
+                    Lihat dan periksa alasan keterlambatan siswa PKL,
+                    serta pantau catatan keterlambatan setiap siswa.
+                </p>
+
+                <div class="navigation-link link-keterlambatan">
+                    <span>Lihat Alasan Keterlambatan</span>
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
 @endsection

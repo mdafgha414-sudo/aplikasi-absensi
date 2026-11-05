@@ -1,170 +1,718 @@
-@extends('layouts.app') {{-- Sesuaikan dengan nama layout Anda --}}
+
+@extends('layouts.app')
 
 @section('content')
-<div class="container-fluid px-4 py-3">
 
-    <!-- 1. Header Banner Modern (Nuansa Biru Soft) -->
-    <div class="card border-0 rounded-4 shadow-sm mb-4 position-relative overflow-hidden" 
-         style="background: #e0f2fe !important; border: 1px solid #bae6fd !important;">
-        <div class="card-body p-4 p-lg-5">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    
-                    <h2 class="fw-bold mb-2" style="color: #0f172a;">Pengajuan Izin & Sakit</h2>
-                    <p class="mb-0 fs-6" style="color: #334155;">
-                        Ajukan izin ketidakhadiran Anda selama kegiatan PKL dengan mengisi formulir di bawah ini secara lengkap.
-                    </p>
-                </div>
-                <div class="col-md-4 text-center text-md-end d-none d-md-block">
-                    <i class="bi bi-envelope-paper-fill display-1 opacity-25" style="color: #0284c7;"></i>
-                </div>
+<style>
+    .izin-page {
+        padding: 25px;
+        background: #f4f8fd;
+        min-height: 100vh;
+    }
+
+    /* HEADER */
+    .izin-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 35px 40px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+        background: linear-gradient(110deg, #0875ed, #079bea, #48c6f5);
+        box-shadow: 0 8px 22px rgba(0, 112, 220, .15);
+        color: white;
+    }
+
+    .izin-hero::before {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        right: 120px;
+        top: -170px;
+        border: 35px solid rgba(255,255,255,.10);
+        border-radius: 50%;
+    }
+
+    .izin-hero::after {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        right: -60px;
+        bottom: -130px;
+        background: rgba(255,255,255,.12);
+        border-radius: 50%;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-label {
+        display: inline-block;
+        padding: 7px 16px;
+        background: rgba(255,255,255,.22);
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .izin-hero h2 {
+        font-size: 30px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .izin-hero p {
+        margin: 0;
+        font-size: 14px;
+        color: rgba(255,255,255,.92);
+    }
+
+    .hero-icon {
+        font-size: 80px;
+        color: rgba(255,255,255,.85);
+        position: relative;
+        z-index: 2;
+    }
+
+    /* CARD */
+    .izin-card {
+        background: #fff;
+        border: 1px solid #e8eef6;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 5px 20px rgba(40,70,110,.05);
+    }
+
+    .form-heading {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding-bottom: 20px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid #e8eef6;
+    }
+
+    .form-heading-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e3f2ff;
+        color: #087fe5;
+        font-size: 27px;
+    }
+
+    .form-heading h4 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #172c4d;
+        margin-bottom: 4px;
+    }
+
+    .form-heading p {
+        font-size: 13px;
+        color: #718198;
+        margin: 0;
+    }
+
+    /* INPUT */
+    .izin-form label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #243958;
+        margin-bottom: 9px;
+    }
+
+    .required {
+        color: #ef4444;
+    }
+
+    .izin-form .form-control,
+    .izin-form .form-select {
+        border: 1px solid #dce5f0;
+        border-radius: 11px;
+        padding: 11px 14px;
+        font-size: 14px;
+        color: #334968;
+        background-color: #fbfcfe;
+        transition: .2s;
+    }
+
+    .izin-form .form-control:focus,
+    .izin-form .form-select:focus {
+        border-color: #1685ed;
+        box-shadow: 0 0 0 3px rgba(22,133,237,.10);
+        background: #fff;
+    }
+
+    .izin-form textarea {
+        min-height: 125px;
+        resize: vertical;
+    }
+
+    .form-hint {
+        font-size: 12px;
+        color: #8190a5;
+        margin-top: 7px;
+    }
+
+    .char-count {
+        text-align: right;
+        font-size: 12px;
+        color: #8190a5;
+        margin-top: 5px;
+    }
+
+    /* UPLOAD */
+    .upload-area {
+        border: 2px dashed #a7ccfa;
+        background: #f4f9ff;
+        border-radius: 15px;
+        min-height: 130px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 22px;
+        cursor: pointer;
+        text-align: center;
+        transition: .2s;
+    }
+
+    .upload-area:hover {
+        background: #eaf4ff;
+        border-color: #1685ed;
+    }
+
+    .upload-area i {
+        font-size: 38px;
+        color: #087fe5;
+        margin-bottom: 10px;
+    }
+
+    .upload-area strong {
+        font-size: 14px;
+        color: #253c5e;
+    }
+
+    .upload-area span {
+        font-size: 12px;
+        color: #8190a5;
+        margin-top: 5px;
+    }
+
+    #fileName {
+        color: #087fe5;
+        font-weight: 600;
+        margin-top: 8px;
+        font-size: 12px;
+    }
+
+    /* BUTTON */
+    .btn-reset {
+        padding: 11px 23px;
+        border-radius: 11px;
+        background: white;
+        border: 1px solid #1685ed;
+        color: #0875df;
+        font-weight: 600;
+    }
+
+    .btn-reset:hover {
+        background: #edf6ff;
+        color: #075bb5;
+    }
+
+    .btn-submit {
+        padding: 12px 25px;
+        border-radius: 11px;
+        border: none;
+        color: white;
+        font-weight: 700;
+        background: linear-gradient(110deg, #0875ed, #0861dc);
+        box-shadow: 0 5px 12px rgba(0,100,220,.17);
+        transition: .2s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 17px rgba(0,100,220,.23);
+        color: white;
+    }
+
+    /* KETENTUAN */
+    .rules-card {
+        background: white;
+        border: 1px solid #e8eef6;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(40,70,110,.05);
+    }
+
+    .rules-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .rules-heading i {
+        color: #087fe5;
+        font-size: 24px;
+    }
+
+    .rules-heading h5 {
+        font-size: 17px;
+        font-weight: 800;
+        color: #172c4d;
+        margin: 0;
+    }
+
+    .rule-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        margin-bottom: 19px;
+    }
+
+    .rule-item i {
+        color: #0eaa82;
+        font-size: 16px;
+        margin-top: 3px;
+    }
+
+    .rule-item p {
+        color: #62748c;
+        font-size: 13px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .rule-item strong {
+        color: #263d5c;
+    }
+
+    .rules-illustration {
+        text-align: center;
+        padding: 15px 0;
+        margin-top: 15px;
+        background: linear-gradient(180deg, #f5faff, #e7f3ff);
+        border-radius: 15px;
+    }
+
+    .rules-illustration i {
+        font-size: 75px;
+        color: #1685ed;
+    }
+
+    .rules-illustration p {
+        color: #31547e;
+        font-size: 13px;
+        font-weight: 600;
+        margin: 10px 0 0;
+    }
+
+    .info-box {
+        padding: 15px;
+        border-radius: 13px;
+        background: #eaf4ff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .info-box i {
+        color: #0875df;
+        font-size: 21px;
+    }
+
+    .info-box p {
+        color: #416184;
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* RESPONSIVE */
+    @media(max-width: 992px) {
+        .izin-hero {
+            padding: 28px;
+        }
+
+        .rules-card {
+            margin-top: 5px;
+        }
+    }
+
+    @media(max-width: 576px) {
+        .izin-page {
+            padding: 14px;
+        }
+
+        .izin-hero {
+            padding: 25px 20px;
+        }
+
+        .izin-hero h2 {
+            font-size: 23px;
+        }
+
+        .hero-icon {
+            display: none;
+        }
+
+        .izin-card,
+        .rules-card {
+            padding: 19px;
+        }
+
+        .form-heading h4 {
+            font-size: 17px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            gap: 10px;
+        }
+
+        .form-actions button {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="izin-page">
+
+    {{-- HEADER --}}
+    <div class="izin-hero">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div class="hero-content">
+
+                <span class="hero-label">
+                    <i class="bi bi-send me-1"></i>
+                    Pengajuan Izin & Sakit
+                </span>
+
+                <h2>Pengajuan Izin & Sakit</h2>
+
+                <p>
+                    Ajukan izin ketidakhadiran Anda dengan mudah
+                    dan cepat melalui formulir berikut.
+                </p>
+
             </div>
+
+            <div class="hero-icon">
+                <i class="bi bi-clipboard2-check"></i>
+            </div>
+
         </div>
+
     </div>
 
-    <!-- 2. Main Card Form -->
-    <div class="row">
+
+    <div class="row g-4">
+
+        {{-- FORM PENGAJUAN --}}
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-body p-4 p-md-5">
-                    
-                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                        {{-- Ikon Form jadi Biru Soft --}}
-                        <div class="rounded-3 p-3 me-3" style="background: #e0f2fe; color: #0284c7;">
-                            <i class="bi bi-pencil-square fs-3"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-1 text-dark">Formulir Pengajuan</h5>
-                            <p class="text-muted small mb-0">Isi data dengan benar sebelum mengirim pengajuan izin Anda.</p>
-                        </div>
+
+            <div class="izin-card">
+
+                <div class="form-heading">
+
+                    <div class="form-heading-icon">
+                        <i class="bi bi-send"></i>
                     </div>
 
-                    <form action="{{ route('izin.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                    <div>
+                        <h4>Form Pengajuan</h4>
+                        <p>Isi formulir di bawah ini dengan lengkap dan benar.</p>
+                    </div>
 
-                        <!-- Field: Jenis Izin & Tanggal -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="jenis_izin" class="form-label fw-semibold text-secondary">
-                                    Jenis Izin <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0 text-muted">
-                                        <i class="bi bi-tag"></i>
-                                    </span>
-                                    <select name="jenis_izin" id="jenis_izin" class="form-select bg-light border-start-0 ps-0" required>
-                                        <option value="" disabled selected>Pilih jenis izin...</option>
-                                        <option value="Izin">Izin (Kepentingan/Urusan)</option>
-                                        <option value="Sakit">Sakit (Memerlukan Surat Dokter)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="tanggal_izin" class="form-label fw-semibold text-secondary">
-                                    Tanggal Izin <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0 text-muted">
-                                        <i class="bi bi-calendar3"></i>
-                                    </span>
-                                    <input type="date" name="tanggal_izin" id="tanggal_izin" class="form-control bg-light border-start-0 ps-0" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Field: Alasan Izin -->
-                        <div class="mb-4">
-                            <label for="alasan" class="form-label fw-semibold text-secondary">
-                                Alasan Izin <span class="text-danger">*</span>
-                            </label>
-                            <textarea name="alasan" id="alasan" rows="4" maxlength="500" class="form-control bg-light p-3" 
-                                      placeholder="Jelaskan alasan detail pengajuan izin kamu di sini..." required></textarea>
-                            <div class="d-flex justify-content-between mt-1">
-                                <span class="text-muted small">Berikan alasan yang meyakinkan & jelas.</span>
-                                <span class="text-muted small"><span id="charCount">0</span>/500 karakter</span>
-                            </div>
-                        </div>
-
-                        <!-- Field: Upload Lampiran Custom -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold text-secondary">
-                                Lampiran / Surat Dokter <span class="text-muted fw-normal">(Opsional)</span>
-                            </label>
-                            <div class="border border-2 border-dashed rounded-4 p-4 text-center bg-light position-relative" id="dropArea">
-                                <i class="bi bi-cloud-arrow-up display-5 mb-2" style="color: #0284c7;"></i>
-                                <p class="fw-semibold mb-1 text-dark">Klik atau seret file ke sini untuk mengunggah</p>
-                                <p class="text-muted small mb-0">Format yang didukung: JPG, PNG, PDF (Maksimal 2MB)</p>
-                                <input type="file" name="lampiran" id="lampiran" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer">
-                            </div>
-                            <div id="fileInfo" class="mt-2 text-success small fw-semibold d-none">
-                                <i class="bi bi-check-circle me-1"></i> File terpilih: <span id="fileName"></span>
-                            </div>
-                        </div>
-
-                        <!-- Tombol Action -->
-                        <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
-                            <button type="reset" class="btn btn-light rounded-3 px-4 fw-medium text-secondary">
-                                Batal
-                            </button>
-                            {{-- Tombol Kirim jadi Biru --}}
-                            <button type="submit" class="btn rounded-3 px-4 py-2 fw-semibold shadow-sm text-white" style="background: #0284c7; border: none;">
-                                <i class="bi bi-send me-1"></i> Kirim Pengajuan
-                            </button>
-                        </div>
-
-                    </form>
                 </div>
+
+
+                {{-- 
+                    SESUAIKAN ACTION DAN NAMA INPUT
+                    DENGAN ROUTE DAN CONTROLLER ASLI
+                --}}
+                <form
+                    action="{{ url('/izin') }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="izin-form"
+                    id="izinForm"
+                >
+
+                    @csrf
+
+                    <div class="row g-4">
+
+                        {{-- JENIS IZIN --}}
+                        <div class="col-md-6">
+
+                            <label>
+                                Jenis Izin <span class="required">*</span>
+                            </label>
+
+                            <select
+                                name="jenis_izin"
+                                class="form-select"
+                                required
+                            >
+                                <option value="">Pilih jenis izin...</option>
+                                <option value="Izin">Izin</option>
+                                <option value="Sakit">Sakit</option>
+                            </select>
+
+                        </div>
+
+
+                        {{-- TANGGAL --}}
+                        <div class="col-md-6">
+
+                            <label>
+                                Tanggal Izin <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="date"
+                                name="tanggal_izin"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        {{-- ALASAN --}}
+                        <div class="col-12">
+
+                            <label>
+                                Alasan Izin <span class="required">*</span>
+                            </label>
+
+                            <textarea
+                                name="alasan"
+                                id="alasanIzin"
+                                class="form-control"
+                                maxlength="500"
+                                placeholder="Jelaskan alasan izin Anda di sini..."
+                                required
+                            ></textarea>
+
+                            <div class="d-flex justify-content-between">
+                                <span class="form-hint">
+                                    Berikan alasan yang jelas dan lengkap.
+                                </span>
+
+                                <span class="char-count">
+                                    <span id="charCount">0</span>/500 karakter
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        {{-- LAMPIRAN --}}
+                        <div class="col-12">
+
+                            <label>
+                                Lampiran / Surat Dokter
+                                <span class="text-muted fw-normal">(Opsional)</span>
+                            </label>
+
+                            <label for="lampiran" class="upload-area w-100">
+
+                                <i class="bi bi-cloud-arrow-up"></i>
+
+                                <strong>
+                                    Klik atau seret file ke sini untuk mengunggah
+                                </strong>
+
+                                <span>
+                                    Format: PDF, JPG, PNG | Maksimal 5MB
+                                </span>
+
+                                <div id="fileName"></div>
+
+                            </label>
+
+                            <input
+                                type="file"
+                                name="lampiran"
+                                id="lampiran"
+                                class="d-none"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                            >
+
+                        </div>
+
+
+                        {{-- TOMBOL --}}
+                        <div class="col-12">
+
+                            <div class="d-flex justify-content-between align-items-center form-actions">
+
+                                <button
+                                    type="reset"
+                                    class="btn btn-reset"
+                                    id="resetBtn"
+                                >
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                    Reset
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-submit"
+                                >
+                                    <i class="bi bi-send me-2"></i>
+                                    Kirim Pengajuan
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
             </div>
+
         </div>
 
-        <!-- 3. Sidebar Widget InformasiTambahan (Opsional) -->
+
+        {{-- PANEL KETENTUAN --}}
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
-                <h6 class="fw-bold text-dark mb-3">
-                    <i class="bi bi-info-circle me-2" style="color: #0284c7;"></i>Ketentuan Pengajuan
-                </h6>
-                <ul class="list-unstyled mb-0 small text-muted">
-                    <li class="mb-3 d-flex align-items-start">
-                        <i class="bi bi-check2-circle text-success me-2 fs-6"></i>
-                        <span>Pengajuan izin minimal dilakukan <strong>1 hari sebelum</strong> tanggal ketidakhadiran (kecuali sakit mendadak).</span>
-                    </li>
-                    <li class="mb-3 d-flex align-items-start">
-                        <i class="bi bi-check2-circle text-success me-2 fs-6"></i>
-                        <span>Jika sakit lebih dari 2 hari, wajib melampirkan <strong>Surat Keterangan Dokter</strong>.</span>
-                    </li>
-                    <li class="d-flex align-items-start">
-                        <i class="bi bi-check2-circle text-success me-2 fs-6"></i>
-                        <span>Status pengajuan dapat dipantau di menu <strong>Riwayat Absensi</strong>.</span>
-                    </li>
-                </ul>
+
+            <div class="rules-card">
+
+                <div class="rules-heading">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <h5>Ketentuan Pengajuan</h5>
+                </div>
+
+
+                <div class="rule-item">
+                    <i class="bi bi-check-circle"></i>
+                    <p>
+                        Pengajuan izin minimal dilakukan
+                        <strong>1 hari sebelum</strong>
+                        tanggal ketidakhadiran (kecuali sakit mendadak).
+                    </p>
+                </div>
+
+
+                <div class="rule-item">
+                    <i class="bi bi-check-circle"></i>
+                    <p>
+                        Jika sakit lebih dari 2 hari, wajib
+                        melampirkan <strong>Surat Keterangan Dokter.</strong>
+                    </p>
+                </div>
+
+
+                <div class="rule-item">
+                    <i class="bi bi-check-circle"></i>
+                    <p>
+                        Status pengajuan dapat dipantau
+                        di menu <strong>Riwayat Absensi.</strong>
+                    </p>
+                </div>
+
+
+                <div class="rules-illustration">
+                    <i class="bi bi-calendar2-check"></i>
+                    <p>
+                        Ajukan dengan mudah,<br>
+                        pantau statusnya secara real-time!
+                    </p>
+                </div>
+
+
+                <div class="info-box">
+                    <i class="bi bi-info-circle"></i>
+                    <p>
+                        Pastikan pengajuan Anda sesuai
+                        dengan ketentuan yang berlaku.
+                    </p>
+                </div>
+
             </div>
+
         </div>
+
     </div>
 
 </div>
 
-<!-- JavaScript Sederhana untuk Penghitung Karakter & Preview File -->
+
 <script>
-    // Live Character Counter
-    const textarea = document.getElementById('alasan');
+    // HITUNG KARAKTER ALASAN
+    const alasan = document.getElementById('alasanIzin');
     const charCount = document.getElementById('charCount');
-    textarea.addEventListener('input', () => {
-        charCount.textContent = textarea.value.length;
+
+    alasan.addEventListener('input', function () {
+        charCount.textContent = this.value.length;
     });
 
-    // File Input Name Display
-    const fileInput = document.getElementById('lampiran');
-    const fileInfo = document.getElementById('fileInfo');
+
+    // TAMPILKAN NAMA FILE
+    const lampiran = document.getElementById('lampiran');
     const fileName = document.getElementById('fileName');
 
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            fileName.textContent = e.target.files[0].name;
-            fileInfo.classList.remove('d-none');
-        } else {
-            fileInfo.classList.add('d-none');
+    lampiran.addEventListener('change', function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            fileName.textContent = '';
+            return;
         }
+
+        const allowedTypes = [
+            'application/pdf',
+            'image/jpeg',
+            'image/png'
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert('Format file harus PDF, JPG, atau PNG.');
+            this.value = '';
+            fileName.textContent = '';
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Ukuran file maksimal 5MB.');
+            this.value = '';
+            fileName.textContent = '';
+            return;
+        }
+
+        fileName.textContent = 'File dipilih: ' + file.name;
+    });
+
+
+    // RESET FORM
+    document.getElementById('izinForm').addEventListener('reset', function () {
+        setTimeout(function () {
+            charCount.textContent = '0';
+            fileName.textContent = '';
+        }, 0);
     });
 </script>
+
 @endsection
