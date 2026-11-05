@@ -91,6 +91,20 @@
         background: #f4f8fe;
         color: #628fc7;
     }
+
+    .btn-eye {
+        background: #fff;
+        border: 1px solid #dce9f8;
+        border-left: none;
+        color: #8b9bb2;
+        border-radius: 0 10px 10px 0;
+        cursor: pointer;
+    }
+
+    .btn-eye:hover {
+        background: #f4f8fe;
+        color: #52627a;
+    }
 </style>
 
 <div class="edit-container">
@@ -136,17 +150,27 @@
                             <input type="email" name="email" class="form-control" value="{{ old('email', $pengguna->email) }}" required>
                         </div>
 
-                        <!-- TAMBAHAN: Password Baru (Opsional) -->
+                        <!-- TAMBAHAN: Password Baru (Opsional) dengan Ikon Mata -->
                         <div class="mb-3">
                             <label class="form-label">Password Baru <span class="text-muted fw-normal">(Opsional)</span></label>
-                            <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                            <div class="input-group">
+                                <input type="password" name="password" id="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password" style="border-radius: 10px 0 0 10px;">
+                                <button class="btn btn-eye" type="button" onclick="togglePassword('password', 'eyeIcon1')">
+                                    <i class="bi bi-eye-slash" id="eyeIcon1"></i>
+                                </button>
+                            </div>
                             <small class="text-muted" style="font-size: 0.75rem;">*Biarkan kosong jika tidak ingin mengganti password lama.</small>
                         </div>
 
-                        <!-- TAMBAHAN: Konfirmasi Password Baru -->
+                        <!-- TAMBAHAN: Konfirmasi Password Baru dengan Ikon Mata -->
                         <div class="mb-4">
                             <label class="form-label">Konfirmasi Password Baru</label>
-                            <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password baru">
+                            <div class="input-group">
+                                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Ulangi password baru" style="border-radius: 10px 0 0 10px;">
+                                <button class="btn btn-eye" type="button" onclick="togglePassword('password_confirmation', 'eyeIcon2')">
+                                    <i class="bi bi-eye-slash" id="eyeIcon2"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- DROPDOWN ROLE -->
@@ -204,8 +228,24 @@
     </div>
 </div>
 
-{{-- JavaScript untuk menampilkan/menyembunyikan input --}}
+{{-- JavaScript untuk menampilkan/menyembunyikan input dan password --}}
 <script>
+    // Fungsi toggle visibilitas password
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        }
+    }
+
     function toggleForm() {
         const role = document.getElementById('roleSelect').value;
         const sekolahContainer = document.getElementById('sekolahContainer');
