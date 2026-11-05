@@ -26,6 +26,95 @@
     </div>
 
     <!-- 2. Section Menu Utama Navigasi -->
+         <!-- 2. Statistik Dashboard Pembimbing -->
+    <!-- Menampilkan ringkasan data jurnal dan siswa dari database -->
+    <div class="row g-3 mb-4">
+
+        <!-- Statistik: Total Siswa PKL -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-secondary small mb-2">Total Siswa PKL</p>
+                            <h3 class="fw-bold text-dark mb-0">
+                                {{ $totalSiswa ?? 0 }}
+                            </h3>
+                        </div>
+
+                        <div class="rounded-3 d-flex align-items-center justify-content-center"
+                             style="width: 48px; height: 48px; background: #e0f2fe; color: #0284c7;">
+                            <i class="bi bi-people-fill fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistik: Total Jurnal -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-secondary small mb-2">Total Jurnal</p>
+                            <h3 class="fw-bold text-dark mb-0">
+                                {{ $totalJurnal ?? 0 }}
+                            </h3>
+                        </div>
+
+                        <div class="rounded-3 d-flex align-items-center justify-content-center"
+                             style="width: 48px; height: 48px; background: #f3e8ff; color: #9333ea;">
+                            <i class="bi bi-journal-text fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistik: Jurnal yang Belum Dinilai -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-secondary small mb-2">Belum Dinilai</p>
+                            <h3 class="fw-bold text-dark mb-0">
+                                {{ $jurnalBelumDinilai ?? 0 }}
+                            </h3>
+                        </div>
+
+                        <div class="rounded-3 d-flex align-items-center justify-content-center"
+                             style="width: 48px; height: 48px; background: #fef3c7; color: #d97706;">
+                            <i class="bi bi-clock-history fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistik: Jurnal yang Sudah Dinilai -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-secondary small mb-2">Sudah Dinilai</p>
+                            <h3 class="fw-bold text-dark mb-0">
+                                {{ $jurnalSudahDinilai ?? 0 }}
+                            </h3>
+                        </div>
+
+                        <div class="rounded-3 d-flex align-items-center justify-content-center"
+                             style="width: 48px; height: 48px; background: #dcfce7; color: #16a34a;">
+                            <i class="bi bi-check-circle-fill fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
     <div class="row mb-4">
         <div class="col-12 mb-3">
             <h5 class="fw-bold text-dark mb-1">Menu Utama</h5>
@@ -208,10 +297,15 @@
                                         </span>
                                     </td>
                                     <td>
-                                        @if($jurnal->nilai)
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Sudah Dinilai</span>
+                                        {{-- Menentukan status berdasarkan apakah nilai sudah tersimpan --}}
+                                        @if($jurnal->nilai !== null)
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                Sudah Dinilai
+                                            </span>
                                         @else
-                                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">Belum Dinilai</span>
+                                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">
+                                                Belum Dinilai
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="text-end">
