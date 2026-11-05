@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -129,15 +128,11 @@
                 Jurnal telah dinilai
             </div>
 
-            {{-- Progress bar mengikuti persentase penilaian --}}
-            <div
-                class="summary-progress"
-                role="progressbar"
-                aria-valuenow="{{ $persentaseJurnal }}"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-label="Persentase jurnal yang sudah dinilai"
-            >
+            {{-- 
+                Progress bar mengikuti persentase penilaian.
+                Ditulis dalam satu baris agar tidak memicu error di VS Code.
+            --}}
+            <div class="summary-progress" role="progressbar" aria-valuenow="{{ $persentaseJurnal }}" aria-valuemin="0" aria-valuemax="100" aria-label="Persentase jurnal yang sudah dinilai">
                 <div style="width: {{ $persentaseJurnal }}%"></div>
             </div>
 
