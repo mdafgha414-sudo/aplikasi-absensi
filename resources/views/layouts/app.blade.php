@@ -294,7 +294,59 @@
                 
                 <li><a href="{{ route('pembimbing.laporan-absensi') }}" class="{{ request()->routeIs('pembimbing.laporan-absensi') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Laporan Absensi</a></li>
                 
-                <li><a href="{{ route('pembimbing.izin') }}" class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Daftar Izin Siswa</a></li>
+                <li>
+                    <a href="{{ route('pembimbing.izin') }}"
+                    class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"
+                    style="display: flex; align-items: center;">
+
+                        {{-- IKON AMPlOP + NOTIFIKASI --}}
+                        <span style="
+                            position: relative;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 24px;
+                            height: 24px;
+                            flex-shrink: 0;
+                            margin-right: 12px;
+                        ">
+
+                            <i class="bi bi-envelope-paper"
+                            style="margin: 0; font-size: 18px; width: auto;">
+                            </i>
+
+                            @if(isset($jumlahIzinPending) && $jumlahIzinPending > 0)
+
+                                <span style="
+                                    position: absolute;
+                                    top: -7px;
+                                    right: -7px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    min-width: 18px;
+                                    height: 18px;
+                                    padding: 0 3px;
+                                    background-color: #ef4444;
+                                    color: #ffffff;
+                                    font-size: 10px;
+                                    font-weight: 800;
+                                    line-height: 1;
+                                    border-radius: 50%;
+                                    border: 2px solid #e0f2fe;
+                                    z-index: 999;
+                                ">
+                                    {{ $jumlahIzinPending }}
+                                </span>
+
+                            @endif
+
+                        </span>
+
+                        <span>Daftar Izin Siswa</span>
+
+                    </a>
+                </li>
 
                 <li><a href="{{ route('pembimbing.keterlambatan.index') }}" class="{{ request()->routeIs('pembimbing.keterlambatan.*') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Keterlambatan Siswa</a></li>
             @endif
