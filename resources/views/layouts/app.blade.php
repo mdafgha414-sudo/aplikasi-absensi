@@ -263,6 +263,20 @@
             {{-- MENU PEMBIMBING --}}
             @if(Auth::user()->role === 'pembimbing')
                 <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
+
+                  <!-- MENU MANAJEMEN SISWA -->
+                <li class="menu-label mt-2">Manajemen Data</li>
+                <li>
+                    <a href="{{ route('pembimbing.siswa.index') }}" class="{{ request()->routeIs('pembimbing.siswa*') ? 'active' : '' }}">
+                        <i class="bi bi-people-fill"></i> Manajemen Siswa
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('pembimbing.sekolah.index') }}" class="{{ request()->routeIs('pembimbing.sekolah*') ? 'active' : '' }}">
+                        <i class="bi bi-building"></i> Manajemen Sekolah
+                    </a>
+                </li>
+
                 
                 <li>
                     <a href="{{ route('pembimbing.scan.index') }}" class="{{ request()->routeIs('pembimbing.scan*') ? 'active' : '' }}">
@@ -288,6 +302,17 @@
             {{-- MENU ADMIN --}}
             @if(Auth::user()->role === 'admin')
                 <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
+                  <!-- TAMBAHKAN MENU INI -->
+                <li>
+                    <a href="{{ route('admin.perusahaan.index') }}" class="{{ request()->routeIs('admin.perusahaan*') ? 'active' : '' }}">
+                        <i class="bi bi-buildings"></i> Manajemen Perusahaan
+                    </a>
+                </li>
+                <li>
+    <a href="{{ route('admin.siswa.index') }}" class="{{ request()->routeIs('admin.siswa*') ? 'active' : '' }}">
+        <i class="bi bi-people-fill"></i> Manajemen Siswa
+    </a>
+</li>
                 <li>
                     <a href="{{ route('qr.index') }}" class="{{ request()->routeIs('qr.*') ? 'active' : '' }}">
                         <i class="bi bi-printer"></i> Cetak Kartu QR Siswa

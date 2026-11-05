@@ -14,6 +14,7 @@ use App\Http\Controllers\AlasanKeterlambatanController;
 use App\Http\Controllers\Pembimbing\ScanKartuController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\Admin\SekolahController;
+use App\Http\Controllers\Admin\PerusahaanController; // <-- TAMBAHAN
 
 // ==========================================
 // ROUTE PUBLIK
@@ -31,7 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // --- FITUR CETAK QR (ADMIN & PEMBIMBING) ---
+    // --- FITUR CETAK QR ---
     Route::get('/cetak-qr', [QrController::class, 'index'])->name('qr.index');
     Route::get('/cetak-qr/{id}', [QrController::class, 'show'])->name('qr.show');
 
@@ -107,6 +108,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/scan-kartu', [ScanKartuController::class, 'index'])->name('scan.index');
         Route::post('/scan-kartu/cek', [ScanKartuController::class, 'cekKartu'])->name('scan.cek');
         Route::post('/scan-kartu/simpan', [ScanKartuController::class, 'simpanAbsen'])->name('scan.simpan');
+
+        // MANAJEMEN SISWA (PEMBIMBING)
+        Route::get('/manajemen-siswa', [AdminController::class, 'manajemenSiswa'])->name('siswa.index');
+        Route::get('/manajemen-siswa/tambah', [AdminController::class, 'createUser'])->name('siswa.create');
+        Route::post('/manajemen-siswa/tambah', [AdminController::class, 'storeUser'])->name('siswa.store');
+        Route::get('/manajemen-siswa/edit/{id}', [AdminController::class, 'editUser'])->name('siswa.edit');
+        Route::put('/manajemen-siswa/edit/{id}', [AdminController::class, 'updateUser'])->name('siswa.update');
+        Route::delete('/manajemen-siswa/hapus/{id}', [AdminController::class, 'destroyUser'])->name('siswa.destroy');
+
+        // MANAJEMEN SEKOLAH (PEMBIMBING)
+        Route::prefix('sekolah')->name('sekolah.')->group(function () {
+            Route::get('/', [SekolahController::class, 'index'])->name('index');
+            Route::post('/', [SekolahController::class, 'store'])->name('store');
+            Route::put('/{id}', [SekolahController::class, 'update'])->name('update');
+            Route::delete('/{id}', [SekolahController::class, 'destroy'])->name('destroy');
+            Route::get('/{id}/assign', [SekolahController::class, 'assignSiswaForm'])->name('assign');
+            Route::post('/{id}/assign', [SekolahController::class, 'assignSiswaStore'])->name('assign.store');
+        });
     });
 }); 
 
@@ -114,6 +133,8 @@ Route::middleware('auth')->group(function () {
 // ROUTE ADMIN
 // ==========================================
 Route::middleware(['auth', 'isAdmin'])->group(function () {
+          Route::get('/admin/manajemen-siswa', [AdminController::class, 'manajemenSiswaAdmin'])->name('admin.siswa.index');
+    Route::get('/admin/perusahaan/{id}/detail', [AdminController::class, 'detailPerusahaan'])->name('admin.perusahaan.detail');
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
     Route::get('/admin/tambah-user', [AdminController::class, 'createUser']);
     Route::post('/admin/tambah-user', [AdminController::class, 'storeUser']);
@@ -126,13 +147,15 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::put('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
 
     // ==========================================
-    // TAMBAHAN: ROUTE CRUD SEKOLAH (DIPERBAIKI)
-    // Menggunakan prefix admin dan name admin. agar route menjadi admin.sekolah.*
+    // GRUP PREFIX ADMIN (SEKOLAH & PERUSAHAAN)
     // ==========================================
     Route::prefix('admin')->name('admin.')->group(function () {
+        // Route Sekolah
         Route::resource('sekolah', SekolahController::class)->except(['create', 'show', 'edit']);
-        // TAMBAHKAN DUA BARIS INI:
         Route::get('sekolah/{id}/assign', [SekolahController::class, 'assignSiswaForm'])->name('sekolah.assign');
         Route::post('sekolah/{id}/assign', [SekolahController::class, 'assignSiswaStore'])->name('sekolah.assign.store');
+
+        // Route Perusahaan (Super Admin)
+        Route::resource('perusahaan', PerusahaanController::class)->except(['create', 'show', 'edit']);
     });
 });

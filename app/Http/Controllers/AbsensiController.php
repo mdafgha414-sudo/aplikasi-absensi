@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Absensi;
 use App\Models\Setting;
-use App\Models\QrToken; // <-- Tambahan: Import Model QrToken
+use App\Models\QrToken; 
+use App\Models\Perusahaan; // <-- TAMBAHAN: Import Model Perusahaan
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage; // <-- Tambahan: Untuk simpan foto
+use Illuminate\Support\Facades\Storage; 
 
 class AbsensiController extends Controller
 {
@@ -98,10 +99,18 @@ class AbsensiController extends Controller
             return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
         }
 
-        // 1. Validasi Lokasi (Geofencing)
-        $latPkl = env('PKL_LATITUDE', -6.200000);
-        $lngPkl = env('PKL_LONGITUDE', 106.816666);
-        $radius = env('PKL_RADIUS', 100); // Meter
+        // 1. Ambil Data Perusahaan User
+        $user = Auth::user();
+        $perusahaan = $user->perusahaan;
+
+        if (!$perusahaan) {
+            return back()->with('error', 'Anda belum terdaftar di perusahaan PKL manapun. Hubungi Admin.');
+        }
+
+        // 2. Validasi Lokasi (Geofencing berdasarkan data Perusahaan)
+        $latPkl = $perusahaan->latitude;
+        $lngPkl = $perusahaan->longitude;
+        $radius = $perusahaan->radius;
 
         if ($request->filled('lat') && $request->filled('lng')) {
             $jarak = $this->hitungJarak($request->lat, $request->lng, $latPkl, $lngPkl);
@@ -119,7 +128,7 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah absen masuk hari ini!');
         }
 
-        // 2. Proses Simpan Foto (Base64)
+        // 3. Proses Simpan Foto (Base64)
         $fotoPath = null;
         if ($request->filled('foto')) {
             $image = $request->foto;
@@ -132,7 +141,7 @@ class AbsensiController extends Controller
             $fotoPath = $imageName;
         }
 
-        // 3. Simpan Absensi
+        // 4. Simpan Absensi
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
@@ -158,10 +167,18 @@ class AbsensiController extends Controller
             return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
         }
 
-        // 1. Validasi Lokasi (Opsional, disarankan tetap aktif)
-        $latPkl = env('PKL_LATITUDE', -6.200000);
-        $lngPkl = env('PKL_LONGITUDE', 106.816666);
-        $radius = env('PKL_RADIUS', 100);
+        // 1. Ambil Data Perusahaan User
+        $user = Auth::user();
+        $perusahaan = $user->perusahaan;
+
+        if (!$perusahaan) {
+            return back()->with('error', 'Anda belum terdaftar di perusahaan PKL manapun.');
+        }
+
+        // 2. Validasi Lokasi (Geofencing berdasarkan data Perusahaan)
+        $latPkl = $perusahaan->latitude;
+        $lngPkl = $perusahaan->longitude;
+        $radius = $perusahaan->radius;
 
         if ($request->filled('lat') && $request->filled('lng')) {
             $jarak = $this->hitungJarak($request->lat, $request->lng, $latPkl, $lngPkl);
@@ -180,7 +197,7 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah melakukan absen pulang hari ini!');
         }
 
-        // 2. Proses Simpan Foto Pulang
+        // 3. Proses Simpan Foto Pulang
         $fotoPath = null;
         if ($request->filled('foto')) {
             $image = $request->foto;
@@ -225,7 +242,7 @@ class AbsensiController extends Controller
     }
 
     // =====================================================
-    // 6. PROSES SCAN QR & VALIDASI LOKASI (OPSIONAL)
+    // 6. PROSES SCAN QR & VALIDASI LOKASI
     // =====================================================
     public function prosesScan(Request $request)
     {
@@ -235,7 +252,15 @@ class AbsensiController extends Controller
             'lng' => 'required|numeric',
         ]);
 
-        // 1. Cek Token
+        // 1. Ambil Data Perusahaan User
+        $user = Auth::user();
+        $perusahaan = $user->perusahaan;
+
+        if (!$perusahaan) {
+            return response()->json(['message' => 'Anda belum terdaftar di perusahaan PKL manapun.'], 400);
+        }
+
+        // 2. Cek Token
         $tokenDikirim = $request->token;
         $tokenDiDatabase = QrToken::where('token', $tokenDikirim)->first();
 
@@ -251,20 +276,20 @@ class AbsensiController extends Controller
             return response()->json(['message' => 'Token sudah KEDALUWARSA.'], 400);
         }
 
-        // 2. Cek Jarak
-        $jarak = $this->hitungJarak($request->lat, $request->lng, env('PKL_LATITUDE'), env('PKL_LONGITUDE'));
-        if ($jarak > env('PKL_RADIUS', 100)) {
+        // 3. Cek Jarak
+        $jarak = $this->hitungJarak($request->lat, $request->lng, $perusahaan->latitude, $perusahaan->longitude);
+        if ($jarak > $perusahaan->radius) {
             return response()->json(['message' => 'Anda berada di luar radius PKL. Jarak: ' . round($jarak) . ' m.'], 400);
         }
 
-        // 3. Cek Absen
+        // 4. Cek Absen
         $hariIni = Carbon::today()->toDateString();
         $sudahAbsen = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
         if ($sudahAbsen) {
             return response()->json(['message' => 'Anda sudah absen hari ini.'], 400);
         }
 
-        // 4. Simpan
+        // 5. Simpan
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);

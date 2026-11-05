@@ -22,6 +22,7 @@ class User extends Authenticatable
         'sekolah_id', // <-- DIUBAH DARI 'sekolah' MENJADI 'sekolah_id'
         'role',
         'kode_kartu',
+        'perusahaan_id', // <-- TAMBAHAN UNTUK RELASI DENGAN PERUSAHAAN
         'foto_profil',
     ];
 
@@ -56,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Sekolah::class, 'sekolah_id');
     }
+
+    public function perusahaan()
+{
+    return $this->belongsTo(Perusahaan::class, 'perusahaan_id');
+}
 }
