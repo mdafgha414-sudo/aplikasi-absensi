@@ -2,125 +2,231 @@
 
 @section('content')
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+
     .report-container { 
         padding: 24px; 
-        background: #f4f6f9; 
+        background: #f4f7fc; 
         min-height: 100vh; 
     }
     
-    /* Hero Banner */
+    /* --- HERO BANNER --- */
     .hero-banner {
-        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-        border-radius: 16px;
-        padding: 28px 32px;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        border-radius: 20px;
+        padding: 32px 40px;
         color: white;
         margin-bottom: 24px;
-        box-shadow: 0 10px 25px -5px rgba(13, 110, 253, 0.25);
+        box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.3);
+        position: relative;
+        overflow: hidden;
     }
-
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        top: -100px; right: -50px;
+        width: 300px; height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    .hero-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -150px; left: 20%;
+        width: 400px; height: 400px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+    }
     .badge-pill-light {
         background-color: rgba(255, 255, 255, 0.2);
         color: #ffffff;
         font-size: 12px;
-        font-weight: 600;
-        padding: 6px 14px;
+        font-weight: 700;
+        padding: 8px 16px;
         border-radius: 50px;
         backdrop-filter: blur(4px);
         display: inline-block;
+        border: 1px solid rgba(255,255,255,0.1);
+        position: relative; z-index: 2;
+    }
+    .btn-kembali {
+        background: white;
+        color: #1e40af;
+        font-weight: 700;
+        border-radius: 50px;
+        padding: 10px 24px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+        position: relative; z-index: 2;
+    }
+    .btn-kembali:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); color: #1e3a8a; }
+    
+    .total-siswa-box {
+        background: rgba(15, 23, 42, 0.3);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        padding: 12px 20px;
+        display: flex; align-items: center; gap: 16px;
+        border: 1px solid rgba(255,255,255,0.15);
+        position: relative; z-index: 2;
     }
 
-    /* Card Box */
+    /* --- MAIN CARD --- */
     .report-card { 
         background: #ffffff; 
-        border-radius: 16px; 
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); 
-        padding: 24px; 
-        border: 1px solid #e9ecef; 
+        border-radius: 20px; 
+        box-shadow: 0 5px 22px rgba(30, 60, 100, 0.04); 
+        padding: 32px; 
+        border: 1px solid #e8edf5; 
     }
 
-    /* Styling Filter & Input */
+    /* --- HEADER FILTER & EXPORT --- */
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    /* Form Filter */
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: nowrap;
+    }
+
+    /* PERBAIKAN: Dropdown dibuat lebih lebar dan padding kanan ditambah agar teks tidak ketumpuk panah */
     .form-select-custom {
+        height: 40px;
+        min-width: 150px;
         border-radius: 8px;
-        border: 1px solid #dee2e6;
-        padding: 6px 12px;
+        border: 1px solid #cbd5e1;
+        padding: 8px 36px 8px 16px; /* Padding kanan 36px agar aman dari ikon panah */
         font-size: 13px;
-        font-weight: 500;
-        color: #495057;
+        font-weight: 600;
+        color: #475569;
         background-color: #fff;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        transition: all 0.2s;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .form-select-custom:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
     }
 
-    /* Styling Tabel Matriks */
-    .matrix-table { 
-        border-collapse: separate; 
-        border-spacing: 0; 
-        width: 100%; 
-        min-width: 1100px; 
+    /* Tombol Ekspor */
+    .btn-export-soft {
+        height: 40px;
+        padding: 0 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        transition: all 0.2s;
+        border: 1px solid;
     }
-    
-    .matrix-table th, .matrix-table td { 
-        border: 1px solid #f1f5f9; 
-        text-align: center; 
-        padding: 10px 6px; 
-        vertical-align: middle; 
+    .btn-excel { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .btn-excel:hover { background: #d1fae5; color: #065f46; }
+    .btn-pdf { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .btn-pdf:hover { background: #fee2e2; color: #991b1b; }
+
+    /* --- TABEL MATRIKS --- */
+    .table-responsive {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        overflow: auto;
+        background: white;
+        margin-bottom: 24px;
     }
 
-    .matrix-table th { 
-        background: #f8fafc; 
-        color: #475569; 
-        font-weight: 600; 
-        font-size: 12px; 
-        white-space: nowrap; 
-        border-bottom: 2px solid #e2e8f0; 
+    .matrix-table {
+        width: 100%;
+        min-width: 1100px;
+        border-spacing: 0;
+        border-collapse: separate;
     }
 
-    .matrix-table td { 
-        font-size: 12px; 
-        color: #334155; 
-        min-width: 42px; 
+    .matrix-table th {
+        padding: 14px 8px;
+        font-size: 11px;
+        line-height: 1.4;
+        background: #e9eafd !important; 
+        color: #34345f !important; 
+        border-bottom: 2px solid #dedff3 !important;
+        font-weight: 700;
+        text-align: center;
     }
 
-    .matrix-table .student-name { 
-        text-align: left; 
-        padding-left: 16px; 
-        font-weight: 600; 
-        color: #1e293b; 
-        min-width: 200px; 
-        position: sticky; 
-        left: 0; 
-        background: #ffffff; 
-        z-index: 1; 
-        border-right: 2px solid #e2e8f0; 
+    .matrix-table td {
+        height: 49px;
+        padding: 9px 8px;
+        font-size: 12px;
+        border-bottom: 1px solid #edf1f6;
+        text-align: center;
+        color: #334155;
+    }
+    .matrix-table tbody tr:hover td { background-color: #f7faff; }
+
+    .matrix-table .student-name {
+        min-width: 190px;
+        font-weight: 600;
+        padding-left: 15px;
+        text-align: left;
+        position: sticky;
+        left: 0;
+        background: #ffffff;
+        z-index: 1;
+    }
+    .matrix-table thead .student-name { z-index: 2; background: #e9eafd; }
+
+    .school-row td {
+        padding: 12px 15px;
+        background: #f0f5ff !important;
+        color: #28528a;
+        font-weight: 700;
+        text-align: left;
     }
 
-    .matrix-table thead .student-name { 
-        z-index: 2; 
-        background: #f8fafc; 
-    }
-
-    .matrix-table tbody tr:hover td { 
-        background-color: #f8fafc; 
-    }
-
-    /* Status Badge Cell Circle */
-    .status-badge-cell { 
-        display: inline-flex; 
-        align-items: center; 
-        justify-content: center; 
-        width: 28px; 
-        height: 28px; 
-        border-radius: 50%; 
-        font-weight: 700; 
-        font-size: 11px; 
+    /* Lingkaran status */
+    .status-badge-cell {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 29px;
+        height: 29px;
+        font-size: 11px;
+        border-radius: 50%;
+        font-weight: 700;
         cursor: pointer;
         transition: transform 0.2s;
-        position: relative;
     }
-
     .status-badge-cell:hover {
-        transform: scale(1.15);
-        box-shadow: 0 0 8px rgba(0,0,0,0.15);
+        transform: scale(1.1);
     }
 
+    /* Warna Status */
     .cell-hadir { background: #dcfce7; color: #15803d; }
     .cell-izin { background: #dbeafe; color: #1d4ed8; }
     .cell-sakit { background: #fef9c3; color: #a16207; }
@@ -128,84 +234,51 @@
     .cell-alfa { background: #ffe4e6; color: #be123c; }
     .cell-pending { background: #f1f5f9; color: #94a3b8; cursor: default; }
 
-    /* Legend Item & Hover Effect */
+    /* --- LEGEND / KETERANGAN --- */
+    .legend-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-top: 20px;
+        border-top: 1px solid #edf1f6;
+    }
     .legend-item {
+        padding: 8px 12px;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        transition: all 0.2s ease-in-out;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid transparent;
     }
-    .legend-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    /* ========================================
-    WARNA HEADER TABEL: LAVENDER
-    ======================================== */
-    .matrix-table thead th {
-        background-color: #E6E6FA !important;
-        color: #312E5C;
-        border-color: #D8D5F2 !important;
-        font-weight: 700;
-    }
+    .legend-item .status-badge-cell { width: 22px; height: 22px; font-size: 10px; }
+    
+    .leg-hadir { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .leg-telat { background: #ffedd5; color: #c2410c; border-color: #fed7aa; }
+    .leg-izin { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+    .leg-sakit { background: #fef9c3; color: #a16207; border-color: #fef08a; }
+    .leg-alfa { background: #ffe4e6; color: #be123c; border-color: #fecdd3; }
+    .leg-pending { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
 
-    .matrix-table thead .student-name {
-        background-color: #E6E6FA !important;
-        color: #312E5C;
-    }
+    /* Scrollbar tabel */
+    .table-responsive::-webkit-scrollbar { height: 9px; }
+    .table-responsive::-webkit-scrollbar-track { background: #f0f3f8; border-radius: 10px; }
+    .table-responsive::-webkit-scrollbar-thumb { background: #aab9cc; border-radius: 10px; }
 
-    .matrix-table thead th:first-child {
-        background-color: #E6E6FA !important;
-    }
-
-    /* ========================================
-    WARNA STATUS KEHADIRAN
-    ======================================== */
-    .cell-telat {
-        background-color: #FED7AA !important;
-        color: #C2410C !important;
-    }
-
-    .cell-hadir {
-        background-color: #BBF7D0 !important;
-        color: #166534 !important;
-    }
-
-    .cell-alfa {
-        background-color: #FECACA !important;
-        color: #B91C1C !important;
-    }
-
-    .cell-sakit {
-        background-color: #FEF08A !important;
-        color: #854D0E !important;
-    }
-
-    .cell-izin {
-        background-color: #BFDBFE !important;
-        color: #1D4ED8 !important;
-    }
-
-    .cell-pending {
-        background-color: #F1F5F9 !important;
-        color: #64748B !important;
-    }
-
-    /* TAMBAHAN: Styling Baris Header Sekolah */
-    .school-row td {
-        background-color: #f0f4ff !important;
-        color: #1e3a8a;
-        font-weight: 700;
-        text-align: left;
-        padding: 10px 16px;
-        border-bottom: 2px solid #bfdbfe;
-        font-size: 13px;
+    /* Responsif */
+    @media (max-width: 992px) {
+        .filter-actions { width: 100%; justify-content: flex-start; }
+        .filter-form { flex-wrap: wrap; width: 100%; }
+        .form-select-custom { width: 100%; flex: 1; }
     }
 </style>
 
 <div class="report-container">
     
-    <!-- Hero Banner Warna Biru Sesuai Header Dashboard -->
+    <!-- HERO BANNER -->
     <div class="hero-banner d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <div class="badge-pill-light mb-2">
@@ -216,14 +289,14 @@
         </div>
         
         <div class="d-flex align-items-center gap-3">
-            <!-- TOMBOL KEMBALI KE DASHBOARD PEMBIMBING -->
-            <a href="{{ route('pembimbing.dashboard') }}" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2" style="color: #0d6efd;">
+            <!-- TOMBOL KEMBALI -->
+            <a href="{{ route('pembimbing.dashboard') }}" class="btn btn-kembali d-flex align-items-center gap-2">
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
 
             <!-- Kotak Total Siswa -->
-            <div class="bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur d-flex align-items-center gap-3">
-                <div class="bg-white text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+            <div class="total-siswa-box">
+                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
                     <i class="bi bi-person-check fs-4"></i>
                 </div>
                 <div>
@@ -234,19 +307,21 @@
         </div>
     </div>
 
+    <!-- MAIN CARD -->
     <div class="report-card">
         
-        <!-- Header Controls & Filter -->
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <!-- HEADER FILTER & EXPORT -->
+        <div class="filter-header">
             <div>
-                <h5 class="fw-bold text-dark mb-0">Matriks Kehadiran Bulanan</h5>
+                <h5 class="fw-bold text-dark mb-1">Matriks Kehadiran Bulanan</h5>
                 <p class="text-muted small mb-0">Filter berdasarkan sekolah, bulan, dan tahun untuk melihat detail harian.</p>
             </div>
             
-            <div class="d-flex gap-2 flex-wrap align-items-center">
-                <!-- Form Filter (Sekolah, Bulan, Tahun) -->
-                <form action="{{ route('pembimbing.laporan-absensi') }}" method="GET" class="d-flex gap-2 flex-wrap">
-                    <select name="sekolah" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
+            <div class="filter-actions">
+                <!-- Form Filter -->
+                <form action="{{ route('pembimbing.laporan-absensi') }}" method="GET" class="filter-form">
+                    <!-- Select Sekolah -->
+                    <select name="sekolah" class="form-select form-select-custom" onchange="this.form.submit()">
                         <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
                         @foreach($daftarSekolah as $sklh)
                             <option value="{{ $sklh->id }}" {{ $sekolahFilter == $sklh->id ? 'selected' : '' }}>
@@ -255,51 +330,51 @@
                         @endforeach
                     </select>
 
-                    <select name="bulan" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
+                    <!-- Select Bulan -->
+                    <select name="bulan" class="form-select form-select-custom" onchange="this.form.submit()">
                         @for($i = 1; $i <= 12; $i++)
                             <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == $i ? 'selected' : '' }}>
                                 {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
                             </option>
                         @endfor
                     </select>
-                    <select name="tahun" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()">
+
+                    <!-- Select Tahun -->
+                    <select name="tahun" class="form-select form-select-custom" onchange="this.form.submit()">
                         @for($i = date('Y') - 2; $i <= date('Y') + 2; $i++)
                             <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
                         @endfor
                     </select>
                 </form>
 
-                <!-- Tombol Export -->
-                <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
-                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                <!-- Tombol Ekspor -->
+                <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-export-soft btn-excel">
+                    <i class="bi bi-file-earmark-excel"></i> Excel
                 </a>
-                <a href="{{ route('pembimbing.laporan.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-danger btn-sm rounded-3 fw-medium">
-                    <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                <a href="{{ route('pembimbing.laporan.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-export-soft btn-pdf">
+                    <i class="bi bi-file-earmark-pdf"></i> PDF
                 </a>
             </div>
         </div>
 
-        <!-- Tabel Matriks -->
-        <div class="table-responsive rounded-3 border border-light mb-4">
+        <!-- TABEL MATRIKS -->
+        <div class="table-responsive">
             <table class="matrix-table">
                 <thead>
                     <tr>
-                        <th style="width: 40px;">No</th>
+                        <th style="width: 50px;">No</th>
                         <th class="student-name">Nama Siswa</th>
 
                         @foreach($tanggalList as $tgl)
                             <th>
                                 {{ $tgl->format('d') }}<br>
-                                <small>
-                                    {{ $tgl->translatedFormat('D') }}
-                                </small>
+                                <small style="font-weight: 500; opacity: 0.8;">{{ $tgl->translatedFormat('D') }}</small>
                             </th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
                     @php
-                        // PERUBAHAN: Kelompokkan siswa berdasarkan sekolah_id
                         $siswaGrouped = $siswa->groupBy('sekolah_id');
                     @endphp
 
@@ -312,7 +387,7 @@
                             </td>
                         </tr>
 
-                        <!-- Looping Siswa di Sekolah tersebut -->
+                        <!-- Looping Siswa -->
                         @foreach($listSiswa as $index => $s)
                             <tr>
                                 <td class="text-muted fw-semibold">{{ $loop->iteration }}</td>
@@ -326,21 +401,16 @@
                                         $absen = $absensi[$key] ?? null;
                                         $status = $absen ? $absen->status : null;
                                         
-                                        // AMBIL DATA IZIN
                                         $dataIzin = $izin[$key] ?? null;
-                                        
-                                        // AMBIL DATA ALASAN KETERLAMBATAN
                                         $dataAlasan = isset($alasanKeterlambatan[$key]) ? $alasanKeterlambatan[$key] : null;
                                         $teksAlasan = $dataAlasan ? $dataAlasan->alasan : null;
                                         
                                         $cellClass = 'cell-pending';
                                         $label = '-';
 
-                                        // 1. Cek apakah hari ini sudah lewat
                                         $isWeekend = in_array($tgl->dayOfWeek, [Carbon\Carbon::SATURDAY, Carbon\Carbon::SUNDAY]);
                                         $isPastDay = $tgl->startOfDay()->lt(\Carbon\Carbon::today()->startOfDay());
                                         
-                                        // 2. Logika penentuan status
                                         if ($status == 'Telat') {
                                             $cellClass = 'cell-telat';
                                             $label = 'T';
@@ -365,7 +435,6 @@
                                             }
                                         }
 
-                                        // Siapkan JSON untuk Modal Absensi
                                         $jsonAbsen = '';
                                         if ($absen) { 
                                             $jsonAbsen = json_encode([
@@ -380,7 +449,6 @@
                                             ]);
                                         }
 
-                                        // Siapkan JSON untuk Modal Izin
                                         $jsonIzin = '';
                                         if ($dataIzin) {
                                             $jsonIzin = json_encode([
@@ -395,30 +463,21 @@
                                     @endphp
 
                                     <td>
-                                        {{-- Prioritas 1: Jika ada data Izin Disetujui, tampilkan Modal Izin --}}
                                         @if($dataIzin && $dataIzin->status == 'Disetujui')
                                             <div class="status-badge-cell cell-izin" onclick="showDetailIzin({{ $jsonIzin }})">
                                                 {{ $dataIzin->jenis_izin == 'Sakit' ? 'S' : 'I' }}
                                             </div>
-                                        
-                                        {{-- Prioritas 2: Jika Izin Menunggu --}}
                                         @elseif($dataIzin && $dataIzin->status == 'Menunggu')
-                                            <div class="status-badge-cell cell-pending" onclick="showDetailIzin({{ $jsonIzin }})" style="cursor: pointer;">
+                                            <div class="status-badge-cell cell-pending" onclick="showDetailIzin({{ $jsonIzin }})">
                                                 <i class="bi bi-hourglass-split"></i>
                                             </div>
-
-                                        {{-- Prioritas 3: Jika data Absensi biasa (Hadir, Telat, Alpa) --}}
                                         @elseif($absen)
-                                            <div class="status-badge-cell {{ $cellClass }}" 
-                                                 onclick="showDetailAbsensi({{ $jsonAbsen }})">
+                                            <div class="status-badge-cell {{ $cellClass }}" onclick="showDetailAbsensi({{ $jsonAbsen }})">
                                                 {{ $label }}
-                                                {{-- Indikator kecil jika ada alasan --}}
                                                 @if($teksAlasan)
                                                     <i class="bi bi-chat-left-text" style="font-size: 10px; position: absolute; top: 2px; right: 2px;"></i>
                                                 @endif
                                             </div>
-
-                                        {{-- Prioritas 4: Jika kosong / libur --}}
                                         @else
                                             <div class="status-badge-cell {{ $cellClass }}">
                                                 {{ $label }}
@@ -433,38 +492,35 @@
             </table>
         </div>
         
-        <!-- Legend & Keterangan -->
-        <div class="row g-3 align-items-center pt-2 border-top border-light">
-            <div class="col-md-3">
-                <span class="fw-bold text-dark d-block">Keterangan Status</span>
-                <span class="text-muted small">Indikator warna matriks kehadiran</span>
+        <!-- LEGEND / KETERANGAN -->
+        <div class="legend-box">
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="bi bi-info-circle-fill"></i>
+                </div>
+                <div>
+                    <span class="fw-bold text-dark d-block" style="font-size: 14px;">Keterangan Status</span>
+                    <span class="text-muted" style="font-size: 12px;">Indikator warna matriks kehadiran</span>
+                </div>
             </div>
-            <div class="col-md-9">
-                <div class="d-flex gap-2 flex-wrap justify-content-md-end">
-                    <div class="legend-item px-3 py-2 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3">
-                        <span class="status-badge-cell cell-hadir me-1" style="width:22px; height:22px; font-size:10px;">H</span> 
-                        <span class="text-success fw-semibold small">Hadir</span>
-                    </div>
-                    <div class="legend-item px-3 py-2 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3">
-                        <span class="status-badge-cell cell-telat me-1" style="width:22px; height:22px; font-size:10px;">T</span> 
-                        <span class="text-warning text-dark fw-semibold small">Telat</span>
-                    </div>
-                    <div class="legend-item px-3 py-2 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
-                        <span class="status-badge-cell cell-izin me-1" style="width:22px; height:22px; font-size:10px;">I</span> 
-                        <span class="text-primary fw-semibold small">Izin</span>
-                    </div>
-                    <div class="legend-item px-3 py-2 bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3">
-                        <span class="status-badge-cell cell-sakit me-1" style="width:22px; height:22px; font-size:10px;">S</span> 
-                        <span class="text-info text-dark fw-semibold small">Sakit</span>
-                    </div>
-                    <div class="legend-item px-3 py-2 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3">
-                        <span class="status-badge-cell cell-alfa me-1" style="width:22px; height:22px; font-size:10px;">A</span> 
-                        <span class="text-danger fw-semibold small">Alpa</span>
-                    </div>
-                    <div class="legend-item px-3 py-2 bg-light border border-light rounded-3">
-                        <span class="status-badge-cell cell-pending me-1" style="width:22px; height:22px; font-size:10px;">-</span> 
-                        <span class="text-muted fw-semibold small">Libur/Belum</span>
-                    </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <div class="legend-item leg-hadir">
+                    <span class="status-badge-cell cell-hadir">H</span> Hadir
+                </div>
+                <div class="legend-item leg-telat">
+                    <span class="status-badge-cell cell-telat">T</span> Telat
+                </div>
+                <div class="legend-item leg-izin">
+                    <span class="status-badge-cell cell-izin">I</span> Izin
+                </div>
+                <div class="legend-item leg-sakit">
+                    <span class="status-badge-cell cell-sakit">S</span> Sakit
+                </div>
+                <div class="legend-item leg-alfa">
+                    <span class="status-badge-cell cell-alfa">A</span> Alpa
+                </div>
+                <div class="legend-item leg-pending">
+                    <span class="status-badge-cell cell-pending">-</span> Libur
                 </div>
             </div>
         </div>
@@ -477,8 +533,8 @@
 <!-- ==================================================== -->
 <div class="modal fade" id="modalDetailAbsensi" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-primary text-white">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-primary text-white border-0 py-3 px-4">
                 <h5 class="modal-title fw-bold" id="modalDetailLabel"><i class="bi bi-person-badge me-2"></i>Detail Absensi Siswa</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -495,44 +551,43 @@
 
                 <div class="row g-3 mb-4">
                     <div class="col-6">
-                        <div class="bg-light p-3 rounded text-center">
+                        <div class="bg-light p-3 rounded-4 text-center">
                             <small class="text-muted d-block mb-1">Jam Masuk</small>
                             <span class="fs-5 fw-bold text-success" id="modalJamMasuk">--:--</span>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="bg-light p-3 rounded text-center">
+                        <div class="bg-light p-3 rounded-4 text-center">
                             <small class="text-muted d-block mb-1">Jam Pulang</small>
                             <span class="fs-5 fw-bold text-danger" id="modalJamPulang">--:--</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- BLOK ALASAN KETERLAMBATAN -->
-                <div id="boxAlasanTerlambat" class="mb-4" style="display: none; background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 8px;">
+                <div id="boxAlasanTerlambat" class="mb-4" style="display: none; background: #fffbeb; border: 1px solid #fde68a; padding: 16px; border-radius: 12px;">
                     <h6 style="font-weight: 700; color: #d97706; margin-bottom: 5px;"><i class="bi bi-info-circle me-1"></i> Alasan Keterlambatan:</h6>
                     <p id="teksAlasanTerlambat" style="margin: 0; color: #92400e; font-size: 14px;"></p>
                 </div>
 
-                <hr>
+                <hr class="text-muted">
 
                 <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-camera me-2"></i>Bukti Foto Absensi</h6>
                 <div class="row g-3 text-center">
                     <div class="col-md-6">
-                        <div class="p-2 border rounded bg-white">
+                        <div class="p-2 border rounded-4 bg-white">
                             <p class="small text-muted fw-bold mb-2">Foto Masuk</p>
                             <img id="imgFotoMasuk" src="" alt="Foto Masuk" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
-                            <div id="noFotoMasuk" class="py-5 text-muted bg-light rounded">
+                            <div id="noFotoMasuk" class="py-5 text-muted bg-light rounded-4">
                                 <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
                                 <small>Tidak ada foto</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="p-2 border rounded bg-white">
+                        <div class="p-2 border rounded-4 bg-white">
                             <p class="small text-muted fw-bold mb-2">Foto Pulang</p>
                             <img id="imgFotoPulang" src="" alt="Foto Pulang" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
-                            <div id="noFotoPulang" class="py-5 text-muted bg-light rounded">
+                            <div id="noFotoPulang" class="py-5 text-muted bg-light rounded-4">
                                 <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
                                 <small>Tidak ada foto</small>
                             </div>
@@ -541,7 +596,7 @@
                 </div>
             </div>
             <div class="modal-footer bg-light border-0">
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-secondary px-4 rounded-3" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -552,8 +607,8 @@
 <!-- ==================================================== -->
 <div class="modal fade" id="modalDetailIzin" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-primary text-white">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-primary text-white border-0 py-3 px-4">
                 <h5 class="modal-title fw-bold"><i class="bi bi-envelope-paper me-2"></i>Detail Pengajuan Izin</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -565,7 +620,7 @@
                 <p><strong>Alasan:</strong> <span id="izAlasan"></span></p>
                 <div id="izBoxLampiran" class="mt-3" style="display: none;">
                     <strong>Lampiran:</strong><br>
-                    <a id="izLinkLampiran" href="#" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                    <a id="izLinkLampiran" href="#" target="_blank" class="btn btn-sm btn-outline-primary mt-2 rounded-3">
                         <i class="bi bi-paperclip"></i> Lihat File
                     </a>
                 </div>
