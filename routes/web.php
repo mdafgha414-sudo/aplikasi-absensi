@@ -104,10 +104,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/keterlambatan', [AlasanKeterlambatanController::class, 'indexPembimbing'])->name('keterlambatan.index');
         Route::post('/keterlambatan/verify/{id}', [AlasanKeterlambatanController::class, 'verifyPembimbing'])->name('keterlambatan.verify');
 
-        // FITUR SCAN KARTU SISWA OLEH PEMBIMBING
+        // =====================================================
+        // FITUR SCAN KARTU SISWA OLEH PEMBIMBING (DIPERBAIKI)
+        // =====================================================
         Route::get('/scan-kartu', [ScanKartuController::class, 'index'])->name('scan.index');
-        Route::post('/scan-kartu/cek', [ScanKartuController::class, 'cekKartu'])->name('scan.cek');
-        Route::post('/scan-kartu/simpan', [ScanKartuController::class, 'simpanAbsen'])->name('scan.simpan');
+        Route::post('/scan-kartu/proses', [ScanKartuController::class, 'prosesScan'])->name('scan.proses');
 
         // MANAJEMEN SISWA (PEMBIMBING)
         Route::get('/manajemen-siswa', [AdminController::class, 'manajemenSiswa'])->name('siswa.index');

@@ -24,38 +24,6 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL KONFIRMASI ABSENSI (LEBIH CANTIK)    -->
-<!-- ========================================== -->
-<div class="modal fade" id="modalKonfirmasi" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold" id="modalLabel"><i class="bi bi-person-badge"></i> Konfirmasi Absensi</h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <div class="mb-3">
-                    <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
-                </div>
-                <h4 class="fw-bold mb-1" id="modalNama">-</h4>
-                <p class="text-muted mb-4" id="modalKode">-</p>
-                
-                <div class="alert alert-warning fw-bold mb-0">
-                    Apakah Anda yakin ingin mencatat <span id="modalTipe" class="text-uppercase">MASUK</span> untuk siswa ini?
-                </div>
-            </div>
-            <div class="modal-footer justify-content-center border-0 pb-4">
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" onclick="batalkanScan()">
-                    <i class="bi bi-x-circle"></i> Batal
-                </button>
-                <button type="button" class="btn btn-primary px-4 fw-bold" id="btnKonfirmasi">
-                    <i class="bi bi-check-circle"></i> Ya, Konfirmasi
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 {{-- Library HTML5 QR Code --}}
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -63,23 +31,6 @@
 <script>
     let html5QrcodeScanner;
     let isProcessing = false; 
-    let dataSiswaSementara = null; // Menyimpan data siswa sebelum dikonfirmasi
-    let modalKonfirmasi; // Variabel untuk Bootstrap Modal
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi Modal Bootstrap
-        modalKonfirmasi = new bootstrap.Modal(document.getElementById('modalKonfirmasi'));
-        
-        // Tombol Konfirmasi di dalam Modal
-        document.getElementById('btnKonfirmasi').addEventListener('click', function() {
-            if (dataSiswaSementara) {
-                modalKonfirmasi.hide();
-                simpanAbsensi(dataSiswaSementara.id, dataSiswaSementara.tipe_absen);
-            }
-        });
-
-        startScanner();
-    });
 
     function onScanSuccess(decodedText, decodedResult) {
         if (isProcessing) return; 
@@ -89,79 +40,37 @@
         html5QrcodeScanner.pause(true);
 
         let resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Membaca kartu...';
+        resultDiv.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Memproses kartu...';
         resultDiv.className = 'alert alert-warning mt-4 fw-bold';
 
-        // 1. Cek data siswa ke server
+        // Kirim data langsung ke server (tanpa modal)
         $.ajax({
-            url: "{{ route('pembimbing.scan.cek') }}",
+            url: "{{ route('pembimbing.scan.proses') }}", // <-- PASTIKAN INI
             method: "POST",
             data: {
                 _token: "{{ csrf_token() }}",
                 kode_kartu: decodedText
             },
             success: function(response) {
-                dataSiswaSementara = response.data;
-                
-                // Isi data ke dalam Modal
-                document.getElementById('modalNama').innerText = response.data.nama;
-                document.getElementById('modalKode').innerText = 'Kode: ' + response.data.kode;
-                
-                let tipeEl = document.getElementById('modalTipe');
-                tipeEl.innerText = response.data.tipe_absen;
-                
-                // Ubah warna teks tipe absen (Merah untuk pulang, Hijau untuk masuk)
-                tipeEl.className = response.data.tipe_absen === 'Pulang' ? 'text-danger' : 'text-success';
-
-                // Tampilkan Modal Bootstrap
-                modalKonfirmasi.show();
+                // Tampilkan pesan sukses
+                resultDiv.innerHTML = response.message;
+                resultDiv.className = 'alert alert-success mt-4 fw-bold';
             },
             error: function(xhr) {
                 let errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Terjadi kesalahan sistem.';
-                resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + errorMsg;
+                resultDiv.innerHTML = '❌ ' + errorMsg;
                 resultDiv.className = 'alert alert-danger mt-4 fw-bold';
-                setTimeout(() => resetScanner('Menunggu scan...'), 3000);
+            },
+            complete: function() {
+                // Jeda 2.5 detik sebelum bisa scan lagi
+                setTimeout(() => {
+                    isProcessing = false;
+                    resultDiv.innerHTML = '<i class="bi bi-camera-video"></i> Menunggu scan...';
+                    resultDiv.className = 'alert alert-info mt-4 fw-bold';
+                    html5QrcodeScanner.resume(); // Nyalakan kamera lagi
+                }, 2500);
             }
         });
-    }
-
-    function simpanAbsensi(userId, tipeAbsen) {
-        let resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Menyimpan data absensi...';
-        resultDiv.className = 'alert alert-warning mt-4 fw-bold';
-
-        $.ajax({
-            url: "{{ route('pembimbing.scan.simpan') }}",
-            method: "POST",
-            data: {
-                _token: "{{ csrf_token() }}",
-                user_id: userId,
-                tipe_absen: tipeAbsen
-            },
-            success: function(response) {
-                resultDiv.innerHTML = '<i class="bi bi-check-circle-fill"></i> ' + response.message;
-                resultDiv.className = 'alert alert-success mt-4 fw-bold';
-                setTimeout(() => resetScanner('Menunggu scan...'), 3000);
-            },
-            error: function(xhr) {
-                let errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Gagal menyimpan.';
-                resultDiv.innerHTML = '<i class="bi bi-x-circle-fill"></i> ' + errorMsg;
-                resultDiv.className = 'alert alert-danger mt-4 fw-bold';
-                setTimeout(() => resetScanner('Menunggu scan...'), 3000);
-            }
-        });
-    }
-
-    function batalkanScan() {
-        resetScanner('Scan dibatalkan.');
-    }
-
-    function resetScanner(pesan) {
-        isProcessing = false;
-        dataSiswaSementara = null;
-        document.getElementById('result').innerHTML = '<i class="bi bi-camera-video"></i> ' + pesan;
-        document.getElementById('result').className = 'alert alert-info mt-4 fw-bold';
-        html5QrcodeScanner.resume(); // Nyalakan kamera lagi
     }
 
     function startScanner() {
@@ -183,5 +92,9 @@
         );
         html5QrcodeScanner.render(onScanSuccess);
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        startScanner();
+    });
 </script>
 @endsection
