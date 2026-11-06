@@ -1,7 +1,7 @@
-
 @extends('layouts.app')
 
 @section('content')
+
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -17,10 +17,7 @@
         box-sizing: border-box;
     }
 
-    /* =========================================
-       HERO BANNER
-    ========================================= */
-
+    /* HERO BANNER */
     .hero-banner {
         background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
         border-radius: 20px;
@@ -102,10 +99,7 @@
         white-space: nowrap;
     }
 
-    /* =========================================
-       MAIN CARD
-    ========================================= */
-
+    /* MAIN CARD */
     .report-card {
         background: #ffffff;
         border-radius: 20px;
@@ -116,10 +110,7 @@
         box-sizing: border-box;
     }
 
-    /* =========================================
-       HEADER FILTER & EXPORT
-    ========================================= */
-
+    /* FILTER HEADER */
     .filter-header {
         display: flex;
         justify-content: space-between;
@@ -131,28 +122,28 @@
 
     .filter-actions {
         display: flex;
-        align-items: center !important;
+        align-items: center;
         justify-content: flex-end;
         gap: 12px;
         flex-wrap: nowrap;
-        margin: 0 !important;
-        padding: 0 !important;
+        margin: 0;
+        padding: 0;
     }
 
     .filter-form {
         display: flex;
-        align-items: center !important;
+        align-items: center;
         justify-content: center;
         gap: 10px;
         flex-wrap: nowrap;
-        margin: 0 !important;
-        padding: 0 !important;
+        margin: 0;
+        padding: 0;
     }
 
     .form-select-custom {
-        height: 40px !important;
+        height: 40px;
         min-width: 150px;
-        margin: 0 !important;
+        margin: 0;
         padding: 8px 36px 8px 16px;
         border-radius: 8px;
         border: 1px solid #cbd5e1;
@@ -166,7 +157,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        box-sizing: border-box !important;
+        box-sizing: border-box;
         vertical-align: middle;
     }
 
@@ -176,24 +167,23 @@
         outline: none;
     }
 
-    /* Tombol Excel dan PDF */
-
+    /* BUTTON EXPORT */
     .btn-export-soft {
-        height: 40px !important;
-        min-height: 40px !important;
-        padding: 0 20px !important;
-        margin: 0 !important;
+        height: 40px;
+        min-height: 40px;
+        padding: 0 20px;
+        margin: 0;
         border-radius: 8px;
         font-size: 13px;
         font-weight: 700;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         gap: 8px;
         white-space: nowrap;
-        line-height: 1 !important;
+        line-height: 1;
         vertical-align: middle;
-        box-sizing: border-box !important;
+        box-sizing: border-box;
         text-decoration: none;
         transition: all 0.2s;
         border: 1px solid;
@@ -222,18 +212,19 @@
         color: #991b1b;
     }
 
-    /* =========================================
-       TABEL MATRIKS
-    ========================================= */
-
+    /* TABEL MATRIKS */
     .table-responsive {
         border: 1px solid #e2e8f0 !important;
         border-radius: 12px !important;
-        overflow: auto;
+        overflow-x: auto !important;
+        overflow-y: hidden;
         background: white;
         margin-bottom: 24px;
         width: 100%;
+        max-width: 100%;
         -webkit-overflow-scrolling: touch;
+        position: relative;
+        isolation: isolate;
     }
 
     .matrix-table {
@@ -285,16 +276,23 @@
         background: #e9eafd;
     }
 
+    /* BARIS NAMA SEKOLAH */
+    .school-row {
+        position: relative;
+        z-index: 3;
+    }
+
     .school-row td {
         padding: 12px 15px;
         background: #f0f5ff !important;
         color: #28528a;
         font-weight: 700;
         text-align: left;
+        position: relative;
+        z-index: 3;
     }
 
-    /* Status */
-
+    /* STATUS */
     .status-badge-cell {
         display: inline-flex;
         align-items: center;
@@ -344,10 +342,7 @@
         cursor: default;
     }
 
-    /* =========================================
-       LEGEND / KETERANGAN
-    ========================================= */
-
+    /* LEGEND */
     .legend-box {
         display: flex;
         align-items: center;
@@ -412,8 +407,7 @@
         border-color: #e2e8f0;
     }
 
-    /* Scrollbar tabel */
-
+    /* SCROLLBAR */
     .table-responsive::-webkit-scrollbar {
         height: 9px;
     }
@@ -428,10 +422,7 @@
         border-radius: 10px;
     }
 
-    /* =========================================
-       RESPONSIVE TABLET
-    ========================================= */
-
+    /* RESPONSIVE TABLET */
     @media (max-width: 992px) {
 
         .report-container {
@@ -471,10 +462,7 @@
         }
     }
 
-    /* =========================================
-       RESPONSIVE HP
-    ========================================= */
-
+    /* RESPONSIVE HP */
     @media (max-width: 576px) {
 
         .report-container {
@@ -482,7 +470,6 @@
             min-height: 100vh;
         }
 
-        /* Banner tetap dengan desain biru asli */
         .hero-banner {
             padding: 22px 18px;
             border-radius: 16px;
@@ -499,51 +486,26 @@
             line-height: 1.6;
         }
 
-        .badge-pill-light {
-            font-size: 10px;
-            padding: 7px 12px;
-        }
-
-        .hero-banner > div:last-child {
+        .hero-banner > .d-flex {
             width: 100%;
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 8px !important;
-        }
-
-        .btn-kembali {
-            padding: 9px 16px;
-            font-size: 12px;
+            flex-wrap: wrap;
         }
 
         .total-siswa-box {
-            padding: 9px 12px;
-            gap: 9px;
-            border-radius: 12px;
+            padding: 10px 12px;
+            gap: 10px;
         }
 
-        .total-siswa-box .rounded-circle {
-            width: 34px !important;
-            height: 34px !important;
-            flex-shrink: 0;
+        .btn-kembali {
+            padding: 10px 18px;
         }
 
-        .total-siswa-box .fs-5 {
-            font-size: 14px !important;
-        }
-
-        .total-siswa-box .small {
-            font-size: 10px;
-        }
-
-        /* Card utama */
         .report-card {
             padding: 16px 12px;
             border-radius: 16px;
         }
 
-        /* Header */
         .filter-header {
             gap: 14px;
             margin-bottom: 18px;
@@ -555,155 +517,126 @@
 
         .filter-header p {
             font-size: 11px;
-            line-height: 1.5;
         }
 
-        /* Filter dibuat rapi */
         .filter-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
         }
 
         .filter-form {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: 1fr;
             width: 100%;
-            gap: 9px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .form-select-custom {
             width: 100%;
             min-width: 0;
-            height: 40px !important;
-            font-size: 12px;
+            height: 40px;
+            flex: none;
         }
 
-        /* Tombol Excel dan PDF sejajar */
         .btn-export-soft {
             width: 100%;
-            height: 40px !important;
-            min-height: 40px !important;
-            padding: 0 10px !important;
-            font-size: 12px;
-            justify-content: center !important;
+            height: 42px;
         }
 
-        /* Tabel tetap bisa digeser */
+        /* PERBAIKAN UTAMA TABEL HP */
         .table-responsive {
             width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            border-radius: 10px !important;
-            margin-bottom: 18px;
+            max-width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            position: relative;
+            isolation: isolate;
+            border-radius: 12px !important;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y;
         }
 
         .matrix-table {
+            width: 1100px;
             min-width: 1100px;
+            table-layout: auto;
         }
 
-        .matrix-table th {
-            padding: 12px 8px;
-            font-size: 10px;
+        /* Hilangkan sticky pada HP agar tidak menutupi nama sekolah */
+        .matrix-table .student-name,
+        .matrix-table thead .student-name {
+            position: static !important;
+            left: auto !important;
+            z-index: auto !important;
         }
 
+        /* Pastikan baris sekolah terlihat utuh */
+        .school-row {
+            position: static !important;
+        }
+
+        .school-row td {
+            position: static !important;
+            z-index: auto !important;
+            background: #f0f5ff !important;
+            white-space: nowrap;
+        }
+
+        .matrix-table th,
         .matrix-table td {
-            height: 45px;
-            padding: 7px;
-            font-size: 11px;
+            white-space: nowrap;
         }
 
         .matrix-table .student-name {
-            min-width: 150px;
+            min-width: 190px;
         }
 
         .status-badge-cell {
-            width: 27px;
-            height: 27px;
-            font-size: 10px;
+            flex-shrink: 0;
         }
 
-        /* Keterangan status */
         .legend-box {
             flex-direction: column;
             align-items: flex-start;
             gap: 14px;
-            padding-top: 16px;
         }
 
-        .legend-box > div:last-child {
-            display: grid !important;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        .legend-box > .d-flex:last-child {
             width: 100%;
             gap: 8px !important;
         }
 
         .legend-item {
-            justify-content: flex-start;
-            padding: 8px;
+            padding: 7px 9px;
             font-size: 11px;
         }
 
         /* Modal HP */
         .modal-dialog {
-            margin: 10px !important;
-        }
-
-        .modal-content {
-            border-radius: 16px !important;
+            margin: 10px;
         }
 
         .modal-body {
             padding: 16px !important;
         }
 
-        .modal-body img {
-            max-width: 100%;
-            height: auto;
-            object-fit: contain;
+        .modal-content {
+            border-radius: 16px !important;
         }
 
-        .modal-header {
-            padding: 12px 16px !important;
+        .modal-title {
+            font-size: 16px;
         }
 
-        .modal-header .modal-title {
-            font-size: 15px;
-        }
-
-        .modal-footer {
-            padding: 12px 16px;
-        }
-    }
-
-    /* HP sangat kecil */
-    @media (max-width: 360px) {
-
-        .hero-banner {
-            padding: 18px 14px;
-        }
-
-        .hero-banner h2 {
-            font-size: 19px;
-        }
-
-        .btn-kembali {
-            padding: 8px 12px;
-            font-size: 11px;
-        }
-
-        .total-siswa-box {
-            padding: 8px;
-            gap: 6px;
-        }
-
-        .report-card {
-            padding: 12px 9px;
+        .modal-body h4 {
+            font-size: 18px;
         }
     }
 </style>
+
 
 <div class="report-container">
 
@@ -751,13 +684,15 @@
                 </div>
 
             </div>
+
         </div>
     </div>
+
 
     <!-- MAIN CARD -->
     <div class="report-card">
 
-        <!-- HEADER FILTER & EXPORT -->
+        <!-- HEADER FILTER -->
         <div class="filter-header">
 
             <div>
@@ -772,12 +707,10 @@
 
             <div class="filter-actions">
 
-                <!-- FORM FILTER -->
                 <form action="{{ route('pembimbing.laporan-absensi') }}"
                       method="GET"
                       class="filter-form">
 
-                    <!-- FILTER SEKOLAH -->
                     <select name="sekolah"
                             class="form-select form-select-custom"
                             onchange="this.form.submit()">
@@ -796,7 +729,7 @@
 
                     </select>
 
-                    <!-- FILTER BULAN -->
+
                     <select name="bulan"
                             class="form-select form-select-custom"
                             onchange="this.form.submit()">
@@ -810,7 +743,7 @@
 
                     </select>
 
-                    <!-- FILTER TAHUN -->
+
                     <select name="tahun"
                             class="form-select form-select-custom"
                             onchange="this.form.submit()">
@@ -826,32 +759,27 @@
 
                 </form>
 
-                <!-- EXPORT EXCEL -->
-                <a href="{{ route('pembimbing.laporan.export.excel', [
-                    'bulan' => $bulan,
-                    'tahun' => $tahun,
-                    'sekolah' => $sekolahFilter
-                ]) }}"
+
+                <a href="{{ route('pembimbing.laporan.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}"
                    class="btn btn-export-soft btn-excel">
 
                     <i class="bi bi-file-earmark-excel"></i>
                     Excel
+
                 </a>
 
-                <!-- EXPORT PDF -->
-                <a href="{{ route('pembimbing.laporan.export.pdf', [
-                    'bulan' => $bulan,
-                    'tahun' => $tahun,
-                    'sekolah' => $sekolahFilter
-                ]) }}"
+
+                <a href="{{ route('pembimbing.laporan.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}"
                    class="btn btn-export-soft btn-pdf">
 
                     <i class="bi bi-file-earmark-pdf"></i>
                     PDF
+
                 </a>
 
             </div>
         </div>
+
 
         <!-- TABEL MATRIKS -->
         <div class="table-responsive">
@@ -861,7 +789,9 @@
                 <thead>
                     <tr>
 
-                        <th style="width: 50px;">No</th>
+                        <th style="width: 50px;">
+                            No
+                        </th>
 
                         <th class="student-name">
                             Nama Siswa
@@ -880,6 +810,7 @@
                     </tr>
                 </thead>
 
+
                 <tbody>
 
                     @php
@@ -888,15 +819,16 @@
 
                     @foreach($siswaGrouped as $sekolahId => $listSiswa)
 
-                        <!-- HEADER SEKOLAH -->
                         <tr class="school-row">
+
                             <td colspan="{{ count($tanggalList) + 2 }}">
                                 <i class="bi bi-building me-2"></i>
                                 {{ $listSiswa->first()->sekolah->nama_sekolah ?? 'Sekolah Tidak Disebutkan' }}
                             </td>
+
                         </tr>
 
-                        <!-- DATA SISWA -->
+
                         @foreach($listSiswa as $index => $s)
 
                             <tr>
@@ -909,9 +841,11 @@
                                     {{ $s->name }}
                                 </td>
 
+
                                 @foreach($tanggalList as $tgl)
 
                                     @php
+
                                         $tglStr = $tgl->format('d');
                                         $key = $s->id . '-' . $tglStr;
 
@@ -920,8 +854,13 @@
 
                                         $dataIzin = $izin[$key] ?? null;
 
-                                        $dataAlasan = $alasanKeterlambatan[$key] ?? null;
-                                        $teksAlasan = $dataAlasan ? $dataAlasan->alasan : null;
+                                        $dataAlasan = isset($alasanKeterlambatan[$key])
+                                            ? $alasanKeterlambatan[$key]
+                                            : null;
+
+                                        $teksAlasan = $dataAlasan
+                                            ? $dataAlasan->alasan
+                                            : null;
 
                                         $cellClass = 'cell-pending';
                                         $label = '-';
@@ -931,19 +870,22 @@
                                             Carbon\Carbon::SUNDAY
                                         ]);
 
-                                        $isPastDay = $tgl->copy()
-                                            ->startOfDay()
-                                            ->lt(\Carbon\Carbon::today()->startOfDay());
+                                        $isPastDay = $tgl->copy()->startOfDay()->lt(
+                                            \Carbon\Carbon::today()->startOfDay()
+                                        );
 
                                         if ($status == 'Telat') {
+
                                             $cellClass = 'cell-telat';
                                             $label = 'T';
 
                                         } elseif ($status == 'Izin') {
+
                                             $cellClass = 'cell-izin';
                                             $label = 'I';
 
                                         } elseif ($status == 'Sakit') {
+
                                             $cellClass = 'cell-sakit';
                                             $label = 'S';
 
@@ -955,6 +897,7 @@
                                             }
 
                                         } elseif ($status) {
+
                                             $cellClass = 'cell-hadir';
                                             $label = 'H';
 
@@ -964,9 +907,10 @@
                                                 $cellClass = 'cell-alfa';
                                                 $label = 'A';
                                             }
+
                                         }
 
-                                        /* DATA DETAIL ABSENSI */
+
                                         $jsonAbsen = '';
 
                                         if ($absen) {
@@ -985,9 +929,10 @@
                                                     : null,
                                                 'alasan_terlambat' => $teksAlasan,
                                             ]);
+
                                         }
 
-                                        /* DATA DETAIL IZIN */
+
                                         $jsonIzin = '';
 
                                         if ($dataIzin) {
@@ -1002,15 +947,18 @@
                                                     ? asset('storage/' . $dataIzin->lampiran)
                                                     : null
                                             ]);
+
                                         }
+
                                     @endphp
+
 
                                     <td>
 
                                         @if($dataIzin && $dataIzin->status == 'Disetujui')
 
                                             <div class="status-badge-cell cell-izin"
-                                                 onclick='showDetailIzin(@json(json_decode($jsonIzin, true)))'>
+                                                 onclick='showDetailIzin(@json($jsonIzin ? json_decode($jsonIzin, true) : []))'>
 
                                                 {{ $dataIzin->jenis_izin == 'Sakit' ? 'S' : 'I' }}
 
@@ -1019,7 +967,7 @@
                                         @elseif($dataIzin && $dataIzin->status == 'Menunggu')
 
                                             <div class="status-badge-cell cell-pending"
-                                                 onclick='showDetailIzin(@json(json_decode($jsonIzin, true)))'>
+                                                 onclick='showDetailIzin(@json($jsonIzin ? json_decode($jsonIzin, true) : []))'>
 
                                                 <i class="bi bi-hourglass-split"></i>
 
@@ -1028,14 +976,13 @@
                                         @elseif($absen)
 
                                             <div class="status-badge-cell {{ $cellClass }}"
-                                                 onclick='showDetailAbsensi(@json(json_decode($jsonAbsen, true)))'>
+                                                 onclick='showDetailAbsensi(@json($jsonAbsen ? json_decode($jsonAbsen, true) : []))'>
 
                                                 {{ $label }}
 
                                                 @if($teksAlasan)
                                                     <i class="bi bi-chat-left-text"
-                                                       style="font-size: 10px; position: absolute; top: 2px; right: 2px;">
-                                                    </i>
+                                                       style="font-size: 10px; position: absolute; top: 2px; right: 2px;"></i>
                                                 @endif
 
                                             </div>
@@ -1064,29 +1011,35 @@
 
         </div>
 
-        <!-- LEGEND / KETERANGAN -->
+
+        <!-- LEGEND -->
         <div class="legend-box">
 
             <div class="d-flex align-items-center gap-2">
 
                 <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-                     style="width: 32px; height: 32px; flex-shrink: 0;">
+                     style="width: 32px; height: 32px;">
 
                     <i class="bi bi-info-circle-fill"></i>
 
                 </div>
 
                 <div>
-                    <span class="fw-bold text-dark d-block" style="font-size: 14px;">
+
+                    <span class="fw-bold text-dark d-block"
+                          style="font-size: 14px;">
                         Keterangan Status
                     </span>
 
-                    <span class="text-muted" style="font-size: 12px;">
+                    <span class="text-muted"
+                          style="font-size: 12px;">
                         Indikator warna matriks kehadiran
                     </span>
+
                 </div>
 
             </div>
+
 
             <div class="d-flex gap-2 flex-wrap">
 
@@ -1125,13 +1078,11 @@
         </div>
 
     </div>
+
 </div>
 
 
-<!-- =========================================
-     MODAL DETAIL ABSENSI
-========================================= -->
-
+<!-- MODAL DETAIL ABSENSI -->
 <div class="modal fade"
      id="modalDetailAbsensi"
      tabindex="-1"
@@ -1158,6 +1109,7 @@
 
             </div>
 
+
             <div class="modal-body p-4">
 
                 <div class="row mb-4">
@@ -1175,13 +1127,15 @@
 
                     <div class="col-md-6 text-md-end mt-3 mt-md-0">
 
-                        <span class="badge fs-6 px-3 py-2" id="modalStatus">
+                        <span class="badge fs-6 px-3 py-2"
+                              id="modalStatus">
                             -
                         </span>
 
                     </div>
 
                 </div>
+
 
                 <div class="row g-3 mb-4">
 
@@ -1193,13 +1147,15 @@
                                 Jam Masuk
                             </small>
 
-                            <span class="fs-5 fw-bold text-success" id="modalJamMasuk">
+                            <span class="fs-5 fw-bold text-success"
+                                  id="modalJamMasuk">
                                 --:--
                             </span>
 
                         </div>
 
                     </div>
+
 
                     <div class="col-6">
 
@@ -1209,7 +1165,8 @@
                                 Jam Pulang
                             </small>
 
-                            <span class="fs-5 fw-bold text-danger" id="modalJamPulang">
+                            <span class="fs-5 fw-bold text-danger"
+                                  id="modalJamPulang">
                                 --:--
                             </span>
 
@@ -1219,7 +1176,7 @@
 
                 </div>
 
-                <!-- ALASAN TERLAMBAT -->
+
                 <div id="boxAlasanTerlambat"
                      class="mb-4"
                      style="display: none; background: #fffbeb; border: 1px solid #fde68a; padding: 16px; border-radius: 12px;">
@@ -1235,16 +1192,18 @@
 
                 </div>
 
+
                 <hr class="text-muted">
+
 
                 <h6 class="fw-bold mb-3 text-dark">
                     <i class="bi bi-camera me-2"></i>
                     Bukti Foto Absensi
                 </h6>
 
+
                 <div class="row g-3 text-center">
 
-                    <!-- FOTO MASUK -->
                     <div class="col-md-6">
 
                         <div class="p-2 border rounded-4 bg-white">
@@ -1263,6 +1222,7 @@
                                  class="py-5 text-muted bg-light rounded-4">
 
                                 <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
+
                                 <small>Tidak ada foto</small>
 
                             </div>
@@ -1271,7 +1231,7 @@
 
                     </div>
 
-                    <!-- FOTO PULANG -->
+
                     <div class="col-md-6">
 
                         <div class="p-2 border rounded-4 bg-white">
@@ -1290,6 +1250,7 @@
                                  class="py-5 text-muted bg-light rounded-4">
 
                                 <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
+
                                 <small>Tidak ada foto</small>
 
                             </div>
@@ -1301,6 +1262,7 @@
                 </div>
 
             </div>
+
 
             <div class="modal-footer bg-light border-0">
 
@@ -1319,10 +1281,7 @@
 </div>
 
 
-<!-- =========================================
-     MODAL DETAIL IZIN
-========================================= -->
-
+<!-- MODAL DETAIL IZIN -->
 <div class="modal fade"
      id="modalDetailIzin"
      tabindex="-1"
@@ -1346,6 +1305,7 @@
                 </button>
 
             </div>
+
 
             <div class="modal-body p-4">
 
@@ -1373,6 +1333,7 @@
                     <strong>Alasan:</strong>
                     <span id="izAlasan"></span>
                 </p>
+
 
                 <div id="izBoxLampiran"
                      class="mt-3"
@@ -1402,15 +1363,8 @@
 </div>
 
 
-<!-- =========================================
-     JAVASCRIPT MODAL
-========================================= -->
-
+<!-- JAVASCRIPT MODAL -->
 <script>
-
-    /* =====================================
-       DETAIL ABSENSI
-    ===================================== */
 
     function showDetailAbsensi(data) {
 
@@ -1420,11 +1374,13 @@
         document.getElementById('modalTanggal').innerText =
             data.tanggal || '-';
 
+
         let badgeStatus = document.getElementById('modalStatus');
 
         badgeStatus.innerText = data.status || '-';
 
-        badgeStatus.className = 'badge fs-6 px-3 py-2';
+        badgeStatus.className = 'badge fs-6 px-3 py-2 ';
+
 
         if (data.status === 'Hadir' || data.status === 'Tepat Waktu') {
 
@@ -1448,6 +1404,7 @@
 
         }
 
+
         document.getElementById('modalJamMasuk').innerText =
             data.jam_masuk ? data.jam_masuk.substring(0, 5) : '--:--';
 
@@ -1455,13 +1412,10 @@
             data.jam_pulang ? data.jam_pulang.substring(0, 5) : '--:--';
 
 
-        /* ALASAN TERLAMBAT */
+        const boxAlasan = document.getElementById('boxAlasanTerlambat');
 
-        const boxAlasan =
-            document.getElementById('boxAlasanTerlambat');
+        const teksAlasan = document.getElementById('teksAlasanTerlambat');
 
-        const teksAlasan =
-            document.getElementById('teksAlasanTerlambat');
 
         if (data.alasan_terlambat) {
 
@@ -1476,27 +1430,27 @@
         }
 
 
-        /* FOTO MASUK */
+        let imgMasuk = document.getElementById('imgFotoMasuk');
 
-        let imgMasuk =
-            document.getElementById('imgFotoMasuk');
+        let noFotoMasuk = document.getElementById('noFotoMasuk');
 
-        let noFotoMasuk =
-            document.getElementById('noFotoMasuk');
 
-        imgMasuk.onerror = function () {
-            this.classList.add('d-none');
+        imgMasuk.onerror = function() {
+
+            imgMasuk.classList.add('d-none');
+
             noFotoMasuk.classList.remove('d-none');
-            this.removeAttribute('src');
+
         };
 
-        if (data.foto_masuk) {
 
-            noFotoMasuk.classList.add('d-none');
+        if (data.foto_masuk) {
 
             imgMasuk.src = data.foto_masuk;
 
             imgMasuk.classList.remove('d-none');
+
+            noFotoMasuk.classList.add('d-none');
 
         } else {
 
@@ -1509,27 +1463,27 @@
         }
 
 
-        /* FOTO PULANG */
+        let imgPulang = document.getElementById('imgFotoPulang');
 
-        let imgPulang =
-            document.getElementById('imgFotoPulang');
+        let noFotoPulang = document.getElementById('noFotoPulang');
 
-        let noFotoPulang =
-            document.getElementById('noFotoPulang');
 
-        imgPulang.onerror = function () {
-            this.classList.add('d-none');
+        imgPulang.onerror = function() {
+
+            imgPulang.classList.add('d-none');
+
             noFotoPulang.classList.remove('d-none');
-            this.removeAttribute('src');
+
         };
 
-        if (data.foto_pulang) {
 
-            noFotoPulang.classList.add('d-none');
+        if (data.foto_pulang) {
 
             imgPulang.src = data.foto_pulang;
 
             imgPulang.classList.remove('d-none');
+
+            noFotoPulang.classList.add('d-none');
 
         } else {
 
@@ -1542,8 +1496,6 @@
         }
 
 
-        /* TAMPILKAN MODAL */
-
         let modal = new bootstrap.Modal(
             document.getElementById('modalDetailAbsensi')
         );
@@ -1553,9 +1505,6 @@
     }
 
 
-    /* =====================================
-       DETAIL IZIN
-    ===================================== */
 
     function showDetailIzin(data) {
 
@@ -1572,8 +1521,7 @@
             data.alasan || '-';
 
 
-        const statusEl =
-            document.getElementById('izStatus');
+        const statusEl = document.getElementById('izStatus');
 
         statusEl.innerText = data.status || '-';
 
@@ -1583,13 +1531,10 @@
                 : (data.status === 'Menunggu' ? '#ea580c' : '#dc2626');
 
 
-        /* LAMPIRAN */
+        const boxLampiran = document.getElementById('izBoxLampiran');
 
-        const boxLampiran =
-            document.getElementById('izBoxLampiran');
+        const linkLampiran = document.getElementById('izLinkLampiran');
 
-        const linkLampiran =
-            document.getElementById('izLinkLampiran');
 
         if (data.lampiran) {
 
@@ -1605,8 +1550,6 @@
 
         }
 
-
-        /* TAMPILKAN MODAL */
 
         let modal = new bootstrap.Modal(
             document.getElementById('modalDetailIzin')
