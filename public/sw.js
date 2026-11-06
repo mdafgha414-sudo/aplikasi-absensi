@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_KEY = "sw-1793943074";
+const CACHE_KEY = "sw-1793946248";
 const IGNORED_PATHS = ['/api/', '/livewire/', '/_inertia/'];
 const OFFLINE_URL = "/offline.html";
 

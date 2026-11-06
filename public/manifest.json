@@ -1,7 +1,7 @@
 {
     "id": "/",
-    "name": "Laravel",
-    "short_name": "Laravel",
+    "name": "Timetrix",
+    "short_name": "Timetrix",
     "description": "A Progressive Web Application setup for Laravel projects.",
     "start_url": "/",
     "scope": "/",
