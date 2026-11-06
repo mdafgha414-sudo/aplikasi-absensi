@@ -34,7 +34,8 @@
                         <option value="Semua">Semua Role</option>
                         <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Siswa</option>
                         <option value="guru" {{ request('role') == 'guru' ? 'selected' : '' }}>Guru</option>
-                        <option value="pembimbing" {{ request('pembimbing') == 'pembimbing' ? 'selected' : '' }}>Pembimbing</option>
+                        <option value="pembimbing" {{ request('role') == 'pembimbing' ? 'selected' : '' }}>Pembimbing</option>
+                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                     </select>
                 </div>
 
@@ -108,12 +109,19 @@
                                 <td>{{ $pengguna->sekolah->nama_sekolah ?? '-' }}</td>
                                 <td>{{ $pengguna->perusahaan->nama_perusahaan ?? '-' }}</td>
                                 <td class="text-center">
-                                    <a href="{{ url('/admin/edit-user/' . $pengguna->id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                                    @if(strtolower($pengguna->role) !== 'admin')
-                                    <form action="{{ url('/admin/hapus-user/' . $pengguna->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pengguna ini?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
+                                    {{-- Cek jika yang diedit adalah Admin --}}
+                                    @if(strtolower($pengguna->role) === 'admin')
+                                        <span class="text-muted small fst-italic">Tidak dapat diedit</span>
+                                    @else
+                                        <a href="{{ url('/admin/edit-user/' . $pengguna->id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ url('/admin/hapus-user/' . $pengguna->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pengguna ini?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     @endif
                                 </td>
                             </tr>

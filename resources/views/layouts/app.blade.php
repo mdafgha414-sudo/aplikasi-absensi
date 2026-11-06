@@ -32,7 +32,6 @@
             left: 0;
             background-color: var(--sidebar-bg);
             padding-top: 20px;
-            /* TAMBAHAN: Memberi ruang kosong di bawah agar Logout tidak mepet */
             padding-bottom: 40px; 
             z-index: 1050;
             transition: all 0.3s ease;
@@ -41,15 +40,8 @@
             border-right: 1px solid #bae6fd;
         }
 
-        /* --- PERBAIKAN SCROLLBAR (DISEMBUNYIKAN TOTAL) --- */
-        .sidebar::-webkit-scrollbar {
-            display: none; /* Sembunyikan scrollbar di Chrome, Safari, Edge */
-        }
-        .sidebar {
-            -ms-overflow-style: none;  /* Sembunyikan scrollbar di IE dan Edge lama */
-            scrollbar-width: none;  /* Sembunyikan scrollbar di Firefox */
-        }
-        /* ------------------------------------------------ */
+        .sidebar::-webkit-scrollbar { display: none; }
+        .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .sidebar.collapsed { left: calc(-1 * var(--sidebar-width)); }
 
@@ -113,114 +105,49 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* =========================================
-        TOMBOL HAMBURGER SIDEBAR
-        Tombol untuk membuka dan menutup sidebar.
-        Tetap terlihat selama topbar ditampilkan.
-        ========================================= */
-
         .btn-toggle-sidebar {
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
             color: #1e293b;
-
-            /* Ukuran tombol agar nyaman diklik */
             width: 42px;
             height: 42px;
             border-radius: 8px;
-
-            /* Memposisikan ikon tepat di tengah */
             display: flex;
             align-items: center;
             justify-content: center;
-
             font-size: 20px;
             cursor: pointer;
-
-            transition: background-color 0.2s ease,
-                        border-color 0.2s ease,
-                        color 0.2s ease;
-
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
         }
 
-        /* Efek ketika tombol disentuh atau diarahkan mouse */
         .btn-toggle-sidebar:hover {
             background-color: #f0f9ff;
             border-color: #bae6fd;
             color: #0284c7;
         }
 
-        /* Efek ketika tombol sedang ditekan */
         .btn-toggle-sidebar:active {
             transform: scale(0.96);
         }
 
-        /* Fokus keyboard untuk aksesibilitas */
         .btn-toggle-sidebar:focus-visible {
             outline: 3px solid rgba(2, 132, 199, 0.3);
             outline-offset: 3px;
         }
 
-        /* =========================================
-        RESPONSIVE SIDEBAR
-        Mengatur sidebar pada layar tablet dan HP.
-        ========================================= */
-
         @media (max-width: 991px) {
-
-            /* Sidebar disembunyikan di luar layar */
-            .sidebar {
-                left: calc(-1 * var(--sidebar-width));
-                width: var(--sidebar-width);
-                z-index: 1050;
-            }
-
-            /* Sidebar muncul ketika tombol hamburger diklik */
-            .sidebar.show-mobile {
-                left: 0;
-            }
-
-            /* Konten memenuhi layar tanpa ruang sidebar */
-            .main-content {
-                margin-left: 0;
-                padding: 15px;
-            }
-
-            /* Padding khusus halaman full-screen */
-            .main-content.full-screen {
-                padding: 15px;
-            }
-
-            /* =====================================
-            OVERLAY SIDEBAR MOBILE
-            Lapisan gelap di belakang sidebar.
-            ===================================== */
-
+            .sidebar { left: calc(-1 * var(--sidebar-width)); width: var(--sidebar-width); z-index: 1050; }
+            .sidebar.show-mobile { left: 0; }
+            .main-content { margin-left: 0; padding: 15px; }
+            .main-content.full-screen { padding: 15px; }
             .sidebar-overlay {
-                display: none;
-
-                position: fixed;
-                top: 0;
-                left: 0;
-
-                width: 100vw;
-                height: 100vh;
-
-                background: rgba(15, 23, 42, 0.5);
-                backdrop-filter: blur(2px);
-
-                z-index: 1040;
-
-                opacity: 0;
-                transition: opacity 0.3s ease;
+                display: none; position: fixed; top: 0; left: 0;
+                width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.5);
+                backdrop-filter: blur(2px); z-index: 1040;
+                opacity: 0; transition: opacity 0.3s ease;
             }
-
-            /* Overlay aktif ketika sidebar dibuka */
-            .sidebar-overlay.show {
-                display: block;
-                opacity: 1;
-            }
+            .sidebar-overlay.show { display: block; opacity: 1; }
         }
     </style>
 </head>
@@ -264,7 +191,6 @@
             @if(Auth::user()->role === 'pembimbing')
                 <li><a href="{{ route('pembimbing.dashboard') }}" class="{{ request()->routeIs('pembimbing.dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard Pembimbing</a></li>
 
-                  <!-- MENU MANAJEMEN SISWA -->
                 <li class="menu-label mt-2">Manajemen Data</li>
                 <li>
                     <a href="{{ route('pembimbing.siswa.index') }}" class="{{ request()->routeIs('pembimbing.siswa*') ? 'active' : '' }}">
@@ -277,7 +203,6 @@
                     </a>
                 </li>
 
-                
                 <li>
                     <a href="{{ route('pembimbing.scan.index') }}" class="{{ request()->routeIs('pembimbing.scan*') ? 'active' : '' }}">
                         <i class="bi bi-qr-code-scan"></i> Scan Kartu Siswa
@@ -295,50 +220,15 @@
                     <a href="{{ route('pembimbing.jurnal') }}"
                     class="{{ request()->routeIs('pembimbing.jurnal') ? 'active' : '' }}">
 
-                        {{-- ICON + BADGE --}}
-                        <span style="
-                            position: relative;
-                            display: inline-flex;
-                            align-items: center;
-                            justify-content: center;
-                            width: 24px;
-                            height: 24px;
-                            flex-shrink: 0;
-                            margin-right: 12px;
-                        ">
-
-                            <i class="bi bi-journal-check"
-                            style="margin: 0; font-size: 18px; width: auto;">
-                            </i>
-
-                            @if($jumlahJurnalPending > 0)
-                                <span style="
-                                    position: absolute;
-                                    top: -7px;
-                                    right: -7px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    min-width: 18px;
-                                    height: 18px;
-                                    padding: 0 3px;
-                                    background-color: #ef4444;
-                                    color: #ffffff;
-                                    font-size: 10px;
-                                    font-weight: 800;
-                                    line-height: 1;
-                                    border-radius: 50%;
-                                    border: 2px solid #e0f2fe;
-                                    z-index: 999;
-                                ">
+                        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0; margin-right: 12px;">
+                            <i class="bi bi-journal-check" style="margin: 0; font-size: 18px; width: auto;"></i>
+                            @if(isset($jumlahJurnalPending) && $jumlahJurnalPending > 0)
+                                <span style="position: absolute; top: -7px; right: -7px; display: flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 3px; background-color: #ef4444; color: #ffffff; font-size: 10px; font-weight: 800; line-height: 1; border-radius: 50%; border: 2px solid #e0f2fe; z-index: 999;">
                                     {{ $jumlahJurnalPending }}
                                 </span>
                             @endif
-
                         </span>
-
                         <span>Nilai Jurnal Siswa</span>
-
                     </a>
                 </li>
                 
@@ -349,52 +239,15 @@
                     class="{{ request()->routeIs('pembimbing.izin*') ? 'active' : '' }}"
                     style="display: flex; align-items: center;">
 
-                        {{-- IKON AMPlOP + NOTIFIKASI --}}
-                        <span style="
-                            position: relative;
-                            display: inline-flex;
-                            align-items: center;
-                            justify-content: center;
-                            width: 24px;
-                            height: 24px;
-                            flex-shrink: 0;
-                            margin-right: 12px;
-                        ">
-
-                            <i class="bi bi-envelope-paper"
-                            style="margin: 0; font-size: 18px; width: auto;">
-                            </i>
-
+                        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0; margin-right: 12px;">
+                            <i class="bi bi-envelope-paper" style="margin: 0; font-size: 18px; width: auto;"></i>
                             @if(isset($jumlahIzinPending) && $jumlahIzinPending > 0)
-
-                                <span style="
-                                    position: absolute;
-                                    top: -7px;
-                                    right: -7px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    min-width: 18px;
-                                    height: 18px;
-                                    padding: 0 3px;
-                                    background-color: #ef4444;
-                                    color: #ffffff;
-                                    font-size: 10px;
-                                    font-weight: 800;
-                                    line-height: 1;
-                                    border-radius: 50%;
-                                    border: 2px solid #e0f2fe;
-                                    z-index: 999;
-                                ">
+                                <span style="position: absolute; top: -7px; right: -7px; display: flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 3px; background-color: #ef4444; color: #ffffff; font-size: 10px; font-weight: 800; line-height: 1; border-radius: 50%; border: 2px solid #e0f2fe; z-index: 999;">
                                     {{ $jumlahIzinPending }}
                                 </span>
-
                             @endif
-
                         </span>
-
                         <span>Daftar Izin Siswa</span>
-
                     </a>
                 </li>
 
@@ -403,50 +256,15 @@
                     <a href="{{ route('pembimbing.keterlambatan.index') }}"
                     class="{{ request()->routeIs('pembimbing.keterlambatan.*') ? 'active' : '' }}">
 
-                        {{-- ICON + BADGE --}}
-                        <span style="
-                            position: relative;
-                            display: inline-flex;
-                            align-items: center;
-                            justify-content: center;
-                            width: 24px;
-                            height: 24px;
-                            flex-shrink: 0;
-                            margin-right: 12px;
-                        ">
-
-                            <i class="bi bi-clock-history"
-                            style="margin: 0; font-size: 18px; width: auto;">
-                            </i>
-
-                            @if($jumlahTerlambatPending > 0)
-                                <span style="
-                                    position: absolute;
-                                    top: -7px;
-                                    right: -7px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    min-width: 18px;
-                                    height: 18px;
-                                    padding: 0 3px;
-                                    background-color: #ef4444;
-                                    color: #ffffff;
-                                    font-size: 10px;
-                                    font-weight: 800;
-                                    line-height: 1;
-                                    border-radius: 50%;
-                                    border: 2px solid #e0f2fe;
-                                    z-index: 999;
-                                ">
+                        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0; margin-right: 12px;">
+                            <i class="bi bi-clock-history" style="margin: 0; font-size: 18px; width: auto;"></i>
+                            @if(isset($jumlahTerlambatPending) && $jumlahTerlambatPending > 0)
+                                <span style="position: absolute; top: -7px; right: -7px; display: flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 3px; background-color: #ef4444; color: #ffffff; font-size: 10px; font-weight: 800; line-height: 1; border-radius: 50%; border: 2px solid #e0f2fe; z-index: 999;">
                                     {{ $jumlahTerlambatPending }}
                                 </span>
                             @endif
-
                         </span>
-
                         <span>Keterlambatan Siswa</span>
-
                     </a>
                 </li>
             @endif
@@ -454,23 +272,21 @@
             {{-- MENU ADMIN --}}
             @if(Auth::user()->role === 'admin')
                 <li><a href="{{ url('/admin/dashboard') }}" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard Admin</a></li>
-                  <!-- TAMBAHKAN MENU INI -->
                 <li>
                     <a href="{{ route('admin.perusahaan.index') }}" class="{{ request()->routeIs('admin.perusahaan*') ? 'active' : '' }}">
                         <i class="bi bi-buildings"></i> Manajemen Perusahaan
                     </a>
                 </li>
                 <li>
-    <a href="{{ route('admin.siswa.index') }}" class="{{ request()->routeIs('admin.siswa*') ? 'active' : '' }}">
-        <i class="bi bi-people-fill"></i> Manajemen Siswa
-    </a>
-</li>
+                    <a href="{{ route('admin.siswa.index') }}" class="{{ request()->routeIs('admin.siswa*') ? 'active' : '' }}">
+                        <i class="bi bi-people-fill"></i> Manajemen Siswa
+                    </a>
+                </li>
                 <li>
                     <a href="{{ route('qr.index') }}" class="{{ request()->routeIs('qr.*') ? 'active' : '' }}">
                         <i class="bi bi-printer"></i> Cetak Kartu QR Siswa
                     </a>
                 </li>
-                              <!-- TAMBAHKAN MENU INI -->
                 <li>
                     <a href="{{ route('admin.sekolah.index') }}" class="{{ request()->routeIs('admin.sekolah.*') ? 'active' : '' }}">
                         <i class="bi bi-building"></i> Manajemen Sekolah
@@ -481,11 +297,13 @@
             <!-- MENU PENGATURAN -->
             <li class="menu-label mt-4">Pengaturan</li>
             
+            {{-- Pengaturan Jam (Hanya Admin) --}}
             @if (Auth::user()->role === 'admin')
                 <li><a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan Jam</a></li>
-            @else
-                <li><a href="{{ route('pengaturan') }}" class="{{ request()->is('pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
             @endif
+
+            {{-- Pengaturan Profil (Semua Role) --}}
+            <li><a href="{{ route('pengaturan') }}" class="{{ request()->is('pengaturan') ? 'active' : '' }}"><i class="bi bi-person-gear"></i> Pengaturan Profil</a></li>
          
             <li>
                 <form action="/logout" method="POST">
@@ -508,24 +326,15 @@
         <div class="topbar">
             <div class="d-flex align-items-center">
                 @auth
-                {{-- =========================================
-                TOMBOL HAMBURGER SIDEBAR
-                Membuka dan menutup menu navigasi.
-                Tampil pada halaman yang menggunakan topbar.
-                ========================================= --}}
-
-            <button
-                class="btn-toggle-sidebar me-3"
-                id="toggleSidebar"
-                type="button"
-                aria-label="Buka atau tutup menu navigasi"
-                aria-controls="sidebar"
-                aria-expanded="false">
-
-                {{-- Ikon hamburger dari Bootstrap Icons --}}
-                <i class="bi bi-list"></i>
-
-            </button>
+                <button
+                    class="btn-toggle-sidebar me-3"
+                    id="toggleSidebar"
+                    type="button"
+                    aria-label="Buka atau tutup menu navigasi"
+                    aria-controls="sidebar"
+                    aria-expanded="false">
+                    <i class="bi bi-list"></i>
+                </button>
                 <h5 class="mb-0 fw-bold text-dark d-none d-sm-block">Dashboard</h5>
                 @endauth
             </div>
@@ -534,7 +343,6 @@
                 @if(Auth::check())
                     <span class="me-3 fw-bold text-muted d-none d-sm-inline" style="font-size: 14px;">Halo, {{ Auth::user()->name }}</span>
                     
-                    <!-- FOTO PROFIL DI TOPBAR -->
                     <a href="{{ route('pengaturan') }}" title="Buka Pengaturan Profil" class="text-decoration-none">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-weight: bold; overflow: hidden; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                             @if(Auth::user()->foto_profil)
@@ -552,196 +360,84 @@
         @yield('content') 
     </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
-        <script>
-        /* =========================================
-        TIMETRIX - SIDEBAR CONTROLLER
-        Mengatur buka/tutup sidebar pada laptop,
-        tablet, dan HP.
-        ========================================= */
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
-
-            // Mengambil elemen yang digunakan untuk sidebar
             const toggleBtn = document.getElementById('toggleSidebar');
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
             const overlay = document.getElementById('sidebarOverlay');
 
-            // Memastikan elemen sidebar tersedia sebelum menjalankan fungsi
-            // Ini mencegah JavaScript error pada halaman tanpa sidebar.
-            if (!sidebar || !mainContent) {
-                return;
-            }
+            if (!sidebar || !mainContent) return;
 
-            // Memeriksa apakah perangkat menggunakan tampilan mobile
-            function isMobile() {
-                return window.innerWidth < 992;
-            }
-
-            // =====================================
-            // FUNGSI MEMBUKA SIDEBAR MOBILE
-            // =====================================
+            function isMobile() { return window.innerWidth < 992; }
 
             function openMobileSidebar() {
-
-                // Menampilkan sidebar dari sisi kiri layar
                 sidebar.classList.add('show-mobile');
-
-                // Menampilkan overlay gelap di belakang sidebar
-                if (overlay) {
-                    overlay.classList.add('show');
-                }
-
-                // Mengunci scroll halaman ketika sidebar terbuka
+                if (overlay) overlay.classList.add('show');
                 document.body.style.overflow = 'hidden';
-
-                // Memperbarui status tombol hamburger
-                if (toggleBtn) {
-                    toggleBtn.setAttribute('aria-expanded', 'true');
-                }
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
             }
-
-            // =====================================
-            // FUNGSI MENUTUP SIDEBAR MOBILE
-            // =====================================
 
             function closeMobileSidebar() {
-
-                // Menyembunyikan sidebar dari layar
                 sidebar.classList.remove('show-mobile');
-
-                // Menghilangkan overlay
-                if (overlay) {
-                    overlay.classList.remove('show');
-                }
-
-                // Mengembalikan scroll halaman
+                if (overlay) overlay.classList.remove('show');
                 document.body.style.overflow = '';
-
-                // Memperbarui status tombol hamburger
-                if (toggleBtn) {
-                    toggleBtn.setAttribute('aria-expanded', 'false');
-                }
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
             }
 
-            // =====================================
-            // FUNGSI TOGGLE SIDEBAR
-            // Dipanggil ketika tombol hamburger diklik.
-            // =====================================
-
             if (toggleBtn) {
-
                 toggleBtn.addEventListener('click', function () {
-
                     if (isMobile()) {
-
-                        // MOBILE:
-                        // Membuka atau menutup sidebar menggunakan overlay.
                         if (sidebar.classList.contains('show-mobile')) {
                             closeMobileSidebar();
                         } else {
                             openMobileSidebar();
                         }
-
                     } else {
-
-                        // DESKTOP:
-                        // Menutup atau membuka sidebar dengan menggeser posisinya.
                         sidebar.classList.toggle('collapsed');
-
-                        // Konten utama menyesuaikan ruang sidebar.
                         mainContent.classList.toggle('expanded');
-
-                        // Menyimpan kondisi sidebar agar tetap sama
-                        // ketika halaman dimuat ulang.
-                        localStorage.setItem(
-                            'sidebarCollapsed',
-                            sidebar.classList.contains('collapsed')
-                        );
+                        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
                     }
                 });
             }
 
-            // =====================================
-            // MENUTUP SIDEBAR KETIKA OVERLAY DIKLIK
-            // =====================================
-
             if (overlay) {
-
-                overlay.addEventListener('click', function () {
-                    closeMobileSidebar();
-                });
+                overlay.addEventListener('click', closeMobileSidebar);
             }
-
-            // =====================================
-            // MENUTUP SIDEBAR DENGAN TOMBOL ESC
-            // =====================================
 
             document.addEventListener('keydown', function (event) {
-
-                if (event.key === 'Escape' && isMobile()) {
-                    closeMobileSidebar();
-                }
+                if (event.key === 'Escape' && isMobile()) closeMobileSidebar();
             });
 
-            // =====================================
-            // MEMULIHKAN KONDISI SIDEBAR DESKTOP
-            // =====================================
-
             if (!isMobile()) {
-
-                // Membaca kondisi sidebar yang tersimpan sebelumnya.
                 const savedState = localStorage.getItem('sidebarCollapsed');
-
                 if (savedState === 'true') {
-
                     sidebar.classList.add('collapsed');
                     mainContent.classList.add('expanded');
-
                 } else {
-
                     sidebar.classList.remove('collapsed');
                     mainContent.classList.remove('expanded');
                 }
             }
 
-            // =====================================
-            // MENYESUAIKAN SIDEBAR KETIKA UKURAN
-            // LAYAR BERUBAH
-            // =====================================
-
             window.addEventListener('resize', function () {
-
                 if (isMobile()) {
-
-                    // Ketika berpindah ke tampilan mobile,
-                    // sidebar desktop tidak boleh memengaruhi layout.
                     sidebar.classList.remove('collapsed');
                     mainContent.classList.remove('expanded');
-
                 } else {
-
-                    // Ketika kembali ke desktop, sidebar mobile ditutup.
                     closeMobileSidebar();
-
-                    // Mengembalikan kondisi sidebar desktop.
                     const savedState = localStorage.getItem('sidebarCollapsed');
-
                     if (savedState === 'true') {
-
                         sidebar.classList.add('collapsed');
                         mainContent.classList.add('expanded');
-
                     } else {
-
                         sidebar.classList.remove('collapsed');
                         mainContent.classList.remove('expanded');
                     }
                 }
             });
-
         });
     </script>
 </body>
