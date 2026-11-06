@@ -71,8 +71,8 @@ return [
 
     'manifest' => [
         'id' => env('PWA_ID', '/'),
-        'name' => env('APP_NAME', 'Laravel'),
-        'short_name' => env('PWA_SHORT_NAME', 'Laravel'),
+        'name' => env('APP_NAME', 'Timetrix'),
+        'short_name' => env('PWA_SHORT_NAME', 'Timetrix'),
         'description' => env('PWA_DESCRIPTION', 'A Progressive Web Application setup for Laravel projects.'),
         'start_url' => env('PWA_START_URL', '/'),
         'scope' => env('PWA_SCOPE', '/'),
