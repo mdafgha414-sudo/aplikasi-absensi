@@ -4,6 +4,10 @@
   <!--  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    {{-- TAMBAHAN: Directive PWA (Manifest, Theme Color, dll) --}}
+    @pwaHead
+    
     <title>Timetrix</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -440,5 +444,9 @@
             });
         });
     </script>
+
+    {{-- TAMBAHAN: Directive PWA Service Worker --}}
+    @pwaSw
+
 </body>
 </html>
