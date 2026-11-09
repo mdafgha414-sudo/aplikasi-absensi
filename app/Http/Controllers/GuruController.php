@@ -492,4 +492,39 @@ class GuruController extends Controller
 
         return view('guru.alasan-keterlambatan', compact('alasanKeterlambatan'));
     }
+
+        // FUNGSI BARU: Menyimpan Absensi Manual / Backdate
+    public function simpanAbsensiManual(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'tanggal' => 'required|date',
+            'status' => 'required|in:Hadir,Izin,Sakit,Telat',
+            'jam_masuk' => 'nullable',
+            'jam_pulang' => 'nullable',
+        ]);
+
+        // Cek apakah data sudah ada
+        $absen = Absensi::where('user_id', $request->user_id)
+                        ->where('tanggal', $request->tanggal)
+                        ->first();
+
+        $data = [
+            'user_id' => $request->user_id,
+            'tanggal' => $request->tanggal,
+            'status' => $request->status,
+            'jam_masuk' => $request->jam_masuk,
+            'jam_pulang' => $request->jam_pulang,
+            // Tambahkan keterangan bahwa ini diinput manual (opsional)
+            'is_manual' => true 
+        ];
+
+        if ($absen) {
+            $absen->update($data);
+        } else {
+            Absensi::create($data);
+        }
+
+        return response()->json(['message' => 'Absensi manual berhasil disimpan!']);
+    }
 }

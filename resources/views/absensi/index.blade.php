@@ -393,10 +393,14 @@
     <div class="action-card">
         <h5 class="section-title mb-2">Aksi Absensi</h5>
 
-        {{-- Alasan Keterlambatan --}}
+          {{-- Alasan Keterlambatan (Hanya muncul jika Terlambat) --}}
+        @if ($absenHariIni && $absenHariIni->status == 'Telat')
         <div class="late-reason-card mb-4">
             <h3>📝 Alasan Keterlambatan</h3>
             <p>Jelaskan alasan kamu terlambat. Kamu bisa mengubahnya kapan saja.</p>
+            <!-- ... (sisa form alasan biarkan sama) ... -->
+        </div>
+        @endif
 
             @if (session('success'))
                 <p class="reason-success">{{ session('success') }}</p>

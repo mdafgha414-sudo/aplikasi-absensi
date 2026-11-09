@@ -109,13 +109,12 @@
         flex-wrap: nowrap;
     }
 
-    /* PERBAIKAN: Dropdown dibuat lebih lebar dan padding kanan ditambah agar teks tidak ketumpuk panah */
     .form-select-custom {
         height: 40px;
         min-width: 150px;
         border-radius: 8px;
         border: 1px solid #cbd5e1;
-        padding: 8px 36px 8px 16px; /* Padding kanan 36px agar aman dari ikon panah */
+        padding: 8px 36px 8px 16px;
         font-size: 13px;
         font-weight: 600;
         color: #475569;
@@ -221,6 +220,7 @@
         font-weight: 700;
         cursor: pointer;
         transition: transform 0.2s;
+        position: relative; 
     }
     .status-badge-cell:hover {
         transform: scale(1.1);
@@ -232,7 +232,7 @@
     .cell-sakit { background: #fef9c3; color: #a16207; }
     .cell-telat { background: #ffedd5; color: #c2410c; }
     .cell-alfa { background: #ffe4e6; color: #be123c; }
-    .cell-pending { background: #f1f5f9; color: #94a3b8; cursor: default; }
+    .cell-pending { background: #f1f5f9; color: #94a3b8; cursor: pointer; }
 
     /* --- LEGEND / KETERANGAN --- */
     .legend-box {
@@ -403,7 +403,13 @@
                                         
                                         $dataIzin = $izin[$key] ?? null;
                                         $dataAlasan = isset($alasanKeterlambatan[$key]) ? $alasanKeterlambatan[$key] : null;
-                                        $teksAlasan = $dataAlasan ? $dataAlasan->alasan : null;
+                                        
+                                        // Alasan keterlambatan HANYA diambil jika status absennya 'Telat'
+                                        if ($status == 'Telat' && $dataAlasan && ($dataAlasan->status === 'Disetujui' || $dataAlasan->status === 'Diterima')) {
+                                            $teksAlasan = $dataAlasan->alasan;
+                                        } else {
+                                            $teksAlasan = null;
+                                        }
                                         
                                         $cellClass = 'cell-pending';
                                         $label = '-';
@@ -438,8 +444,10 @@
                                         $jsonAbsen = '';
                                         if ($absen) { 
                                             $jsonAbsen = json_encode([
+                                                'user_id' => $s->id,
                                                 'nama' => $s->name,
-                                                'tanggal' => $tgl->format('d M Y'),
+                                                'tanggal_ymd' => $tgl->format('Y-m-d'),
+                                                'tanggal_label' => $tgl->format('d M Y'),
                                                 'status' => $status,
                                                 'jam_masuk' => $absen->jam_masuk,
                                                 'jam_pulang' => $absen->jam_pulang,
@@ -464,22 +472,24 @@
 
                                     <td>
                                         @if($dataIzin && $dataIzin->status == 'Disetujui')
-                                            <div class="status-badge-cell cell-izin" onclick="showDetailIzin({{ $jsonIzin }})">
+                                            <div class="status-badge-cell cell-izin" onclick="showDetailIzin({{ $jsonIzin }})" title="Klik untuk detail izin">
                                                 {{ $dataIzin->jenis_izin == 'Sakit' ? 'S' : 'I' }}
                                             </div>
                                         @elseif($dataIzin && $dataIzin->status == 'Menunggu')
-                                            <div class="status-badge-cell cell-pending" onclick="showDetailIzin({{ $jsonIzin }})">
+                                            <div class="status-badge-cell cell-pending" onclick="showDetailIzin({{ $jsonIzin }})" title="Menunggu persetujuan">
                                                 <i class="bi bi-hourglass-split"></i>
                                             </div>
                                         @elseif($absen)
-                                            <div class="status-badge-cell {{ $cellClass }}" onclick="showDetailAbsensi({{ $jsonAbsen }})">
+                                            <div class="status-badge-cell {{ $cellClass }}" onclick="showDetailAbsensi({{ $jsonAbsen }})" title="Klik untuk lihat/edit">
                                                 {{ $label }}
                                                 @if($teksAlasan)
                                                     <i class="bi bi-chat-left-text" style="font-size: 10px; position: absolute; top: 2px; right: 2px;"></i>
                                                 @endif
                                             </div>
                                         @else
-                                            <div class="status-badge-cell {{ $cellClass }}">
+                                            <div class="status-badge-cell {{ $cellClass }}" 
+                                                 onclick="bukaKoreksi('{{ $s->id }}', '{{ addslashes($s->name) }}', '{{ $tgl->format('Y-m-d') }}', '{{ $tgl->format('d M Y') }}', '{{ $cellClass }}')"
+                                                 title="Klik untuk koreksi manual">
                                                 {{ $label }}
                                             </div>
                                         @endif
@@ -500,7 +510,7 @@
                 </div>
                 <div>
                     <span class="fw-bold text-dark d-block" style="font-size: 14px;">Keterangan Status</span>
-                    <span class="text-muted" style="font-size: 12px;">Indikator warna matriks kehadiran</span>
+                    <span class="text-muted" style="font-size: 12px;">Semua kotak dapat diklik untuk melihat detail atau koreksi</span>
                 </div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
@@ -520,7 +530,7 @@
                     <span class="status-badge-cell cell-alfa">A</span> Alpa
                 </div>
                 <div class="legend-item leg-pending">
-                    <span class="status-badge-cell cell-pending">-</span> Libur
+                    <span class="status-badge-cell cell-pending">-</span> Libur / Kosong
                 </div>
             </div>
         </div>
@@ -529,7 +539,7 @@
 </div>
 
 <!-- ==================================================== -->
-<!-- MODAL 1: DETAIL ABSENSI                              -->
+<!-- MODAL 1: DETAIL & EDIT ABSENSI                       -->
 <!-- ==================================================== -->
 <div class="modal fade" id="modalDetailAbsensi" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -549,7 +559,7 @@
                     </div>
                 </div>
 
-                <div class="row g-3 mb-4">
+                <div class="row g-3 mb-4" id="boxJamAbsen">
                     <div class="col-6">
                         <div class="bg-light p-3 rounded-4 text-center">
                             <small class="text-muted d-block mb-1">Jam Masuk</small>
@@ -569,34 +579,38 @@
                     <p id="teksAlasanTerlambat" style="margin: 0; color: #92400e; font-size: 14px;"></p>
                 </div>
 
-                <hr class="text-muted">
-
-                <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-camera me-2"></i>Bukti Foto Absensi</h6>
-                <div class="row g-3 text-center">
-                    <div class="col-md-6">
-                        <div class="p-2 border rounded-4 bg-white">
-                            <p class="small text-muted fw-bold mb-2">Foto Masuk</p>
-                            <img id="imgFotoMasuk" src="" alt="Foto Masuk" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
-                            <div id="noFotoMasuk" class="py-5 text-muted bg-light rounded-4">
-                                <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
-                                <small>Tidak ada foto</small>
+                <div id="boxBuktiFoto">
+                    <hr class="text-muted">
+                    <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-camera me-2"></i>Bukti Foto Absensi</h6>
+                    <div class="row g-3 text-center">
+                        <div class="col-md-6">
+                            <div class="p-2 border rounded-4 bg-white">
+                                <p class="small text-muted fw-bold mb-2">Foto Masuk</p>
+                                <img id="imgFotoMasuk" src="" alt="Foto Masuk" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
+                                <div id="noFotoMasuk" class="py-5 text-muted bg-light rounded-4">
+                                    <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
+                                    <small>Tidak ada foto</small>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-2 border rounded-4 bg-white">
-                            <p class="small text-muted fw-bold mb-2">Foto Pulang</p>
-                            <img id="imgFotoPulang" src="" alt="Foto Pulang" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
-                            <div id="noFotoPulang" class="py-5 text-muted bg-light rounded-4">
-                                <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
-                                <small>Tidak ada foto</small>
+                        <div class="col-md-6">
+                            <div class="p-2 border rounded-4 bg-white">
+                                <p class="small text-muted fw-bold mb-2">Foto Pulang</p>
+                                <img id="imgFotoPulang" src="" alt="Foto Pulang" class="img-fluid rounded shadow-sm d-none" style="max-height: 250px; object-fit: cover;">
+                                <div id="noFotoPulang" class="py-5 text-muted bg-light rounded-4">
+                                    <i class="bi bi-image fs-1 opacity-25 d-block mb-2"></i>
+                                    <small>Tidak ada foto</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer bg-light border-0">
+            <div class="modal-footer bg-light border-0 d-flex justify-content-between">
                 <button type="button" class="btn btn-secondary px-4 rounded-3" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-warning px-4 rounded-3 fw-bold" id="btnEditDariDetail">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Status Ini
+                </button>
             </div>
         </div>
     </div>
@@ -630,12 +644,67 @@
 </div>
 
 <!-- ==================================================== -->
+<!-- MODAL 3: KOREKSI ABSENSI MANUAL                      -->
+<!-- ==================================================== -->
+<div class="modal fade" id="modalKoreksiAbsensi" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+            <div class="modal-header bg-primary text-white border-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Koreksi / Edit Absensi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formKoreksi">
+                @csrf
+                <input type="hidden" id="koreksi_user_id" name="user_id">
+                <input type="hidden" id="koreksi_tanggal" name="tanggal">
+                
+                <div class="modal-body p-4">
+                    <h5 class="fw-bold mb-1" id="koreksi_nama">Nama Siswa</h5>
+                    <p class="text-muted mb-3" id="koreksi_tgl_label">Tanggal</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Status Kehadiran:</label>
+                        <select name="status" class="form-select" id="koreksi_status" required>
+                            <option value="Hadir">Hadir (Tepat Waktu)</option>
+                            <option value="Telat">Telat</option>
+                            <option value="Izin">Izin</option>
+                            <option value="Sakit">Sakit</option>
+                            <option value="Alpa">Alpa (Tanpa Keterangan)</option>
+                        </select>
+                    </div>
+
+                    <div class="row" id="rowJamKoreksi">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Jam Masuk (Opsional)</label>
+                            <input type="time" name="jam_masuk" id="koreksi_jam_masuk" class="form-control">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Jam Pulang (Opsional)</label>
+                            <input type="time" name="jam_pulang" id="koreksi_jam_pulang" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================== -->
 <!-- JAVASCRIPT UNTUK MODAL                               -->
 <!-- ==================================================== -->
 <script>
+    let currentAbsenData = null;
+
+    // --- FUNGSI MODAL DETAIL ABSENSI ---
     function showDetailAbsensi(data) {
+        currentAbsenData = data;
+
         document.getElementById('modalNama').innerText = data.nama;
-        document.getElementById('modalTanggal').innerText = data.tanggal;
+        document.getElementById('modalTanggal').innerText = data.tanggal_label;
         
         let badgeStatus = document.getElementById('modalStatus');
         badgeStatus.innerText = data.status;
@@ -650,42 +719,81 @@
         document.getElementById('modalJamMasuk').innerText = data.jam_masuk ? data.jam_masuk.substring(0, 5) : '--:--';
         document.getElementById('modalJamPulang').innerText = data.jam_pulang ? data.jam_pulang.substring(0, 5) : '--:--';
 
+        // LOGIKA BARU: Sembunyikan/Tampilkan elemen berdasarkan status
+        const boxJam = document.getElementById('boxJamAbsen');
+        const boxFoto = document.getElementById('boxBuktiFoto');
         const boxAlasan = document.getElementById('boxAlasanTerlambat');
         const teksAlasan = document.getElementById('teksAlasanTerlambat');
-        
-        if (data.alasan_terlambat) {
-            teksAlasan.innerText = data.alasan_terlambat;
-            boxAlasan.style.display = 'block';
+
+        if (data.status === 'Hadir' || data.status === 'Telat') {
+            // Hadir / Telat: Tampilkan Jam & Foto
+            boxJam.style.display = 'flex';
+            boxFoto.style.display = 'block';
+
+            // Tampilkan alasan HANYA jika statusnya Telat
+            if (data.status === 'Telat' && data.alasan_terlambat) {
+                teksAlasan.innerText = data.alasan_terlambat;
+                boxAlasan.style.display = 'block';
+            } else {
+                boxAlasan.style.display = 'none';
+            }
+
+            // Render Foto
+            let imgMasuk = document.getElementById('imgFotoMasuk');
+            let noFotoMasuk = document.getElementById('noFotoMasuk');
+            if (data.foto_masuk && data.foto_masuk !== '') {
+                imgMasuk.src = data.foto_masuk;
+                imgMasuk.classList.remove('d-none');
+                noFotoMasuk.classList.add('d-none');
+            } else {
+                imgMasuk.classList.add('d-none');
+                noFotoMasuk.classList.remove('d-none');
+            }
+
+            let imgPulang = document.getElementById('imgFotoPulang');
+            let noFotoPulang = document.getElementById('noFotoPulang');
+            if (data.foto_pulang && data.foto_pulang !== '') {
+                imgPulang.src = data.foto_pulang;
+                imgPulang.classList.remove('d-none');
+                noFotoPulang.classList.add('d-none');
+            } else {
+                imgPulang.classList.add('d-none');
+                noFotoPulang.classList.remove('d-none');
+            }
+
         } else {
+            // Izin / Sakit / Alpa: Sembunyikan Jam, Foto, dan Alasan Keterlambatan
+            boxJam.style.display = 'none';
+            boxFoto.style.display = 'none';
             boxAlasan.style.display = 'none';
-        }
-
-        let imgMasuk = document.getElementById('imgFotoMasuk');
-        let noFotoMasuk = document.getElementById('noFotoMasuk');
-        if (data.foto_masuk && data.foto_masuk !== '') {
-            imgMasuk.src = data.foto_masuk;
-            imgMasuk.classList.remove('d-none');
-            noFotoMasuk.classList.add('d-none');
-        } else {
-            imgMasuk.classList.add('d-none');
-            noFotoMasuk.classList.remove('d-none');
-        }
-
-        let imgPulang = document.getElementById('imgFotoPulang');
-        let noFotoPulang = document.getElementById('noFotoPulang');
-        if (data.foto_pulang && data.foto_pulang !== '') {
-            imgPulang.src = data.foto_pulang;
-            imgPulang.classList.remove('d-none');
-            noFotoPulang.classList.add('d-none');
-        } else {
-            imgPulang.classList.add('d-none');
-            noFotoPulang.classList.remove('d-none');
         }
 
         let modal = new bootstrap.Modal(document.getElementById('modalDetailAbsensi'));
         modal.show();
     }
 
+    // --- FUNGSI TOMBOL EDIT DARI DALAM MODAL DETAIL ---
+    document.getElementById('btnEditDariDetail').addEventListener('click', function() {
+        let modalDetailEl = document.getElementById('modalDetailAbsensi');
+        let modalDetail = bootstrap.Modal.getInstance(modalDetailEl);
+        modalDetail.hide();
+
+        if (currentAbsenData) {
+            setTimeout(() => {
+                bukaKoreksi(
+                    currentAbsenData.user_id, 
+                    currentAbsenData.nama, 
+                    currentAbsenData.tanggal_ymd, 
+                    currentAbsenData.tanggal_label,
+                    currentAbsenData.status,
+                    currentAbsenData.jam_masuk,
+                    currentAbsenData.jam_pulang
+                );
+            }, 400);
+        }
+    });
+
+    // --- FUNGSI MODAL DETAIL IZIN ---
     function showDetailIzin(data) {
         document.getElementById('izNama').innerText = data.nama;
         document.getElementById('izTanggal').innerText = data.tanggal;
@@ -709,5 +817,79 @@
         let modal = new bootstrap.Modal(document.getElementById('modalDetailIzin'));
         modal.show();
     }
+
+    // --- FUNGSI MODAL KOREKSI MANUAL ---
+    function bukaKoreksi(id, nama, tanggalYmd, tanggalLabel, statusSaatIni = 'Hadir', jamMasuk = '', jamPulang = '') {
+        document.getElementById('koreksi_user_id').value = id;
+        document.getElementById('koreksi_tanggal').value = tanggalYmd;
+        document.getElementById('koreksi_nama').innerText = nama;
+        document.getElementById('koreksi_tgl_label').innerText = tanggalLabel;
+        
+        document.getElementById('koreksi_status').value = statusSaatIni;
+        document.getElementById('koreksi_jam_masuk').value = jamMasuk ? jamMasuk.substring(0, 5) : '';
+        document.getElementById('koreksi_jam_pulang').value = jamPulang ? jamPulang.substring(0, 5) : '';
+
+        // Panggil fungsi untuk cek form jam
+        toggleFormJam(statusSaatIni);
+
+        let modal = new bootstrap.Modal(document.getElementById('modalKoreksiAbsensi'));
+        modal.show();
+    }
+
+    // --- FUNGSI UNTUK SEMBUNYIKAN FORM JAM SAAT EDIT JIKA IZIN/SAKIT/ALPA ---
+    function toggleFormJam(status) {
+        const rowJam = document.getElementById('rowJamKoreksi');
+        if (status === 'Hadir' || status === 'Telat') {
+            rowJam.style.display = 'flex';
+        } else {
+            rowJam.style.display = 'none';
+        }
+    }
+
+    // Event listener saat dropdown status di modal koreksi diganti
+    document.getElementById('koreksi_status').addEventListener('change', function() {
+        toggleFormJam(this.value);
+    });
+
+    // --- PROSES SUBMIT FORM KOREKSI VIA AJAX ---
+    document.getElementById('formKoreksi').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let formData = new FormData(this);
+        let btn = this.querySelector('button[type="submit"]');
+        let originalText = btn.innerText;
+        
+        btn.disabled = true;
+        btn.innerText = 'Menyimpan...';
+
+        fetch("{{ route('pembimbing.laporan.simpan-manual') }}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message || 'Koreksi absensi berhasil disimpan!');
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            let errorMsg = error.message || 'Terjadi kesalahan sistem.';
+            if (error.errors) {
+                errorMsg = Object.values(error.errors).flat().join('\n');
+            }
+            alert('Gagal menyimpan: \n' + errorMsg);
+            btn.disabled = false;
+            btn.innerText = originalText;
+        });
+    });
 </script>
 @endsection
