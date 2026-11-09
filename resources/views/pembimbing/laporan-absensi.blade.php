@@ -817,13 +817,11 @@ document.addEventListener('DOMContentLoaded', function () {
         inputCari.addEventListener('input', function () {
             const kata = this.value.toLocaleLowerCase('id').trim();
             
-            // Sembunyikan/tampilkan baris siswa
             document.querySelectorAll('.student-row').forEach(function (baris) {
                 const nama = (baris.dataset.nama || '').toLocaleLowerCase('id');
                 baris.style.display = nama.includes(kata) ? '' : 'none';
             });
 
-            // Sembunyikan header sekolah jika semua siswanya tidak ada yang cocok
             document.querySelectorAll('.school-row').forEach(function (barisSekolah) {
                 let adaSiswa = false;
                 let berikutnya = barisSekolah.nextElementSibling;
@@ -840,190 +838,225 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- EVENT LISTENER TOMBOL EDIT DI MODAL DETAIL ---
-    document.getElementById('btnEditDariDetail').addEventListener('click', function() {
-        let modalDetailEl = document.getElementById('modalDetailAbsensi');
-        let modalDetail = bootstrap.Modal.getInstance(modalDetailEl);
-        if(modalDetail) modalDetail.hide();
+    const btnEdit = document.getElementById('btnEditDariDetail');
+    if(btnEdit) {
+        btnEdit.addEventListener('click', function() {
+            let modalDetailEl = document.getElementById('modalDetailAbsensi');
+            let modalDetail = bootstrap.Modal.getInstance(modalDetailEl);
+            if(modalDetail) modalDetail.hide();
 
-        if (window.currentAbsenData) {
-            setTimeout(() => {
-                bukaKoreksi(
-                    window.currentAbsenData.user_id, 
-                    window.currentAbsenData.nama, 
-                    window.currentAbsenData.tanggal_ymd, 
-                    window.currentAbsenData.tanggal_label,
-                    window.currentAbsenData.status,
-                    window.currentAbsenData.jam_masuk,
-                    window.currentAbsenData.jam_pulang
-                );
-            }, 400);
-        }
-    });
+            if (window.currentAbsenData) {
+                setTimeout(() => {
+                    bukaKoreksi(
+                        window.currentAbsenData.user_id, 
+                        window.currentAbsenData.nama, 
+                        window.currentAbsenData.tanggal_ymd, 
+                        window.currentAbsenData.tanggal_label,
+                        window.currentAbsenData.status,
+                        window.currentAbsenData.jam_masuk,
+                        window.currentAbsenData.jam_pulang
+                    );
+                }, 400);
+            }
+        });
+    }
 
     // --- EVENT LISTENER DROPDOWN STATUS DI FORM KOREKSI ---
-    document.getElementById('koreksi_status').addEventListener('change', function() {
-        toggleFormJam(this.value);
-    });
+    const selStatus = document.getElementById('koreksi_status');
+    if(selStatus) {
+        selStatus.addEventListener('change', function() {
+            toggleFormJam(this.value);
+        });
+    }
 
     // --- EVENT LISTENER SUBMIT FORM KOREKSI (AJAX) ---
-    document.getElementById('formKoreksi').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let formData = new FormData(this);
-        let btn = this.querySelector('button[type="submit"]');
-        let originalText = btn.innerText;
-        
-        btn.disabled = true;
-        btn.innerText = 'Menyimpan...';
+    const formKoreksi = document.getElementById('formKoreksi');
+    if(formKoreksi) {
+        formKoreksi.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            let btn = this.querySelector('button[type="submit"]');
+            let originalText = btn.innerText;
+            
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
 
-        fetch("{{ route('pembimbing.laporan.simpan-manual') }}", {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message || 'Koreksi absensi berhasil disimpan!');
-            location.reload();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            let errorMsg = error.message || 'Terjadi kesalahan sistem.';
-            if (error.errors) {
-                errorMsg = Object.values(error.errors).flat().join('\n');
-            }
-            alert('Gagal menyimpan: \n' + errorMsg);
-            btn.disabled = false;
-            btn.innerText = originalText;
+            fetch("{{ route('pembimbing.laporan.simpan-manual') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message || 'Koreksi absensi berhasil disimpan!');
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let errorMsg = error.message || 'Terjadi kesalahan sistem.';
+                if (error.errors) {
+                    errorMsg = Object.values(error.errors).flat().join('\n');
+                }
+                alert('Gagal menyimpan: \n' + errorMsg);
+                btn.disabled = false;
+                btn.innerText = originalText;
+            });
         });
-    });
+    }
 
 });
 
 // --- FUNGSI MODAL DETAIL ABSENSI ---
 function showDetailAbsensi(data) {
-    window.currentAbsenData = data; // Simpan ke global scope
+    try {
+        window.currentAbsenData = data; 
 
-    document.getElementById('modalNama').innerText = data.nama || '-';
-    document.getElementById('modalTanggal').innerText = data.tanggal_label || '-';
-    
-    let badgeStatus = document.getElementById('modalStatus');
-    badgeStatus.innerText = data.status || '-';
-    badgeStatus.className = 'badge fs-6 px-3 py-2 ';
-    if (data.status === 'Hadir' || data.status === 'Tepat Waktu') badgeStatus.classList.add('bg-success');
-    else if (data.status === 'Telat') badgeStatus.classList.add('bg-warning', 'text-dark');
-    else if (data.status === 'Izin') badgeStatus.classList.add('bg-primary');
-    else if (data.status === 'Sakit') badgeStatus.classList.add('bg-info', 'text-dark');
-    else badgeStatus.classList.add('bg-danger');
+        document.getElementById('modalNama').innerText = data.nama || '-';
+        document.getElementById('modalTanggal').innerText = data.tanggal_label || '-';
+        
+        let badgeStatus = document.getElementById('modalStatus');
+        badgeStatus.innerText = data.status || '-';
+        badgeStatus.className = 'badge fs-6 px-3 py-2 ';
+        if (data.status === 'Hadir' || data.status === 'Tepat Waktu') badgeStatus.classList.add('bg-success');
+        else if (data.status === 'Telat') badgeStatus.classList.add('bg-warning', 'text-dark');
+        else if (data.status === 'Izin') badgeStatus.classList.add('bg-primary');
+        else if (data.status === 'Sakit') badgeStatus.classList.add('bg-info', 'text-dark');
+        else badgeStatus.classList.add('bg-danger');
 
-    document.getElementById('modalJamMasuk').innerText = data.jam_masuk ? data.jam_masuk.substring(0, 5) : '--:--';
-    document.getElementById('modalJamPulang').innerText = data.jam_pulang ? data.jam_pulang.substring(0, 5) : '--:--';
+        document.getElementById('modalJamMasuk').innerText = data.jam_masuk ? data.jam_masuk.substring(0, 5) : '--:--';
+        document.getElementById('modalJamPulang').innerText = data.jam_pulang ? data.jam_pulang.substring(0, 5) : '--:--';
 
-    const boxJam = document.getElementById('boxJamAbsen');
-    const boxFoto = document.getElementById('boxBuktiFoto');
-    const boxAlasan = document.getElementById('boxAlasanTerlambat');
-    const teksAlasan = document.getElementById('teksAlasanTerlambat');
+        const boxJam = document.getElementById('boxJamAbsen');
+        const boxFoto = document.getElementById('boxBuktiFoto');
+        const boxAlasan = document.getElementById('boxAlasanTerlambat');
+        const teksAlasan = document.getElementById('teksAlasanTerlambat');
 
-    if (data.status === 'Hadir' || data.status === 'Telat') {
-        boxJam.style.display = 'flex';
-        boxFoto.style.display = 'block';
+        if (data.status === 'Hadir' || data.status === 'Telat') {
+            boxJam.style.display = 'flex';
+            boxFoto.style.display = 'block';
 
-        if (data.status === 'Telat' && data.alasan_terlambat) {
-            teksAlasan.innerText = data.alasan_terlambat;
-            boxAlasan.style.display = 'block';
+            if (data.status === 'Telat' && data.alasan_terlambat) {
+                teksAlasan.innerText = data.alasan_terlambat;
+                boxAlasan.style.display = 'block';
+            } else {
+                boxAlasan.style.display = 'none';
+            }
+
+            // Render Foto Masuk
+            let imgMasuk = document.getElementById('imgFotoMasuk');
+            let noFotoMasuk = document.getElementById('noFotoMasuk');
+            if (data.foto_masuk) {
+                imgMasuk.onerror = function() {
+                    this.classList.add('d-none');
+                    noFotoMasuk.classList.remove('d-none');
+                };
+                imgMasuk.src = data.foto_masuk;
+                imgMasuk.classList.remove('d-none');
+                noFotoMasuk.classList.add('d-none');
+            } else {
+                imgMasuk.removeAttribute('src');
+                imgMasuk.classList.add('d-none');
+                noFotoMasuk.classList.remove('d-none');
+            }
+
+            // Render Foto Pulang
+            let imgPulang = document.getElementById('imgFotoPulang');
+            let noFotoPulang = document.getElementById('noFotoPulang');
+            if (data.foto_pulang) {
+                imgPulang.onerror = function() {
+                    this.classList.add('d-none');
+                    noFotoPulang.classList.remove('d-none');
+                };
+                imgPulang.src = data.foto_pulang;
+                imgPulang.classList.remove('d-none');
+                noFotoPulang.classList.add('d-none');
+            } else {
+                imgPulang.removeAttribute('src');
+                imgPulang.classList.add('d-none');
+                noFotoPulang.classList.remove('d-none');
+            }
         } else {
+            boxJam.style.display = 'none';
+            boxFoto.style.display = 'none';
             boxAlasan.style.display = 'none';
         }
 
-        let imgMasuk = document.getElementById('imgFotoMasuk');
-        let noFotoMasuk = document.getElementById('noFotoMasuk');
-        if (data.foto_masuk && data.foto_masuk !== '') {
-            imgMasuk.src = data.foto_masuk;
-            imgMasuk.classList.remove('d-none');
-            noFotoMasuk.classList.add('d-none');
-        } else {
-            imgMasuk.classList.add('d-none');
-            noFotoMasuk.classList.remove('d-none');
-        }
-
-        let imgPulang = document.getElementById('imgFotoPulang');
-        let noFotoPulang = document.getElementById('noFotoPulang');
-        if (data.foto_pulang && data.foto_pulang !== '') {
-            imgPulang.src = data.foto_pulang;
-            imgPulang.classList.remove('d-none');
-            noFotoPulang.classList.add('d-none');
-        } else {
-            imgPulang.classList.add('d-none');
-            noFotoPulang.classList.remove('d-none');
-        }
-    } else {
-        // Sembunyikan jika Izin, Sakit, Alpa
-        boxJam.style.display = 'none';
-        boxFoto.style.display = 'none';
-        boxAlasan.style.display = 'none';
+        let modal = new bootstrap.Modal(document.getElementById('modalDetailAbsensi'));
+        modal.show();
+    } catch (error) {
+        console.error("Error di showDetailAbsensi:", error);
+        alert("Terjadi kesalahan saat membuka detail. Cek Console (F12) untuk info.");
     }
-
-    let modal = new bootstrap.Modal(document.getElementById('modalDetailAbsensi'));
-    modal.show();
 }
 
 // --- FUNGSI MODAL DETAIL IZIN ---
 function showDetailIzin(data) {
-    document.getElementById('izNama').innerText = data.nama || '-';
-    document.getElementById('izTanggal').innerText = data.tanggal || '-';
-    document.getElementById('izJenis').innerText = data.jenis || '-';
-    document.getElementById('izAlasan').innerText = data.alasan || '-';
-    
-    const statusEl = document.getElementById('izStatus');
-    statusEl.innerText = data.status || '-';
-    statusEl.style.color = data.status === 'Disetujui' ? '#16a34a' : (data.status === 'Menunggu' ? '#ea580c' : '#dc2626');
+    try {
+        document.getElementById('izNama').innerText = data.nama || '-';
+        document.getElementById('izTanggal').innerText = data.tanggal || '-';
+        document.getElementById('izJenis').innerText = data.jenis || '-';
+        document.getElementById('izAlasan').innerText = data.alasan || '-';
+        
+        const statusEl = document.getElementById('izStatus');
+        statusEl.innerText = data.status || '-';
+        statusEl.style.color = data.status === 'Disetujui' ? '#16a34a' : (data.status === 'Menunggu' ? '#ea580c' : '#dc2626');
 
-    const boxLampiran = document.getElementById('izBoxLampiran');
-    const linkLampiran = document.getElementById('izLinkLampiran');
-    
-    if (data.lampiran) {
-        linkLampiran.href = data.lampiran;
-        boxLampiran.style.display = 'block';
-    } else {
-        linkLampiran.removeAttribute('href');
-        boxLampiran.style.display = 'none';
+        const boxLampiran = document.getElementById('izBoxLampiran');
+        const linkLampiran = document.getElementById('izLinkLampiran');
+        
+        if (data.lampiran) {
+            linkLampiran.href = data.lampiran;
+            boxLampiran.style.display = 'block';
+        } else {
+            linkLampiran.removeAttribute('href');
+            boxLampiran.style.display = 'none';
+        }
+
+        let modal = new bootstrap.Modal(document.getElementById('modalDetailIzin'));
+        modal.show();
+    } catch (error) {
+        console.error("Error di showDetailIzin:", error);
     }
-
-    let modal = new bootstrap.Modal(document.getElementById('modalDetailIzin'));
-    modal.show();
 }
 
 // --- FUNGSI MODAL KOREKSI MANUAL ---
 function bukaKoreksi(id, nama, tanggalYmd, tanggalLabel, statusSaatIni = 'Hadir', jamMasuk = '', jamPulang = '') {
-    document.getElementById('koreksi_user_id').value = id;
-    document.getElementById('koreksi_tanggal').value = tanggalYmd;
-    document.getElementById('koreksi_nama').innerText = nama;
-    document.getElementById('koreksi_tgl_label').innerText = tanggalLabel;
-    
-    document.getElementById('koreksi_status').value = statusSaatIni;
-    document.getElementById('koreksi_jam_masuk').value = jamMasuk ? jamMasuk.substring(0, 5) : '';
-    document.getElementById('koreksi_jam_pulang').value = jamPulang ? jamPulang.substring(0, 5) : '';
+    try {
+        document.getElementById('koreksi_user_id').value = id;
+        document.getElementById('koreksi_tanggal').value = tanggalYmd;
+        document.getElementById('koreksi_nama').innerText = nama;
+        document.getElementById('koreksi_tgl_label').innerText = tanggalLabel;
+        
+        document.getElementById('koreksi_status').value = statusSaatIni;
+        document.getElementById('koreksi_jam_masuk').value = jamMasuk ? jamMasuk.substring(0, 5) : '';
+        document.getElementById('koreksi_jam_pulang').value = jamPulang ? jamPulang.substring(0, 5) : '';
 
-    toggleFormJam(statusSaatIni);
+        toggleFormJam(statusSaatIni);
 
-    let modal = new bootstrap.Modal(document.getElementById('modalKoreksiAbsensi'));
-    modal.show();
+        let modal = new bootstrap.Modal(document.getElementById('modalKoreksiAbsensi'));
+        modal.show();
+    } catch (error) {
+        console.error("Error di bukaKoreksi:", error);
+    }
 }
 
 // --- FUNGSI SEMBUNYIKAN FORM JAM SAAT EDIT ---
 function toggleFormJam(status) {
     const rowJam = document.getElementById('rowJamKoreksi');
-    if (status === 'Hadir' || status === 'Telat') {
-        rowJam.style.display = 'flex';
-    } else {
-        rowJam.style.display = 'none';
+    if (rowJam) {
+        if (status === 'Hadir' || status === 'Telat') {
+            rowJam.style.display = 'flex';
+        } else {
+            rowJam.style.display = 'none';
+        }
     }
 }
 </script>
