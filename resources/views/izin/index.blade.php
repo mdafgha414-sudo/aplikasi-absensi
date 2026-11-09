@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -441,153 +440,166 @@
 
                 </div>
 
-
-                {{-- 
-                    SESUAIKAN ACTION DAN NAMA INPUT
-                    DENGAN ROUTE DAN CONTROLLER ASLI
-                --}}
-                <form
-                    action="{{ url('/izin') }}"
-                    method="POST"
-                    enctype="multipart/form-data"
-                    class="izin-form"
-                    id="izinForm"
-                >
-
-                    @csrf
-
-                    <div class="row g-4">
-
-                        {{-- JENIS IZIN --}}
-                        <div class="col-md-6">
-
-                            <label>
-                                Jenis Izin <span class="required">*</span>
-                            </label>
-
-                            <select
-                                name="jenis_izin"
-                                class="form-select"
-                                required
-                            >
-                                <option value="">Pilih jenis izin...</option>
-                                <option value="Izin">Izin</option>
-                                <option value="Sakit">Sakit</option>
-                            </select>
-
+                {{-- LOGIKA BLOKIR FORM JIKA SUDAH ABSEN --}}
+                @if($sudahAbsenHariIni)
+                    <div class="alert alert-warning d-flex align-items-start mb-0" role="alert" style="border-radius: 15px; border-left: 5px solid #f59e0b; background-color: #fffbeb; padding: 25px;">
+                        <i class="bi bi-exclamation-triangle-fill fs-2 me-3 text-warning mt-1"></i>
+                        <div>
+                            <h5 class="alert-heading fw-bold text-dark mb-2">Anda Sudah Absen Hari Ini</h5>
+                            <p class="mb-0 text-muted" style="font-size: 14px; line-height: 1.6;">
+                                Sistem mendeteksi Anda sudah melakukan absensi masuk pada hari ini. Formulir pengajuan izin dinonaktifkan untuk mencegah data ganda.
+                                <br><br>
+                                <strong>Silakan ajukan izin untuk tanggal esok hari atau seterusnya.</strong>
+                            </p>
                         </div>
-
-
-                        {{-- TANGGAL --}}
-                        <div class="col-md-6">
-
-                            <label>
-                                Tanggal Izin <span class="required">*</span>
-                            </label>
-
-                            <input
-                                type="date"
-                                name="tanggal_izin"
-                                class="form-control"
-                                required
-                            >
-
-                        </div>
-
-
-                        {{-- ALASAN --}}
-                        <div class="col-12">
-
-                            <label>
-                                Alasan Izin <span class="required">*</span>
-                            </label>
-
-                            <textarea
-                                name="alasan"
-                                id="alasanIzin"
-                                class="form-control"
-                                maxlength="500"
-                                placeholder="Jelaskan alasan izin Anda di sini..."
-                                required
-                            ></textarea>
-
-                            <div class="d-flex justify-content-between">
-                                <span class="form-hint">
-                                    Berikan alasan yang jelas dan lengkap.
-                                </span>
-
-                                <span class="char-count">
-                                    <span id="charCount">0</span>/500 karakter
-                                </span>
-                            </div>
-
-                        </div>
-
-
-                        {{-- LAMPIRAN --}}
-                        <div class="col-12">
-
-                            <label>
-                                Lampiran / Surat Dokter
-                                <span class="text-muted fw-normal">(Opsional)</span>
-                            </label>
-
-                            <label for="lampiran" class="upload-area w-100">
-
-                                <i class="bi bi-cloud-arrow-up"></i>
-
-                                <strong>
-                                    Klik atau seret file ke sini untuk mengunggah
-                                </strong>
-
-                                <span>
-                                    Format: PDF, JPG, PNG | Maksimal 5MB
-                                </span>
-
-                                <div id="fileName"></div>
-
-                            </label>
-
-                            <input
-                                type="file"
-                                name="lampiran"
-                                id="lampiran"
-                                class="d-none"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                            >
-
-                        </div>
-
-
-                        {{-- TOMBOL --}}
-                        <div class="col-12">
-
-                            <div class="d-flex justify-content-between align-items-center form-actions">
-
-                                <button
-                                    type="reset"
-                                    class="btn btn-reset"
-                                    id="resetBtn"
-                                >
-                                    <i class="bi bi-arrow-counterclockwise me-1"></i>
-                                    Reset
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-submit"
-                                >
-                                    <i class="bi bi-send me-2"></i>
-                                    Kirim Pengajuan
-                                </button>
-
-                            </div>
-
-                        </div>
-
                     </div>
+                @else
+                    <form
+                        action="{{ url('/izin') }}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        class="izin-form"
+                        id="izinForm"
+                    >
 
-                </form>
+                        @csrf
+
+                        <div class="row g-4">
+
+                            {{-- JENIS IZIN --}}
+                            <div class="col-md-6">
+
+                                <label>
+                                    Jenis Izin <span class="required">*</span>
+                                </label>
+
+                                <select
+                                    name="jenis_izin"
+                                    id="jenis_izin"
+                                    class="form-select"
+                                    required
+                                >
+                                    <option value="">Pilih jenis izin...</option>
+                                    <option value="Izin">Izin</option>
+                                    <option value="Sakit">Sakit</option>
+                                </select>
+
+                            </div>
+
+
+                            {{-- TANGGAL --}}
+                            <div class="col-md-6">
+
+                                <label>
+                                    Tanggal Izin <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="date"
+                                    name="tanggal_izin"
+                                    id="tanggal_izin"
+                                    class="form-control"
+                                    min="{{ \Carbon\Carbon::today()->format('Y-m-d') }}"
+                                    required
+                                >
+
+                            </div>
+
+
+                            {{-- ALASAN --}}
+                            <div class="col-12">
+
+                                <label>
+                                    Alasan Izin <span class="required">*</span>
+                                </label>
+
+                                <textarea
+                                    name="alasan"
+                                    id="alasanIzin"
+                                    class="form-control"
+                                    maxlength="500"
+                                    placeholder="Jelaskan alasan izin Anda di sini..."
+                                    required
+                                ></textarea>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="form-hint">
+                                        Berikan alasan yang jelas dan lengkap.
+                                    </span>
+
+                                    <span class="char-count">
+                                        <span id="charCount">0</span>/500 karakter
+                                    </span>
+                                </div>
+
+                            </div>
+
+
+                            {{-- LAMPIRAN --}}
+                            <div class="col-12">
+
+                                <label>
+                                    Lampiran / Surat Dokter
+                                    <span class="text-muted fw-normal">(Opsional)</span>
+                                </label>
+
+                                <label for="lampiran" class="upload-area w-100">
+
+                                    <i class="bi bi-cloud-arrow-up"></i>
+
+                                    <strong>
+                                        Klik atau seret file ke sini untuk mengunggah
+                                    </strong>
+
+                                    <span>
+                                        Format: PDF, JPG, PNG | Maksimal 5MB
+                                    </span>
+
+                                    <div id="fileName"></div>
+
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="lampiran"
+                                    id="lampiran"
+                                    class="d-none"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                >
+
+                            </div>
+
+
+                            {{-- TOMBOL --}}
+                            <div class="col-12">
+
+                                <div class="d-flex justify-content-between align-items-center form-actions">
+
+                                    <button
+                                        type="reset"
+                                        class="btn btn-reset"
+                                        id="resetBtn"
+                                    >
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                        Reset
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-submit"
+                                    >
+                                        <i class="bi bi-send me-2"></i>
+                                        Kirim Pengajuan
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+                @endif
 
             </div>
 
@@ -660,59 +672,98 @@
 
 
 <script>
-    // HITUNG KARAKTER ALASAN
+    // Pastikan elemen ada sebelum menjalankan script (karena form bisa disembunyikan)
     const alasan = document.getElementById('alasanIzin');
     const charCount = document.getElementById('charCount');
+    
+    if (alasan && charCount) {
+        alasan.addEventListener('input', function () {
+            charCount.textContent = this.value.length;
+        });
+    }
 
-    alasan.addEventListener('input', function () {
-        charCount.textContent = this.value.length;
-    });
-
-
-    // TAMPILKAN NAMA FILE
     const lampiran = document.getElementById('lampiran');
     const fileName = document.getElementById('fileName');
 
-    lampiran.addEventListener('change', function () {
+    if (lampiran && fileName) {
+        lampiran.addEventListener('change', function () {
+            const file = this.files[0];
 
-        const file = this.files[0];
+            if (!file) {
+                fileName.textContent = '';
+                return;
+            }
 
-        if (!file) {
-            fileName.textContent = '';
-            return;
-        }
+            const allowedTypes = [
+                'application/pdf',
+                'image/jpeg',
+                'image/png'
+            ];
 
-        const allowedTypes = [
-            'application/pdf',
-            'image/jpeg',
-            'image/png'
-        ];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Format file harus PDF, JPG, atau PNG.');
+                this.value = '';
+                fileName.textContent = '';
+                return;
+            }
 
-        if (!allowedTypes.includes(file.type)) {
-            alert('Format file harus PDF, JPG, atau PNG.');
-            this.value = '';
-            fileName.textContent = '';
-            return;
-        }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Ukuran file maksimal 5MB.');
+                this.value = '';
+                fileName.textContent = '';
+                return;
+            }
 
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Ukuran file maksimal 5MB.');
-            this.value = '';
-            fileName.textContent = '';
-            return;
-        }
+            fileName.textContent = 'File dipilih: ' + file.name;
+        });
+    }
 
-        fileName.textContent = 'File dipilih: ' + file.name;
-    });
+    // LOGIKA KALENDER OTOMATIS
+    const jenisIzin = document.getElementById('jenis_izin');
+    const tanggalIzin = document.getElementById('tanggal_izin');
 
+    if (jenisIzin && tanggalIzin) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tmmrwYyyy = tomorrow.getFullYear();
+        const tmmrwMm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const tmmrwDd = String(tomorrow.getDate()).padStart(2, '0');
+        const tomorrowStr = `${tmmrwYyyy}-${tmmrwMm}-${tmmrwDd}`;
+
+        jenisIzin.addEventListener('change', function() {
+            if (this.value === 'Sakit') {
+                tanggalIzin.value = todayStr;
+                tanggalIzin.min = todayStr;
+                tanggalIzin.max = todayStr; 
+            } else if (this.value === 'Izin') {
+                tanggalIzin.value = tomorrowStr;
+                tanggalIzin.min = tomorrowStr;
+                tanggalIzin.max = ''; 
+            } else {
+                tanggalIzin.value = '';
+                tanggalIzin.min = todayStr;
+                tanggalIzin.max = '';
+            }
+        });
+    }
 
     // RESET FORM
-    document.getElementById('izinForm').addEventListener('reset', function () {
-        setTimeout(function () {
-            charCount.textContent = '0';
-            fileName.textContent = '';
-        }, 0);
-    });
+    const izinForm = document.getElementById('izinForm');
+    if (izinForm) {
+        izinForm.addEventListener('reset', function () {
+            setTimeout(function () {
+                if(charCount) charCount.textContent = '0';
+                if(fileName) fileName.textContent = '';
+                if(tanggalIzin) tanggalIzin.value = ''; 
+            }, 0);
+        });
+    }
 </script>
 
 @endsection

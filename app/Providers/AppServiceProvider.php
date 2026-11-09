@@ -37,30 +37,48 @@ class AppServiceProvider extends ServiceProvider
         // ==========================================
         // NOTIFIKASI SIDEBAR PEMBIMBING
         // ==========================================
-
         View::composer('layouts.app', function ($view) {
 
-            // Default notifikasi
             $jumlahJurnalPending = 0;
             $jumlahTerlambatPending = 0;
             $jumlahIzinPending = 0;
 
             // Hanya hitung jika user adalah pembimbing
             if (Auth::check() && Auth::user()->role === 'pembimbing') {
+                $user = Auth::user();
 
-                // 1. JURNAL YANG BELUM DINILAI
+                // 1. JURNAL YANG BELUM DINILAI (FILTER PERUSAHAAN/SEKOLAH)
                 $jumlahJurnalPending = Jurnal::whereNull('nilai')
-                    ->count();
+                    ->whereHas('user', function ($q) use ($user) {
+                        if ($user->perusahaan_id) {
+                            $q->where('perusahaan_id', $user->perusahaan_id);
+                        } elseif ($user->sekolah_id) {
+                            $q->where('sekolah_id', $user->sekolah_id);
+                        }
+                    })->count();
 
-                // 2. ALASAN KETERLAMBATAN YANG BELUM DITINDAKLANJUTI
+                // 2. ALASAN KETERLAMBATAN (FILTER PERUSAHAAN/SEKOLAH)
                 $jumlahTerlambatPending = AlasanKeterlambatan::where(function ($query) {
                     $query->whereNull('status')
-                        ->orWhere('status', 'Menunggu');
+                          ->orWhere('status', 'Menunggu');
+                })
+                ->whereHas('user', function ($q) use ($user) {
+                    if ($user->perusahaan_id) {
+                        $q->where('perusahaan_id', $user->perusahaan_id);
+                    } elseif ($user->sekolah_id) {
+                        $q->where('sekolah_id', $user->sekolah_id);
+                    }
                 })->count();
 
-                // 3. IZIN SISWA YANG MASIH MENUNGGU
+                // 3. IZIN SISWA YANG MASIH MENUNGGU (FILTER PERUSAHAAN/SEKOLAH)
                 $jumlahIzinPending = Izin::where('status', 'Menunggu')
-                    ->count();
+                    ->whereHas('user', function ($q) use ($user) {
+                        if ($user->perusahaan_id) {
+                            $q->where('perusahaan_id', $user->perusahaan_id);
+                        } elseif ($user->sekolah_id) {
+                            $q->where('sekolah_id', $user->sekolah_id);
+                        }
+                    })->count();
             }
 
             // Kirim variabel ke sidebar
