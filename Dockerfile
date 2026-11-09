@@ -34,16 +34,19 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # 7. Install dependencies Node & Build aset
 RUN npm install && npm run build
 
-# 8. Set permission
+# 8. Set permission awal (Agar folder storage bisa ditulis)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 9. Entrypoint Script (DIPERBAIKI)
-# Kita pindahkan proses cache ke sini agar membaca variabel Railway yang terbaru
+# 9. Entrypoint Script
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-# Buat link storage\n\
+# Pastikan permission storage selalu benar setiap container nyala\n\
+chown -R www-data:www-data /var/www/html/storage\n\
+chmod -R 775 /var/www/html/storage\n\
+\n\
+# Buat link storage (paksa buat ulang jika ada)\n\
 php artisan storage:link --force\n\
 \n\
 # Bersihkan cache lama (PENTING!)\n\
