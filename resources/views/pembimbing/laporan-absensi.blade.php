@@ -939,7 +939,7 @@ function showDetailAbsensi(data) {
         const boxAlasan = document.getElementById('boxAlasanTerlambat');
         const teksAlasan = document.getElementById('teksAlasanTerlambat');
 
-        if (data.status === 'Hadir' || data.status === 'Telat') {
+        if (data.status === 'Hadir' || data.status === 'Tepat Waktu' || data.status === 'Telat') {
             boxJam.style.display = 'flex';
             boxFoto.style.display = 'block';
 

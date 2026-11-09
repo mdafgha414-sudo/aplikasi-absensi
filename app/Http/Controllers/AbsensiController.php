@@ -293,7 +293,7 @@ class AbsensiController extends Controller
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
-        $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Tepat Waktu' : 'Telat';
+        $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Hadir' : 'Telat';
 
         Absensi::create([
             'user_id' => Auth::id(),
