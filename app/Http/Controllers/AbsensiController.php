@@ -7,14 +7,14 @@ use Carbon\Carbon;
 use App\Models\Absensi;
 use App\Models\Setting;
 use App\Models\QrToken; 
-use App\Models\Perusahaan; // <-- TAMBAHAN: Import Model Perusahaan
+use App\Models\Perusahaan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
 class AbsensiController extends Controller
 {
     // =====================================================
-    // FUNGSI BANTU: MENGAMBIL JADWAL HARI INI
+    // FUNGSI BANTU: MENGAMBIL JADWAL HARI INI (DIPERBAIKI)
     // =====================================================
     private function jadwalHariIni()
     {
@@ -30,9 +30,22 @@ class AbsensiController extends Controller
 
         $namaHari = $hari[Carbon::now()->dayOfWeekIso];
 
-        $masuk = Setting::where('key', 'waktu_masuk_' . $namaHari)->value('value') ?? '09:00';
-        $batasTelat = Setting::where('key', 'batas_jam_telat_' . $namaHari)->value('value') ?? '09:00';
-        $pulang = Setting::where('key', 'jam_pulang_' . $namaHari)->value('value') ?? '16:00';
+        // DAPATKAN PERUSAHAAN DARI USER YANG SEDANG LOGIN (SISWA)
+        $user = Auth::user();
+        $perusahaanId = $user->perusahaan_id ?? null;
+
+        // Cari setting berdasarkan perusahaan_id user
+        $query = Setting::where(function($q) use ($perusahaanId) {
+            if ($perusahaanId) {
+                $q->where('perusahaan_id', $perusahaanId);
+            } else {
+                $q->whereNull('perusahaan_id');
+            }
+        });
+
+        $masuk = (clone $query)->where('key', 'waktu_masuk_' . $namaHari)->value('value') ?? '09:00';
+        $batasTelat = (clone $query)->where('key', 'batas_jam_telat_' . $namaHari)->value('value') ?? '09:00';
+        $pulang = (clone $query)->where('key', 'jam_pulang_' . $namaHari)->value('value') ?? '16:00';
 
         return [
             'masuk' => substr($masuk, 0, 5),
@@ -99,7 +112,6 @@ class AbsensiController extends Controller
             return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
         }
 
-        // 1. Ambil Data Perusahaan User
         $user = Auth::user();
         $perusahaan = $user->perusahaan;
 
@@ -107,7 +119,6 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda belum terdaftar di perusahaan PKL manapun. Hubungi Admin.');
         }
 
-        // 2. Validasi Lokasi (Geofencing berdasarkan data Perusahaan)
         $latPkl = $perusahaan->latitude;
         $lngPkl = $perusahaan->longitude;
         $radius = $perusahaan->radius;
@@ -128,24 +139,21 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah absen masuk hari ini!');
         }
 
-        // 3. Proses Simpan Foto (Base64)
         $fotoPath = null;
         if ($request->filled('foto')) {
             $image = $request->foto;
-            // Hapus header base64
             $image = preg_replace('#^data:image/\w+;base64,#i', '', $image);
             $imageName = 'absensi/' . Auth::id() . '_masuk_' . time() . '.jpg';
-            
-            // Simpan ke folder storage/app/public/absensi
             Storage::disk('public')->put($imageName, base64_decode($image));
             $fotoPath = $imageName;
         }
 
-        // 4. Simpan Absensi
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
-        $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Tepat Waktu' : 'Telat';
+        
+        // Ubah 'Tepat Waktu' menjadi 'Hadir' agar konsisten dengan View
+        $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Hadir' : 'Telat';
 
         Absensi::create([
             'user_id' => Auth::id(),
@@ -167,7 +175,6 @@ class AbsensiController extends Controller
             return back()->with('error', 'Absensi hari ini sedang dinonaktifkan oleh admin.');
         }
 
-        // 1. Ambil Data Perusahaan User
         $user = Auth::user();
         $perusahaan = $user->perusahaan;
 
@@ -175,7 +182,6 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda belum terdaftar di perusahaan PKL manapun.');
         }
 
-        // 2. Validasi Lokasi (Geofencing berdasarkan data Perusahaan)
         $latPkl = $perusahaan->latitude;
         $lngPkl = $perusahaan->longitude;
         $radius = $perusahaan->radius;
@@ -197,7 +203,6 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah melakukan absen pulang hari ini!');
         }
 
-        // 3. Proses Simpan Foto Pulang
         $fotoPath = null;
         if ($request->filled('foto')) {
             $image = $request->foto;
@@ -252,7 +257,6 @@ class AbsensiController extends Controller
             'lng' => 'required|numeric',
         ]);
 
-        // 1. Ambil Data Perusahaan User
         $user = Auth::user();
         $perusahaan = $user->perusahaan;
 
@@ -260,7 +264,6 @@ class AbsensiController extends Controller
             return response()->json(['message' => 'Anda belum terdaftar di perusahaan PKL manapun.'], 400);
         }
 
-        // 2. Cek Token
         $tokenDikirim = $request->token;
         $tokenDiDatabase = QrToken::where('token', $tokenDikirim)->first();
 
@@ -276,20 +279,17 @@ class AbsensiController extends Controller
             return response()->json(['message' => 'Token sudah KEDALUWARSA.'], 400);
         }
 
-        // 3. Cek Jarak
         $jarak = $this->hitungJarak($request->lat, $request->lng, $perusahaan->latitude, $perusahaan->longitude);
         if ($jarak > $perusahaan->radius) {
             return response()->json(['message' => 'Anda berada di luar radius PKL. Jarak: ' . round($jarak) . ' m.'], 400);
         }
 
-        // 4. Cek Absen
         $hariIni = Carbon::today()->toDateString();
         $sudahAbsen = Absensi::where('user_id', Auth::id())->where('tanggal', $hariIni)->first();
         if ($sudahAbsen) {
             return response()->json(['message' => 'Anda sudah absen hari ini.'], 400);
         }
 
-        // 5. Simpan
         $jadwal = $this->jadwalHariIni();
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
