@@ -10,16 +10,13 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
-    // ==========================================
-    // 1. TAMPILKAN HALAMAN PENGATURAN JAM (ADMIN)
-    // ==========================================
     public function index()
     {
         if (Auth::user()->role !== 'admin') {
             abort(403, 'Hanya Admin yang bisa mengakses halaman ini.');
         }
 
-        // Ambil data langsung dari tabel, tanpa perantara
+        // Ambil data langsung dari tabel
         $settings = DB::table('settings')->whereNull('perusahaan_id')->pluck('value', 'key')->toArray();
 
         $default = ['masuk' => '07:00', 'telat' => '07:15', 'pulang' => '15:00'];
@@ -33,12 +30,13 @@ class SettingController extends Controller
             }
         }
 
+        // Ambil status aktif Sabtu/Minggu (default: Sabtu aktif, Minggu nonaktif)
+        $jadwal['sabtu']['aktif'] = $settings['sabtu_aktif'] ?? '1';
+        $jadwal['minggu']['aktif'] = $settings['minggu_aktif'] ?? '0';
+
         return view('dashboard.pengaturan', compact('jadwal'));
     }
 
-    // ==========================================
-    // 2. SIMPAN PENGATURAN JAM (ADMIN)
-    // ==========================================
     public function update(Request $request)
     {
         if (Auth::user()->role !== 'admin') {
@@ -52,10 +50,9 @@ class SettingController extends Controller
             'jam_pulang_senin' => 'required',
         ]);
 
-        // Paksa hapus data lama, lalu buat baru (Anti-Gagal)
         DB::transaction(function () use ($request) {
             foreach (['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'] as $hari) {
-                // Hapus data lama untuk hari ini (jika ada)
+                // Hapus data lama untuk hari ini
                 DB::table('settings')->whereNull('perusahaan_id')->where('key', 'like', '%_' . $hari)->delete();
 
                 // Buat data baru
@@ -65,14 +62,21 @@ class SettingController extends Controller
                     ['key' => 'jam_pulang_' . $hari, 'perusahaan_id' => null, 'value' => $request->input('jam_pulang_' . $hari, '15:00')],
                 ]);
             }
+
+            // Simpan status aktif Sabtu/Minggu
+            $statusSabtu = $request->has('status_sabtu') ? '1' : '0';
+            $statusMinggu = $request->has('status_minggu') ? '1' : '0';
+
+            DB::table('settings')->whereNull('perusahaan_id')->whereIn('key', ['sabtu_aktif', 'minggu_aktif'])->delete();
+            DB::table('settings')->insert([
+                ['key' => 'sabtu_aktif', 'perusahaan_id' => null, 'value' => $statusSabtu],
+                ['key' => 'minggu_aktif', 'perusahaan_id' => null, 'value' => $statusMinggu],
+            ]);
         });
 
         return redirect('/admin/setting')->with('success', 'Jadwal absensi berhasil disimpan!');
     }
 
-    // ==========================================
-    // 3. PROFIL (BIARKAN SEPERTI ASLINYA)
-    // ==========================================
     public function profil()
     {
         $user = Auth::user();
