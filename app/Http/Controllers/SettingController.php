@@ -3,21 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
+    // ==========================================
+    // 1. TAMPILKAN HALAMAN PENGATURAN JAM (ADMIN)
+    // ==========================================
     public function index()
     {
-        // Pastikan hanya Admin yang bisa akses
         if (Auth::user()->role !== 'admin') {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+            abort(403, 'Hanya Admin yang bisa mengakses halaman ini.');
         }
 
-        $settings = Setting::whereNull('perusahaan_id')->pluck('value', 'key')->toArray();
+        // Ambil data langsung dari tabel, tanpa perantara
+        $settings = DB::table('settings')->whereNull('perusahaan_id')->pluck('value', 'key')->toArray();
 
         $default = ['masuk' => '07:00', 'telat' => '07:15', 'pulang' => '15:00'];
         $jadwal = [];
@@ -33,36 +36,43 @@ class SettingController extends Controller
         return view('dashboard.pengaturan', compact('jadwal'));
     }
 
+    // ==========================================
+    // 2. SIMPAN PENGATURAN JAM (ADMIN)
+    // ==========================================
     public function update(Request $request)
     {
         if (Auth::user()->role !== 'admin') {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+            abort(403, 'Hanya Admin yang bisa mengakses halaman ini.');
         }
 
+        // Validasi simpel
         $request->validate([
             'jam_masuk_senin' => 'required',
             'jam_telat_senin' => 'required',
             'jam_pulang_senin' => 'required',
         ]);
 
-        foreach (['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'] as $hari) {
-            Setting::updateOrCreate(
-                ['key' => 'waktu_masuk_' . $hari, 'perusahaan_id' => null],
-                ['value' => $request->input('jam_masuk_' . $hari, '07:00')]
-            );
-            Setting::updateOrCreate(
-                ['key' => 'batas_jam_telat_' . $hari, 'perusahaan_id' => null],
-                ['value' => $request->input('jam_telat_' . $hari, '07:15')]
-            );
-            Setting::updateOrCreate(
-                ['key' => 'jam_pulang_' . $hari, 'perusahaan_id' => null],
-                ['value' => $request->input('jam_pulang_' . $hari, '15:00')]
-            );
-        }
+        // Paksa hapus data lama, lalu buat baru (Anti-Gagal)
+        DB::transaction(function () use ($request) {
+            foreach (['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'] as $hari) {
+                // Hapus data lama untuk hari ini (jika ada)
+                DB::table('settings')->whereNull('perusahaan_id')->where('key', 'like', '%_' . $hari)->delete();
+
+                // Buat data baru
+                DB::table('settings')->insert([
+                    ['key' => 'waktu_masuk_' . $hari, 'perusahaan_id' => null, 'value' => $request->input('jam_masuk_' . $hari, '07:00')],
+                    ['key' => 'batas_jam_telat_' . $hari, 'perusahaan_id' => null, 'value' => $request->input('jam_telat_' . $hari, '07:15')],
+                    ['key' => 'jam_pulang_' . $hari, 'perusahaan_id' => null, 'value' => $request->input('jam_pulang_' . $hari, '15:00')],
+                ]);
+            }
+        });
 
         return redirect('/admin/setting')->with('success', 'Jadwal absensi berhasil disimpan!');
     }
 
+    // ==========================================
+    // 3. PROFIL (BIARKAN SEPERTI ASLINYA)
+    // ==========================================
     public function profil()
     {
         $user = Auth::user();
