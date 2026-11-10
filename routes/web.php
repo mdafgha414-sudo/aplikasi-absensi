@@ -40,6 +40,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengaturan', [SettingController::class, 'profil'])->name('pengaturan');
     Route::put('/pengaturan/update', [SettingController::class, 'updateProfil'])->name('pengaturan.update');
 
+    // =========================================================
+    // PENGATURAN JAM (Bisa diakses Admin & Pembimbing)
+    // (Pengaman role ada di SettingController.php)
+    // =========================================================
+    Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
+    Route::post('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
+
     // --- FITUR SISWA ---
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
     Route::post('/absensi/masuk', [AbsensiController::class, 'masuk'])->name('absensi.masuk');
@@ -111,10 +118,6 @@ Route::middleware('auth')->group(function () {
 // ROUTE ADMIN (Khusus Fitur Admin)
 // ==========================================
 Route::middleware(['auth', 'isAdmin'])->group(function () {
-    // PINDAHKAN RUTE SETTING KE SINI AGAR HANYA ADMIN YANG BISA AKSES
-    Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
-    Route::post('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
-
     Route::get('/admin/manajemen-siswa', [AdminController::class, 'manajemenSiswaAdmin'])->name('admin.siswa.index');
     Route::get('/admin/perusahaan/{id}/detail', [AdminController::class, 'detailPerusahaan'])->name('admin.perusahaan.detail');
     Route::get('/admin/dashboard', [AdminController::class, 'index']);

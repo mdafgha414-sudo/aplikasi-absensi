@@ -302,8 +302,7 @@
             <li class="menu-label mt-4">Pengaturan</li>
             
             
-        {{-- Pengaturan Jam (Admin & Pembimbing) --}}
-@if (in_array(Auth::user()->role, ['admin', 'pembimbing']))
+        @if (in_array(Auth::user()->role, ['admin', 'pembimbing']))
     <li>
         <a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}">
             <i class="bi bi-clock"></i> Pengaturan Jam
