@@ -219,6 +219,12 @@
                     </a>
                 </li>
 
+                <li>
+    <a href="{{ route('pembimbing.perusahaan.edit') }}" class="{{ request()->routeIs('pembimbing.perusahaan.*') ? 'active' : '' }}">
+        <i class="bi bi-geo-alt"></i> Lokasi Perusahaan
+    </a>
+</li>
+
                 {{-- MENU NILAI JURNAL SISWA + NOTIFIKASI --}}
                 <li>
                     <a href="{{ route('pembimbing.jurnal') }}"

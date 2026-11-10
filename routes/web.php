@@ -81,6 +81,9 @@ Route::middleware('auth')->group(function () {
 
     // --- FITUR KHUSUS PEMBIMBING PKL ---
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
+                // --- MANAJEMEN PERUSAHAAN (PEMBIMBING) ---
+        Route::get('/perusahaan/edit', [PerusahaanController::class, 'editPerusahaanSendiri'])->name('perusahaan.edit');
+        Route::put('/perusahaan/update', [PerusahaanController::class, 'updatePerusahaanSendiri'])->name('perusahaan.update');
         Route::get('/dashboard', [GuruController::class, 'dashboardPembimbing'])->name('dashboard');
         Route::get('/laporan-absensi', [GuruController::class, 'laporanAbsensi'])->name('laporan-absensi');
         Route::get('/laporan-absensi/export-excel', [GuruExportController::class, 'exportExcelAbsensi'])->name('laporan.export.excel');
