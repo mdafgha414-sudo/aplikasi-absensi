@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
+    // =========================================================
+    // 1. MENAMPILKAN HALAMAN PENGATURAN JAM
+    // =========================================================
     public function index()
     {
         $user = Auth::user();
@@ -21,6 +24,18 @@ class SettingController extends Controller
 
         // Ambil setting HANYA berdasarkan perusahaan_id yang sesuai
         $settings = Setting::where('perusahaan_id', $perusahaanId)->pluck('value', 'key')->toArray();
+
+        // =======================================================
+        // TAMBAHKAN BARIS INI UNTUK MELIHAT DATA YANG DIBACA
+        // =======================================================
+        dd([
+            'User yang Login' => $user->name,
+            'Role' => $user->role,
+            'Perusahaan ID yang Dipakai' => $perusahaanId,
+            'Data Settings yang Ditemukan' => $settings,
+            'Cek Jam Senin' => $settings['waktu_masuk_senin'] ?? 'TIDAK ADA DATA'
+        ]);
+        // =======================================================
 
         $default = ['masuk' => '07:00', 'telat' => '07:15', 'pulang' => '15:00'];
         $jadwal = [];
@@ -40,6 +55,9 @@ class SettingController extends Controller
         return view('dashboard.pengaturan', compact('daftarHari', 'jadwal'));
     }
 
+    // =========================================================
+    // 2. MENYIMPAN JADWAL
+    // =========================================================
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -93,6 +111,9 @@ class SettingController extends Controller
         return redirect('/admin/setting')->with('success', 'Jadwal absensi berhasil disimpan!');
     }
 
+    // =========================================================
+    // 3. PROFIL
+    // =========================================================
     public function profil()
     {
         $user = Auth::user();
