@@ -44,10 +44,22 @@ class SettingController extends Controller
     }
 
     // =========================================================
-    // 2. MENYIMPAN JADWAL (VERSI FINAL)
+    // 2. MENYIMPAN JADWAL (VERSI FINAL + DEBUG DD)
     // =========================================================
     public function update(Request $request)
     {
+        // =======================================================
+        // MATA-MATA: KITA PAKSA SISTEM BERHENTI DI SINI UNTUK MELIHAT DATA
+        // =======================================================
+        dd([
+            'User yang Login' => Auth::user()->name,
+            'Role' => Auth::user()->role,
+            'Perusahaan ID' => Auth::user()->perusahaan_id,
+            'Data jam_masuk_senin' => $request->input('jam_masuk_senin'),
+            'Semua Data yang Dikirim' => $request->all()
+        ]);
+        // =======================================================
+
         $user = Auth::user();
         $daftarHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
 
