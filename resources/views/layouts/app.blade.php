@@ -301,14 +301,15 @@
             <!-- MENU PENGATURAN -->
             <li class="menu-label mt-4">Pengaturan</li>
             
-             {{-- Pengaturan Jam (Hanya Admin & Pembimbing) --}}
-            @if (in_array(Auth::user()->role, ['admin', 'pembimbing']))
-                <li>
-                    <a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}">
-                        <i class="bi bi-clock"></i> Pengaturan Jam
-                    </a>
-                </li>
-            @endif
+            
+           {{-- Pengaturan Jam (Hanya Admin) --}}
+@if (Auth::user()->role === 'admin')
+    <li>
+        <a href="{{ url('/admin/setting') }}" class="{{ request()->is('admin/setting') ? 'active' : '' }}">
+            <i class="bi bi-clock"></i> Pengaturan Jam
+        </a>
+    </li>
+@endif
 
             {{-- Pengaturan Profil (Semua Role) --}}
             <li><a href="{{ route('pengaturan') }}" class="{{ request()->is('pengaturan') ? 'active' : '' }}"><i class="bi bi-person-gear"></i> Pengaturan Profil</a></li>

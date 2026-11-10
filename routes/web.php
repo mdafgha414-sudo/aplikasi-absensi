@@ -105,16 +105,16 @@ Route::middleware('auth')->group(function () {
             Route::post('/{id}/assign', [SekolahController::class, 'assignSiswaStore'])->name('assign.store');
         });
     });
-    
-    // --- PENGATURAN JAM (Bisa diakses Admin & Pembimbing) ---
-    Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
-   Route::post('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
 }); 
 
 // ==========================================
 // ROUTE ADMIN (Khusus Fitur Admin)
 // ==========================================
 Route::middleware(['auth', 'isAdmin'])->group(function () {
+    // PINDAHKAN RUTE SETTING KE SINI AGAR HANYA ADMIN YANG BISA AKSES
+    Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
+    Route::post('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
+
     Route::get('/admin/manajemen-siswa', [AdminController::class, 'manajemenSiswaAdmin'])->name('admin.siswa.index');
     Route::get('/admin/perusahaan/{id}/detail', [AdminController::class, 'detailPerusahaan'])->name('admin.perusahaan.detail');
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
