@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
+    // =========================================================
     // 1. MENAMPILKAN HALAMAN PENGATURAN JAM
+    // =========================================================
     public function index()
     {
         $user = Auth::user();
@@ -26,10 +28,15 @@ class SettingController extends Controller
         ];
 
         // Ambil setting berdasarkan perusahaan_id (jika pembimbing)
-        // Jika admin, ambil setting global (perusahaan_id = null) atau semua
+        // Jika admin, ambil setting global (perusahaan_id = null)
         if ($user->role === 'pembimbing') {
-            $settings = Setting::where('perusahaan_id', $user->perusahaan_id)
-                               ->pluck('value', 'key')->toArray();
+            // PENGAMAN: Jika pembimbing tidak punya perusahaan_id, ambil array kosong
+            if (is_null($user->perusahaan_id)) {
+                $settings = [];
+            } else {
+                $settings = Setting::where('perusahaan_id', $user->perusahaan_id)
+                                   ->pluck('value', 'key')->toArray();
+            }
         } else {
             // Admin melihat setting global
             $settings = Setting::whereNull('perusahaan_id')
@@ -70,7 +77,9 @@ class SettingController extends Controller
         return view('dashboard.pengaturan', compact('daftarHari', 'jadwal'));
     }
 
+    // =========================================================
     // 2. MENYIMPAN JADWAL TUJUH HARI
+    // =========================================================
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -92,6 +101,7 @@ class SettingController extends Controller
 
         $data = $request->validate($aturan);
 
+        // Validasi logika waktu (Telat tidak boleh mendahului Masuk, Pulang tidak boleh mendahului Telat)
         foreach ($daftarHari as $hari) {
             if (
                 in_array($hari, ['sabtu', 'minggu']) &&
@@ -119,8 +129,21 @@ class SettingController extends Controller
         // Jika pembimbing, pakai perusahaan_id miliknya. Jika admin, null (global).
         $perusahaanId = $user->role === 'pembimbing' ? $user->perusahaan_id : null;
 
+        // PENGAMAN EKSTRA: Jangan biarkan pembimbing tanpa perusahaan menyimpan data
+        if ($user->role === 'pembimbing' && is_null($perusahaanId)) {
+            return back()->withErrors(['jadwal' => 'Akun Anda belum terhubung ke perusahaan manapun. Hubungi Admin untuk mendaftarkan perusahaan Anda.'])->withInput();
+        }
+
         DB::transaction(function () use ($data, $daftarHari, $perusahaanId) {
             foreach ($daftarHari as $hari) {
+                // Jika hari sabtu/minggu tidak aktif, lewati penyimpanan jam
+                if (
+                    in_array($hari, ['sabtu', 'minggu']) &&
+                    !((int) ($data['jadwal'][$hari]['aktif'] ?? 0))
+                ) {
+                    continue;
+                }
+
                 $jadwalHari = $data['jadwal'][$hari];
 
                 $pengaturan = [
@@ -130,6 +153,7 @@ class SettingController extends Controller
                 ];
 
                 foreach ($pengaturan as $key => $value) {
+                    // updateOrCreate akan mencari berdasarkan 'key' DAN 'perusahaan_id'
                     Setting::updateOrCreate(
                         ['key' => $key, 'perusahaan_id' => $perusahaanId],
                         ['value' => $value]
@@ -148,14 +172,18 @@ class SettingController extends Controller
         return redirect('/admin/setting')->with('success', 'Jadwal absensi berhasil disimpan!');
     }
 
+    // =========================================================
     // 3. MENAMPILKAN PROFIL
+    // =========================================================
     public function profil()
     {
         $user = Auth::user();
         return view('pengaturan.index', compact('user'));
     }
 
+    // =========================================================
     // 4. MENYIMPAN PERUBAHAN PROFIL
+    // =========================================================
     public function updateProfil(Request $request)
     {
         $user = Auth::user();
