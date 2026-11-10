@@ -28,13 +28,7 @@ class SettingController extends Controller
         // =======================================================
         // TAMBAHKAN BARIS INI UNTUK MELIHAT DATA YANG DIBACA
         // =======================================================
-        dd([
-            'User yang Login' => $user->name,
-            'Role' => $user->role,
-            'Perusahaan ID yang Dipakai' => $perusahaanId,
-            'Data Settings yang Ditemukan' => $settings,
-            'Cek Jam Senin' => $settings['waktu_masuk_senin'] ?? 'TIDAK ADA DATA'
-        ]);
+      
         // =======================================================
 
         $default = ['masuk' => '07:00', 'telat' => '07:15', 'pulang' => '15:00'];
