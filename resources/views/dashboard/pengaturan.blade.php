@@ -22,12 +22,13 @@
     .schedule-panel { background: white; border: 1px solid #e4edfa; border-radius: 20px; padding: 18px; box-shadow: 0 12px 40px rgba(41,77,125,.045); }
     .panel-heading { display: flex; align-items: center; gap: 15px; background: #f7faff; border-radius: 14px; padding: 19px; margin-bottom: 17px; flex-wrap: wrap; }
     .panel-icon { width: 48px; height: 48px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: #d8e9ff; color: #2878f0; font-size: 21px; }
-    .total-days { margin-left: auto; border: 1px solid #d4e5ff; border-radius: 11px; padding: 11px 14px; display: flex; align-items: center; gap: 12px; color: #2878f0; flex-shrink: 0; }
-    .panel-side { width: 170px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; align-self: stretch; }
-    .panel-side .total-days { width: 100%; margin: 0; }
-    .panel-side-tools { width: 100%; padding: 10px; border: 1px solid #d4e5ff; border-radius: 11px; background: #fff; }
-    .panel-side-tools h2 { font-size: 11px; color: #233d63; margin-bottom: 8px; }
-    .pilih-semua-hari { display: inline-flex; align-items: center; gap: 8px; margin: 10px 0; color: #1e40af; font-size: 13px; font-weight: 600; cursor: pointer; }
+    
+    /* PENGATURAN MASSAL */
+    .pengaturan-massal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; width: 100%; }
+    .pengaturan-massal-item { padding: 14px; border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; }
+    .pengaturan-massal-item label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #334155; }
+    .pengaturan-massal-item input { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #dbe3ef; border-radius: 8px; background: white; }
+    .pengaturan-massal-item button { width: 100%; margin-top: 10px; padding: 10px 6px; border: none; border-radius: 8px; background: #2878f0; color: white; font-weight: 600; cursor: pointer; }
 
     /* KARTU JADWAL */
     .day-card { display: grid; grid-template-columns: 40px 95px repeat(3, minmax(0, 1fr)) 65px; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 11px; padding: 8px; margin-bottom: 8px; transition: border-color .2s; }
@@ -42,7 +43,6 @@
     .field label { display: block; font-size: 9px; font-weight: 600; color: #687e9f; margin-bottom: 5px; }
     .time-input { display: flex; align-items: center; gap: 5px; border: 1px solid #dfe9f8; border-radius: 7px; padding: 0 7px; height: 33px; background: white; }
     .time-input input { width: 100%; border: none; outline: none; color: #294567; font-size: 11px; }
-    .field-hint { display: block; margin-top: 4px; color: #8295b0; font-size: 8px; }
     .edit-button { border: 1px solid #d6e5fa; background: #f5f9ff; color: #2878f0; border-radius: 7px; padding: 8px 5px; font-size: 10px; font-weight: 700; cursor: pointer; }
 
     /* SWITCH */
@@ -70,7 +70,7 @@
     @media (max-width: 760px) {
         .day-card { grid-template-columns: 1fr; gap: 13px; padding: 14px; }
         .day-info { display: flex; align-items: center; gap: 10px; text-align: left; }
-        .panel-side { width: 100%; }
+        .pengaturan-massal { grid-template-columns: 1fr; }
     }
 </style>
 
@@ -98,21 +98,35 @@
         </div>
     @endif
 
-    <form action="{{ url('/admin/setting') }}" method="POST">
+    <form action="{{ url('/admin/setting') }}" method="POST" id="formSetting">
         @csrf
+        <input type="hidden" name="apply_to_all" id="apply_to_all" value="false">
 
         <div class="schedule-panel">
             <div class="panel-heading">
                 <div class="panel-icon"><i class="fa-regular fa-calendar-check"></i></div>
                 <div style="flex: 1;">
                     <h2>Jadwal Kehadiran Mingguan</h2>
-                    <p>Ubah jam langsung di kolom yang tersedia, lalu klik Simpan.</p>
+                    <p>Ubah jam langsung di kolom yang tersedia, atau gunakan tombol massal di atas.</p>
                 </div>
-                <div class="panel-side">
-                    <div class="total-days">
-                        <i class="fa-regular fa-clock"></i>
-                        <div><small>Total Hari Kerja</small><strong>7 hari dalam seminggu</strong></div>
-                    </div>
+            </div>
+
+            <!-- PENGATURAN MASSAL -->
+            <div class="pengaturan-massal">
+                <div class="pengaturan-massal-item">
+                    <label>Waktu Masuk</label>
+                    <input type="time" id="massal_masuk" value="08:00">
+                    <button type="button" onclick="terapkanMassal('masuk')">Terapkan Waktu Masuk</button>
+                </div>
+                <div class="pengaturan-massal-item">
+                    <label>Batas Jam Telat</label>
+                    <input type="time" id="massal_telat" value="08:15">
+                    <button type="button" onclick="terapkanMassal('telat')">Terapkan Batas Telat</button>
+                </div>
+                <div class="pengaturan-massal-item">
+                    <label>Jam Pulang</label>
+                    <input type="time" id="massal_pulang" value="16:00">
+                    <button type="button" onclick="terapkanMassal('pulang')">Terapkan Jam Pulang</button>
                 </div>
             </div>
 
@@ -157,7 +171,7 @@
                     <div class="field">
                         <label>Waktu Masuk</label>
                         <div class="time-input">
-                            <input type="time" name="jam_masuk_{{ $key }}" value="{{ $jamMasuk }}">
+                            <input type="time" name="jam_masuk_{{ $key }}" value="{{ $jamMasuk }}" class="input-massal-masuk">
                             <i class="fa-regular fa-clock"></i>
                         </div>
                     </div>
@@ -165,7 +179,7 @@
                     <div class="field">
                         <label>Batas Jam Telat</label>
                         <div class="time-input">
-                            <input type="time" name="jam_telat_{{ $key }}" value="{{ $jamTelat }}">
+                            <input type="time" name="jam_telat_{{ $key }}" value="{{ $jamTelat }}" class="input-massal-telat">
                             <i class="fa-regular fa-clock"></i>
                         </div>
                     </div>
@@ -173,7 +187,7 @@
                     <div class="field">
                         <label>Jam Pulang</label>
                         <div class="time-input">
-                            <input type="time" name="jam_pulang_{{ $key }}" value="{{ $jamPulang }}">
+                            <input type="time" name="jam_pulang_{{ $key }}" value="{{ $jamPulang }}" class="input-massal-pulang">
                             <i class="fa-regular fa-clock"></i>
                         </div>
                     </div>
@@ -191,4 +205,21 @@
         </div>
     </form>
 </div>
+
+<script>
+    function terapkanMassal(jenis) {
+        // Ambil nilai dari input massal
+        const nilai = document.getElementById('massal_' + jenis).value;
+        
+        // Ambil semua input yang sesuai (misal input-massal-masuk)
+        const inputs = document.querySelectorAll('.input-massal-' + jenis);
+        
+        // Ubah semua nilainya
+        inputs.forEach(input => {
+            input.value = nilai;
+        });
+
+        alert('Waktu berhasil diterapkan ke SEMUA HARI. Klik Simpan untuk menyimpan.');
+    }
+</script>
 @endsection
