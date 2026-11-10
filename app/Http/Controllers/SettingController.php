@@ -19,11 +19,11 @@ class SettingController extends Controller
         $user = Auth::user();
         $daftarHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
 
-        if ($user->role === 'pembimbing') {
-            $settings = is_null($user->perusahaan_id) ? [] : Setting::where('perusahaan_id', $user->perusahaan_id)->pluck('value', 'key')->toArray();
-        } else {
-            $settings = Setting::whereNull('perusahaan_id')->pluck('value', 'key')->toArray();
-        }
+        // Tentukan ID Perusahaan (Admin = NULL, Pembimbing = ID Perusahaannya)
+        $perusahaanId = ($user->role === 'pembimbing') ? $user->perusahaan_id : null;
+
+        // Ambil setting HANYA berdasarkan perusahaan_id yang sesuai
+        $settings = Setting::where('perusahaan_id', $perusahaanId)->pluck('value', 'key')->toArray();
 
         $default = ['masuk' => '07:00', 'telat' => '07:15', 'pulang' => '15:00'];
         $jadwal = [];
@@ -44,14 +44,14 @@ class SettingController extends Controller
     }
 
     // =========================================================
-    // 2. MENYIMPAN JADWAL TUJUH HARI (VERSI ANTI-GAGAL)
+    // 2. MENYIMPAN JADWAL (VERSI FINAL)
     // =========================================================
     public function update(Request $request)
     {
         $user = Auth::user();
         $daftarHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
 
-        // 1. Validasi menggunakan nama input yang datar (flat)
+        // 1. Validasi Nama Input Datar
         $rules = [];
         foreach ($daftarHari as $hari) {
             $rules["jam_masuk_$hari"] = 'required|date_format:H:i';
@@ -60,47 +60,40 @@ class SettingController extends Controller
         }
         $rules['status_sabtu'] = 'nullable|boolean';
         $rules['status_minggu'] = 'nullable|boolean';
-
         $request->validate($rules);
 
-        // 2. Validasi logika waktu
+        // 2. Validasi Logika Waktu
         foreach ($daftarHari as $hari) {
-            // Jika sabtu/minggu tidak dicentang aktif, lewati pengecekan
             if (in_array($hari, ['sabtu', 'minggu']) && !$request->has("status_$hari")) {
                 continue;
             }
-
             $masuk = $request->input("jam_masuk_$hari");
             $telat = $request->input("jam_telat_$hari");
             $pulang = $request->input("jam_pulang_$hari");
 
-            if ($telat < $masuk) {
-                return back()->withErrors(['error' => 'Batas jam telat hari ' . ucfirst($hari) . ' tidak boleh lebih awal dari waktu masuk.'])->withInput();
-            }
-            if ($pulang < $telat) {
-                return back()->withErrors(['error' => 'Jam pulang hari ' . ucfirst($hari) . ' tidak boleh lebih awal dari batas jam telat.'])->withInput();
-            }
+            if ($telat < $masuk) return back()->withErrors(['error' => "Batas jam telat hari $hari tidak boleh lebih awal dari jam masuk."])->withInput();
+            if ($pulang < $telat) return back()->withErrors(['error' => "Jam pulang hari $hari tidak boleh lebih awal dari batas jam telat."])->withInput();
         }
 
-        // 3. Tentukan perusahaan_id
-        $perusahaanId = $user->role === 'pembimbing' ? $user->perusahaan_id : null;
+        // 3. Tentukan ID Perusahaan (Admin = NULL, Pembimbing = ID Perusahaannya)
+        $perusahaanId = ($user->role === 'pembimbing') ? $user->perusahaan_id : null;
 
         if ($user->role === 'pembimbing' && is_null($perusahaanId)) {
-            return back()->withErrors(['error' => 'Akun Anda belum terhubung ke perusahaan manapun.'])->withInput();
+            return back()->withErrors(['error' => 'Akun Anda belum terhubung ke perusahaan.'])->withInput();
         }
 
         // 4. Simpan ke Database
         DB::transaction(function () use ($request, $daftarHari, $perusahaanId) {
             foreach ($daftarHari as $hari) {
                 // Simpan Jam
-                Setting::updateOrCreate(['key' => 'waktu_masuk_' . $hari, 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_masuk_$hari")]);
-                Setting::updateOrCreate(['key' => 'batas_jam_telat_' . $hari, 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_telat_$hari")]);
-                Setting::updateOrCreate(['key' => 'jam_pulang_' . $hari, 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_pulang_$hari")]);
+                Setting::updateOrCreate(['key' => "waktu_masuk_$hari", 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_masuk_$hari")]);
+                Setting::updateOrCreate(['key' => "batas_jam_telat_$hari", 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_telat_$hari")]);
+                Setting::updateOrCreate(['key' => "jam_pulang_$hari", 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_pulang_$hari")]);
 
                 // Simpan Status Sabtu/Minggu
                 if (in_array($hari, ['sabtu', 'minggu'])) {
                     $status = $request->has("status_$hari") ? '1' : '0';
-                    Setting::updateOrCreate(['key' => $hari . '_aktif', 'perusahaan_id' => $perusahaanId], ['value' => $status]);
+                    Setting::updateOrCreate(['key' => "{$hari}_aktif", 'perusahaan_id' => $perusahaanId], ['value' => $status]);
                 }
             }
         });
@@ -109,7 +102,7 @@ class SettingController extends Controller
     }
 
     // =========================================================
-    // 3. MENAMPILKAN PROFIL
+    // 3. PROFIL
     // =========================================================
     public function profil()
     {
@@ -117,9 +110,6 @@ class SettingController extends Controller
         return view('pengaturan.index', compact('user'));
     }
 
-    // =========================================================
-    // 4. MENYIMPAN PERUBAHAN PROFIL
-    // =========================================================
     public function updateProfil(Request $request)
     {
         $user = Auth::user();

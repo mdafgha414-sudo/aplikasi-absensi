@@ -168,7 +168,6 @@
                         @if(in_array($key, ['sabtu', 'minggu']))
                             <div class="switch-wrapper">
                                 <label class="sunday-switch">
-                                    {{-- NAMA INPUT DATAR: status_sabtu / status_minggu --}}
                                     <input type="checkbox" name="status_{{ $key }}" value="1" {{ $isAktif == '1' ? 'checked' : '' }} onchange="updateSwitchStatus(this)">
                                     <span class="switch-track"></span>
                                 </label>
@@ -183,7 +182,6 @@
                         <small>{{ $isSunday ? ($isAktif == '1' ? 'Hari Kerja' : 'Hari Libur') : 'Hari Kerja' }}</small>
                     </div>
 
-                    {{-- NAMA INPUT DATAR: jam_masuk_senin, dll --}}
                     <div class="field">
                         <label>Waktu Masuk</label>
                         <div class="time-input">
