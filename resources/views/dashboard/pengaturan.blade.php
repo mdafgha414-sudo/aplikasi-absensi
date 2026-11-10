@@ -2,83 +2,266 @@
 
 @section('content')
 <style>
+    /* RESET & VARIABEL */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root { --primary: #2878f0; --border: #e2ebf8; --background: #f3f7fd; --text: #243b60; }
+    :root { 
+        --primary: #2563eb; 
+        --primary-hover: #1d4ed8;
+        --border: #e2e8f0; 
+        --background: #f8fafc; 
+        --text: #1e293b; 
+        --text-muted: #64748b;
+    }
     
     .content-wrapper {
-        font-family: 'Inter', sans-serif; background: var(--background); color: var(--text);
-        min-height: 100vh; padding: 30px 32px 45px; max-width: 1450px; margin: auto;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+        background: var(--background); 
+        color: var(--text);
+        min-height: 100vh; 
+        padding: 30px 32px 45px; 
+        max-width: 1400px; 
+        margin: auto;
     }
 
-    /* HEADER */
-    .breadcrumb { display: flex; gap: 11px; align-items: center; font-size: 11px; color: #8396b4; margin-bottom: 27px; }
-    .page-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 27px; flex-wrap: wrap; }
-    .heading-icon { width: 54px; height: 54px; border-radius: 17px; background: #e0edff; color: var(--primary); display: grid; place-items: center; font-size: 23px; flex-shrink: 0; }
-    .page-heading h1 { font-size: clamp(20px, 2vw, 27px); font-weight: 800; color: #1b3153; letter-spacing: -.7px; }
-    .page-heading p { font-size: 12px; color: #7185a4; margin-top: 8px; }
-    .active-badge { margin-left: auto; padding: 11px 15px; border-radius: 12px; background: #dcf9ee; color: #11966d; font-size: 11px; font-weight: 700; }
-
-    /* PANEL */
-    .schedule-panel { background: white; border: 1px solid #e4edfa; border-radius: 20px; padding: 18px; box-shadow: 0 12px 40px rgba(41,77,125,.045); }
-    .panel-heading { display: flex; align-items: center; gap: 15px; background: #f7faff; border-radius: 14px; padding: 19px; margin-bottom: 17px; flex-wrap: wrap; }
-    .panel-icon { width: 48px; height: 48px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: #d8e9ff; color: #2878f0; font-size: 21px; }
+    /* BREADCRUMB & HEADER */
+    .breadcrumb { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+    .breadcrumb i { font-size: 10px; }
     
-    /* PENGATURAN MASSAL */
-    .pengaturan-massal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; width: 100%; }
-    .pengaturan-massal-item { padding: 14px; border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; }
-    .pengaturan-massal-item label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #334155; }
-    .pengaturan-massal-item input { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #dbe3ef; border-radius: 8px; background: white; }
-    .pengaturan-massal-item button { width: 100%; margin-top: 10px; padding: 10px 6px; border: none; border-radius: 8px; background: #2878f0; color: white; font-weight: 600; cursor: pointer; }
+    .page-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 30px; flex-wrap: wrap; }
+    .heading-icon { width: 56px; height: 56px; border-radius: 16px; background: #eff6ff; color: var(--primary); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+    .page-heading h1 { font-size: 24px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
+    .page-heading p { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+    .active-badge { margin-left: auto; padding: 8px 16px; border-radius: 20px; background: #dcfce7; color: #166534; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 
-    /* KARTU JADWAL */
-    .day-card { display: grid; grid-template-columns: 40px 95px repeat(3, minmax(0, 1fr)) 65px; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 11px; padding: 8px; margin-bottom: 8px; transition: border-color .2s; }
-    .day-card:hover { border-color: #bdd7ff; }
-    .day-controls { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .checkbox-pilih-hari { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; color: #2563eb; margin: 0; }
-    .checkbox-pilih-hari input { width: 17px; height: 17px; accent-color: #2878f0; cursor: pointer; }
-    .day-info { background: #e8f1ff; border-radius: 9px; text-align: center; padding: 8px 4px; color: #2878f0; }
-    .day-icon { width: 28px; height: 28px; margin: 0 auto 5px; border-radius: 50%; background: white; display: grid; place-items: center; }
-    .day-info h3 { font-size: 11px; font-weight: 800; }
-    .day-info small { display: block; margin-top: 3px; font-size: 9px; color: #7e91ad; }
-    .field label { display: block; font-size: 9px; font-weight: 600; color: #687e9f; margin-bottom: 5px; }
-    .time-input { display: flex; align-items: center; gap: 5px; border: 1px solid #dfe9f8; border-radius: 7px; padding: 0 7px; height: 33px; background: white; }
-    .time-input input { width: 100%; border: none; outline: none; color: #294567; font-size: 11px; }
-    .edit-button { border: 1px solid #d6e5fa; background: #f5f9ff; color: #2878f0; border-radius: 7px; padding: 8px 5px; font-size: 10px; font-weight: 700; cursor: pointer; }
-
-    /* SWITCH */
-    .switch-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-    .switch-status { font-size: 10px; font-weight: 700; color: #64748b; }
-    .sunday-switch { position: relative; display: inline-flex; width: 42px; height: 24px; cursor: pointer; }
-    .sunday-switch input { position: absolute; opacity: 0; }
-    .sunday-switch .switch-track { position: absolute; inset: 0; background: #cbd5e1; border-radius: 30px; transition: .2s; }
-    .sunday-switch .switch-track::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform .2s; }
-    .sunday-switch input:checked + .switch-track { background: #2878f0; }
-    .sunday-switch input:checked + .switch-track::before { transform: translateX(18px); }
-
-    /* FOOTER & MESSAGES */
-    .panel-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #e9eff8; padding-top: 18px; margin-top: 18px; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; border-radius: 10px; padding: 12px 17px; font-size: 11px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; }
-    .btn-back { border: 1px solid #dce6f4; background: white; color: #526c8f; }
-    .btn-save { background: #2878f0; color: white; box-shadow: 0 5px 13px rgba(40,120,240,.18); }
-    .success-message { background: #e2f8ec; border: 1px solid #c3efd6; color: #168553; padding: 13px 15px; border-radius: 10px; margin-bottom: 18px; font-size: 12px; }
-    .error-message { background: #fff0f0; color: #c73939; padding: 13px 15px; border-radius: 10px; margin-bottom: 18px; font-size: 12px; }
-
-    @media (max-width: 1100px) {
-        .day-card { grid-template-columns: 35px 85px repeat(3, 1fr) 60px; }
-        .edit-button { grid-column: 2 / -1; justify-self: end; }
+    /* PANEL UTAMA */
+    .schedule-panel { background: white; border: 1px solid #f1f5f9; border-radius: 24px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -2px rgba(0,0,0,0.02); }
+    
+    /* PANEL MASSAL (ATAS) */
+    .massal-container {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        gap: 20px;
+        margin-bottom: 24px;
+        align-items: start;
     }
-    @media (max-width: 760px) {
-        .day-card { grid-template-columns: 1fr; gap: 13px; padding: 14px; }
-        .day-info { display: flex; align-items: center; gap: 10px; text-align: left; }
-        .pengaturan-massal { grid-template-columns: 1fr; }
+
+    .massal-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .massal-item {
+        background: white;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .massal-item label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 8px; }
+    .massal-item input { 
+        width: 100%; 
+        padding: 10px 12px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 8px; 
+        font-size: 13px; 
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .massal-item input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .massal-item button { 
+        width: 100%; 
+        margin-top: 12px; 
+        padding: 10px; 
+        border: none; 
+        border-radius: 8px; 
+        background: var(--primary); 
+        color: white; 
+        font-weight: 600; 
+        font-size: 12px;
+        cursor: pointer; 
+        transition: background 0.2s;
+    }
+    .massal-item button:hover { background: var(--primary-hover); }
+
+    /* INFO PANEL KANAN */
+    .info-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .info-box {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .info-box-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: var(--primary);
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    .info-box-text h4 { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .info-box-text p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    
+    .checkbox-semua {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+        cursor: pointer;
+        padding: 12px 16px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+    .checkbox-semua input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+
+    /* KARTU JADWAL HARIAN */
+    .day-list { display: flex; flex-direction: column; gap: 12px; }
+    
+    .day-card { 
+        display: grid; 
+        grid-template-columns: 70px 140px repeat(3, 1fr) 80px; 
+        align-items: center; 
+        gap: 16px; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 16px; 
+        padding: 16px; 
+        background: white;
+        transition: all 0.2s;
+    }
+    .day-card:hover { border-color: #bfdbfe; box-shadow: 0 4px 12px rgba(37,99,235,0.05); }
+    
+    /* Checkbox Kiri */
+    .day-check { display: flex; align-items: center; gap: 8px; }
+    .day-check input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+    .day-check span { font-size: 11px; font-weight: 600; color: #64748b; }
+
+    /* Kotak Hari */
+    .day-badge { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+        padding: 12px;
+        border-radius: 12px;
+        text-align: center;
+    }
+    .day-badge i { font-size: 18px; margin-bottom: 6px; }
+    .day-badge h3 { font-size: 14px; font-weight: 700; }
+    .day-badge small { font-size: 10px; margin-top: 2px; opacity: 0.8; }
+
+    /* Warna Spesifik Hari */
+    .day-senin { background: #eff6ff; color: #1d4ed8; }
+    .day-selasa { background: #f0fdf4; color: #15803d; }
+    .day-rabu { background: #faf5ff; color: #7e22ce; }
+    .day-kamis { background: #fff7ed; color: #c2410c; }
+    .day-jumat { background: #f0f9ff; color: #0369a1; }
+    .day-sabtu { background: #fef2f2; color: #b91c1c; }
+    .day-minggu { background: #f8fafc; color: #475569; }
+
+    /* Input Waktu */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 11px; font-weight: 600; color: #64748b; }
+    .time-input { 
+        display: flex; 
+        align-items: center; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 8px; 
+        padding: 8px 12px; 
+        background: #f8fafc; 
+        transition: border-color 0.2s;
+    }
+    .time-input:focus-within { border-color: var(--primary); background: white; }
+    .time-input input { border: none; background: transparent; outline: none; font-size: 13px; color: #0f172a; width: 100%; font-weight: 500; }
+    .time-input i { color: #94a3b8; font-size: 14px; }
+    .field small { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+
+    /* Tombol Edit */
+    .btn-edit { 
+        border: 1px solid #bfdbfe; 
+        background: #eff6ff; 
+        color: var(--primary); 
+        border-radius: 8px; 
+        padding: 10px; 
+        font-size: 12px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 6px;
+        transition: all 0.2s;
+    }
+    .btn-edit:hover { background: #dbeafe; }
+
+    /* SWITCH TOGGLE (Untuk Weekend) */
+    .switch-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 10px; }
+    .switch-status { font-size: 10px; font-weight: 700; color: #64748b; }
+    .switch { position: relative; display: inline-flex; width: 40px; height: 22px; cursor: pointer; }
+    .switch input { position: absolute; opacity: 0; }
+    .switch .slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 30px; transition: .3s; }
+    .switch .slider::before { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform .3s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .switch input:checked + .slider { background: var(--primary); }
+    .switch input:checked + .slider::before { transform: translateX(18px); }
+
+    /* FOOTER */
+    .panel-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 24px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; padding: 12px 24px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-back { border: 1px solid #e2e8f0; background: white; color: #475569; }
+    .btn-back:hover { background: #f8fafc; }
+    .btn-save { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+    .btn-save:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+    /* ALERTS */
+    .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+        .massal-container { grid-template-columns: 1fr; }
+        .info-panel { flex-direction: row; }
+        .info-box, .checkbox-semua { flex: 1; }
+    }
+    @media (max-width: 1024px) {
+        .day-card { grid-template-columns: 70px 120px repeat(3, 1fr); }
+        .btn-edit { grid-column: 2 / -1; width: max-content; justify-self: end; margin-top: 8px; }
+    }
+    @media (max-width: 768px) {
+        .massal-grid { grid-template-columns: 1fr; }
+        .info-panel { flex-direction: column; }
+        .day-card { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
+        .day-check { justify-content: flex-start; }
+        .day-badge { flex-direction: row; gap: 10px; padding: 12px 20px; justify-content: flex-start; }
+        .day-badge i { margin-bottom: 0; }
+        .btn-edit { grid-column: 1 / -1; width: 100%; }
     }
 </style>
 
 <div class="content-wrapper">
+    <!-- Breadcrumb -->
     <div class="breadcrumb">
         <i class="fa-solid fa-house"></i> <span>Dashboard</span> <i class="fa-solid fa-chevron-right"></i> <span>Pengaturan</span>
     </div>
 
+    <!-- Header -->
     <div class="page-heading">
         <div class="heading-icon"><i class="fa-solid fa-clock"></i></div>
         <div>
@@ -88,13 +271,17 @@
         <div class="active-badge"><i class="fa-solid fa-circle-check"></i> Pengaturan Aktif</div>
     </div>
 
+    <!-- Alerts -->
     @if(session('success'))
-        <div class="success-message"><i class="fa-solid fa-circle-check"></i> {{ session('success') }}</div>
+        <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> {{ session('success') }}</div>
     @endif
     @if($errors->any())
-        <div class="error-message">
-            <strong>Pengaturan belum berhasil disimpan.</strong>
-            <ul style="margin:8px 0 0 20px;">@foreach($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>
+                <strong>Pengaturan belum berhasil disimpan.</strong>
+                <ul style="margin:4px 0 0 16px; font-size:12px;">@foreach($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
+            </div>
         </div>
     @endif
 
@@ -103,101 +290,130 @@
         <input type="hidden" name="apply_to_all" id="apply_to_all" value="false">
 
         <div class="schedule-panel">
-            <div class="panel-heading">
-                <div class="panel-icon"><i class="fa-regular fa-calendar-check"></i></div>
-                <div style="flex: 1;">
-                    <h2>Jadwal Kehadiran Mingguan</h2>
-                    <p>Ubah jam langsung di kolom yang tersedia, atau gunakan tombol massal di atas.</p>
+            
+            <!-- PENGATURAN MASSAL & INFO -->
+            <div class="massal-container">
+                <div class="massal-grid">
+                    <div class="massal-item">
+                        <label>Waktu Masuk</label>
+                        <input type="time" id="massal_masuk" value="08:00">
+                        <button type="button" onclick="terapkanMassal('masuk')">Terapkan Waktu Masuk</button>
+                    </div>
+                    <div class="massal-item">
+                        <label>Batas Jam Telat</label>
+                        <input type="time" id="massal_telat" value="08:15">
+                        <button type="button" onclick="terapkanMassal('telat')">Terapkan Batas Telat</button>
+                    </div>
+                    <div class="massal-item">
+                        <label>Jam Pulang</label>
+                        <input type="time" id="massal_pulang" value="16:00">
+                        <button type="button" onclick="terapkanMassal('pulang')">Terapkan Jam Pulang</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- PENGATURAN MASSAL -->
-            <div class="pengaturan-massal">
-                <div class="pengaturan-massal-item">
-                    <label>Waktu Masuk</label>
-                    <input type="time" id="massal_masuk" value="08:00">
-                    <button type="button" onclick="terapkanMassal('masuk')">Terapkan Waktu Masuk</button>
-                </div>
-                <div class="pengaturan-massal-item">
-                    <label>Batas Jam Telat</label>
-                    <input type="time" id="massal_telat" value="08:15">
-                    <button type="button" onclick="terapkanMassal('telat')">Terapkan Batas Telat</button>
-                </div>
-                <div class="pengaturan-massal-item">
-                    <label>Jam Pulang</label>
-                    <input type="time" id="massal_pulang" value="16:00">
-                    <button type="button" onclick="terapkanMassal('pulang')">Terapkan Jam Pulang</button>
+                <div class="info-panel">
+                    <div class="info-box">
+                        <div class="info-box-icon"><i class="fa-regular fa-clock"></i></div>
+                        <div class="info-box-text">
+                            <h4>Total Hari Kerja</h4>
+                            <p><span id="totalHariKerja">7</span> hari dalam seminggu</p>
+                        </div>
+                    </div>
+                    <label class="checkbox-semua">
+                        <input type="checkbox" id="pilihSemuaHari"> Pilih Semua Hari
+                    </label>
                 </div>
             </div>
 
             @php
                 $days = [
-                    'senin' => 'Senin', 'selasa' => 'Selasa', 'rabu' => 'Rabu',
-                    'kamis' => 'Kamis', 'jumat' => 'Jumat', 'sabtu' => 'Sabtu', 'minggu' => 'Minggu'
+                    'senin' => ['name' => 'Senin', 'icon' => 'fa-calendar-day', 'class' => 'day-senin'],
+                    'selasa' => ['name' => 'Selasa', 'icon' => 'fa-calendar-day', 'class' => 'day-selasa'],
+                    'rabu' => ['name' => 'Rabu', 'icon' => 'fa-calendar-day', 'class' => 'day-rabu'],
+                    'kamis' => ['name' => 'Kamis', 'icon' => 'fa-calendar-day', 'class' => 'day-kamis'],
+                    'jumat' => ['name' => 'Jumat', 'icon' => 'fa-calendar-day', 'class' => 'day-jumat'],
+                    'sabtu' => ['name' => 'Sabtu', 'icon' => 'fa-calendar-weekend', 'class' => 'day-sabtu'],
+                    'minggu' => ['name' => 'Minggu', 'icon' => 'fa-calendar-weekend', 'class' => 'day-minggu']
                 ];
             @endphp
 
-            @foreach($days as $key => $dayName)
-                @php
-                    $isWeekend = in_array($key, ['sabtu', 'minggu']);
-                    $isActive = $isWeekend ? ($jadwal[$key]['aktif'] ?? ($key === 'sabtu' ? '1' : '0')) : '1';
-                    $jamMasuk = $jadwal[$key]['masuk'] ?? '07:00';
-                    $jamTelat = $jadwal[$key]['telat'] ?? '07:15';
-                    $jamPulang = $jadwal[$key]['pulang'] ?? '15:00';
-                @endphp
+            <div class="day-list">
+                @foreach($days as $key => $day)
+                    @php
+                        $isWeekend = in_array($key, ['sabtu', 'minggu']);
+                        $isActive = $isWeekend ? ($jadwal[$key]['aktif'] ?? ($key === 'sabtu' ? '1' : '0')) : '1';
+                        $jamMasuk = $jadwal[$key]['masuk'] ?? '07:00';
+                        $jamTelat = $jadwal[$key]['telat'] ?? '07:15';
+                        $jamPulang = $jadwal[$key]['pulang'] ?? '15:00';
+                    @endphp
 
-                <div class="day-card">
-                    <div class="day-controls">
-                        <label class="checkbox-pilih-hari">
-                            <input type="checkbox" class="pilih-hari-jadwal" value="{{ $key }}"> Pilih
-                        </label>
-                        @if($isWeekend)
-                            <div class="switch-wrapper">
-                                <label class="sunday-switch">
-                                    <input type="checkbox" name="status_{{ $key }}" value="1" {{ $isActive == '1' ? 'checked' : '' }}>
-                                    <span class="switch-track"></span>
-                                </label>
-                                <span class="switch-status">{{ $isActive == '1' ? 'Aktif' : 'Nonaktif' }}</span>
+                    <div class="day-card">
+                        <!-- Checkbox Pilih -->
+                        <div class="day-check">
+                            <input type="checkbox" class="pilih-hari-jadwal" value="{{ $key }}">
+                            <span>Pilih</span>
+                        </div>
+
+                        <!-- Badge Hari -->
+                        <div class="day-badge {{ $day['class'] }}">
+                            <i class="fa-solid {{ $day['icon'] }}"></i>
+                            <div>
+                                <h3>{{ $day['name'] }}</h3>
+                                <small>{{ $isWeekend ? ($isActive == '1' ? 'Hari Kerja' : 'Hari Libur') : 'Hari Kerja' }}</small>
                             </div>
-                        @endif
-                    </div>
+                        </div>
 
-                    <div class="day-info">
-                        <div class="day-icon"><i class="fa-regular fa-calendar-check"></i></div>
-                        <h3>{{ $dayName }}</h3>
-                        <small>{{ $isWeekend ? ($isActive == '1' ? 'Hari Kerja' : 'Hari Libur') : 'Hari Kerja' }}</small>
-                    </div>
+                        <!-- Input Waktu Masuk -->
+                        <div class="field">
+                            <label>Waktu Masuk</label>
+                            <div class="time-input">
+                                <input type="time" name="jam_masuk_{{ $key }}" value="{{ $jamMasuk }}" class="input-massal-masuk">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <small>Jam mulai kerja</small>
+                        </div>
 
-                    <div class="field">
-                        <label>Waktu Masuk</label>
-                        <div class="time-input">
-                            <input type="time" name="jam_masuk_{{ $key }}" value="{{ $jamMasuk }}" class="input-massal-masuk">
-                            <i class="fa-regular fa-clock"></i>
+                        <!-- Input Batas Telat -->
+                        <div class="field">
+                            <label>Batas Jam Telat</label>
+                            <div class="time-input">
+                                <input type="time" name="jam_telat_{{ $key }}" value="{{ $jamTelat }}" class="input-massal-telat">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <small>Batas waktu keterlambatan</small>
+                        </div>
+
+                        <!-- Input Jam Pulang -->
+                        <div class="field">
+                            <label>Jam Pulang</label>
+                            <div class="time-input">
+                                <input type="time" name="jam_pulang_{{ $key }}" value="{{ $jamPulang }}" class="input-massal-pulang">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <small>Jam selesai kerja</small>
+                        </div>
+
+                        <!-- Tombol Edit / Toggle -->
+                        <div>
+                            @if($isWeekend)
+                                <div class="switch-wrapper">
+                                    <label class="switch">
+                                        <input type="checkbox" name="status_{{ $key }}" value="1" class="toggle-hari" {{ $isActive == '1' ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="switch-status">{{ $isActive == '1' ? 'Aktif' : 'Nonaktif' }}</span>
+                                </div>
+                            @else
+                                <button type="button" class="btn-edit">
+                                    <i class="fas fa-pen"></i> Edit
+                                </button>
+                            @endif
                         </div>
                     </div>
+                @endforeach
+            </div>
 
-                    <div class="field">
-                        <label>Batas Jam Telat</label>
-                        <div class="time-input">
-                            <input type="time" name="jam_telat_{{ $key }}" value="{{ $jamTelat }}" class="input-massal-telat">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>Jam Pulang</label>
-                        <div class="time-input">
-                            <input type="time" name="jam_pulang_{{ $key }}" value="{{ $jamPulang }}" class="input-massal-pulang">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                    </div>
-
-                    <button type="button" class="edit-button">
-                        <i class="fas fa-pen"></i> Edit
-                    </button>
-                </div>
-            @endforeach
-
+            <!-- Footer -->
             <div class="panel-footer">
                 <a href="{{ url('/admin/dashboard') }}" class="btn btn-back"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
                 <button type="submit" class="btn btn-save"><i class="fa-regular fa-floppy-disk"></i> Simpan Pengaturan</button>
@@ -207,19 +423,64 @@
 </div>
 
 <script>
+    // FUNGSI TERAPKAN MASSAL
     function terapkanMassal(jenis) {
-        // Ambil nilai dari input massal
         const nilai = document.getElementById('massal_' + jenis).value;
-        
-        // Ambil semua input yang sesuai (misal input-massal-masuk)
         const inputs = document.querySelectorAll('.input-massal-' + jenis);
         
-        // Ubah semua nilainya
         inputs.forEach(input => {
             input.value = nilai;
         });
 
-        alert('Waktu berhasil diterapkan ke SEMUA HARI. Klik Simpan untuk menyimpan.');
+        // Animasi alert sederhana
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = 'Berhasil Diterapkan!';
+        btn.style.background = '#16a34a';
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = 'var(--primary)';
+        }, 1500);
     }
+
+    // FUNGSI HITUNG TOTAL HARI KERJA (INTERAKTIF)
+    function updateTotalHariKerja() {
+        let total = 0;
+        // Hitung Senin - Jumat (otomatis aktif)
+        total += 5;
+        
+        // Hitung Sabtu & Minggu berdasarkan toggle switch
+        const sabtuAktif = document.querySelector('input[name="status_sabtu"]')?.checked;
+        const mingguAktif = document.querySelector('input[name="status_minggu"]')?.checked;
+        
+        if (sabtuAktif) total++;
+        if (mingguAktif) total++;
+
+        document.getElementById('totalHariKerja').innerText = total;
+    }
+
+    // Inisialisasi awal
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTotalHariKerja();
+
+        // Event listener untuk toggle switch
+        document.querySelectorAll('.toggle-hari').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                // Update teks status di sebelah switch
+                const statusText = this.closest('.switch-wrapper').querySelector('.switch-status');
+                statusText.innerText = this.checked ? 'Aktif' : 'Nonaktif';
+                updateTotalHariKerja();
+            });
+        });
+
+        // Fitur Pilih Semua Hari
+        const pilihSemua = document.getElementById('pilihSemuaHari');
+        if (pilihSemua) {
+            pilihSemua.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.pilih-hari-jadwal');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+            });
+        }
+    });
 </script>
 @endsection
