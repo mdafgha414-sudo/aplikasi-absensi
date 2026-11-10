@@ -27,10 +27,7 @@ class SettingController extends Controller
             'minggu' => 'Minggu',
         ];
 
-        // Ambil setting berdasarkan perusahaan_id (jika pembimbing)
-        // Jika admin, ambil setting global (perusahaan_id = null)
         if ($user->role === 'pembimbing') {
-            // PENGAMAN: Jika pembimbing tidak punya perusahaan_id, ambil array kosong
             if (is_null($user->perusahaan_id)) {
                 $settings = [];
             } else {
@@ -38,7 +35,6 @@ class SettingController extends Controller
                                    ->pluck('value', 'key')->toArray();
             }
         } else {
-            // Admin melihat setting global
             $settings = Setting::whereNull('perusahaan_id')
                                ->pluck('value', 'key')->toArray();
         }
@@ -78,39 +74,31 @@ class SettingController extends Controller
     }
 
     // =========================================================
-    // 2. MENYIMPAN JADWAL TUJUH HARI
+    // 2. MENYIMPAN JADWAL TUJUH HARI (DIPERBAIKI)
     // =========================================================
     public function update(Request $request)
     {
         $user = Auth::user();
-        $daftarHari = [
-            'senin', 'selasa', 'rabu', 'kamis',
-            'jumat', 'sabtu', 'minggu',
-        ];
+        $daftarHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
 
-        $aturan = [];
+        // 1. Validasi menggunakan format array yang sesuai dengan form HTML
+        $request->validate([
+            'jadwal.*.masuk' => 'required|date_format:H:i',
+            'jadwal.*.telat' => 'required|date_format:H:i',
+            'jadwal.*.pulang' => 'required|date_format:H:i',
+            'jadwal.sabtu.aktif' => 'nullable|boolean',
+            'jadwal.minggu.aktif' => 'nullable|boolean',
+        ]);
 
+        $data = $request->input('jadwal');
+
+        // 2. Validasi logika waktu
         foreach ($daftarHari as $hari) {
-            $aturan["jadwal.$hari.masuk"] = 'required|date_format:H:i';
-            $aturan["jadwal.$hari.telat"] = 'required|date_format:H:i';
-            $aturan["jadwal.$hari.pulang"] = 'required|date_format:H:i';
-        }
-
-        $aturan['jadwal.sabtu.aktif'] = 'nullable|boolean';
-        $aturan['jadwal.minggu.aktif'] = 'nullable|boolean';
-
-        $data = $request->validate($aturan);
-
-        // Validasi logika waktu (Telat tidak boleh mendahului Masuk, Pulang tidak boleh mendahului Telat)
-        foreach ($daftarHari as $hari) {
-            if (
-                in_array($hari, ['sabtu', 'minggu']) &&
-                !((int) ($data['jadwal'][$hari]['aktif'] ?? 0))
-            ) {
+            if (in_array($hari, ['sabtu', 'minggu']) && !((int) ($data[$hari]['aktif'] ?? 0))) {
                 continue;
             }
 
-            $jadwalHari = $data['jadwal'][$hari];
+            $jadwalHari = $data[$hari];
 
             if ($jadwalHari['telat'] < $jadwalHari['masuk']) {
                 return back()->withErrors([
@@ -125,26 +113,21 @@ class SettingController extends Controller
             }
         }
 
-        // Tentukan perusahaan_id
-        // Jika pembimbing, pakai perusahaan_id miliknya. Jika admin, null (global).
+        // 3. Tentukan perusahaan_id
         $perusahaanId = $user->role === 'pembimbing' ? $user->perusahaan_id : null;
 
-        // PENGAMAN EKSTRA: Jangan biarkan pembimbing tanpa perusahaan menyimpan data
         if ($user->role === 'pembimbing' && is_null($perusahaanId)) {
-            return back()->withErrors(['jadwal' => 'Akun Anda belum terhubung ke perusahaan manapun. Hubungi Admin untuk mendaftarkan perusahaan Anda.'])->withInput();
+            return back()->withErrors(['jadwal' => 'Akun Anda belum terhubung ke perusahaan manapun.'])->withInput();
         }
 
+        // 4. Simpan ke Database
         DB::transaction(function () use ($data, $daftarHari, $perusahaanId) {
             foreach ($daftarHari as $hari) {
-                // Jika hari sabtu/minggu tidak aktif, lewati penyimpanan jam
-                if (
-                    in_array($hari, ['sabtu', 'minggu']) &&
-                    !((int) ($data['jadwal'][$hari]['aktif'] ?? 0))
-                ) {
+                if (in_array($hari, ['sabtu', 'minggu']) && !((int) ($data[$hari]['aktif'] ?? 0))) {
                     continue;
                 }
 
-                $jadwalHari = $data['jadwal'][$hari];
+                $jadwalHari = $data[$hari];
 
                 $pengaturan = [
                     'waktu_masuk_' . $hari => $jadwalHari['masuk'],
@@ -153,7 +136,6 @@ class SettingController extends Controller
                 ];
 
                 foreach ($pengaturan as $key => $value) {
-                    // updateOrCreate akan mencari berdasarkan 'key' DAN 'perusahaan_id'
                     Setting::updateOrCreate(
                         ['key' => $key, 'perusahaan_id' => $perusahaanId],
                         ['value' => $value]
@@ -164,7 +146,7 @@ class SettingController extends Controller
             foreach (['sabtu', 'minggu'] as $hari) {
                 Setting::updateOrCreate(
                     ['key' => $hari . '_aktif', 'perusahaan_id' => $perusahaanId],
-                    ['value' => (string) ((int) ($data['jadwal'][$hari]['aktif'] ?? 0))]
+                    ['value' => (string) ((int) ($data[$hari]['aktif'] ?? 0))]
                 );
             }
         });
