@@ -17,99 +17,68 @@ class SettingController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $daftarHari = [
-            'senin'  => 'Senin',
-            'selasa' => 'Selasa',
-            'rabu'   => 'Rabu',
-            'kamis'  => 'Kamis',
-            'jumat'  => 'Jumat',
-            'sabtu'  => 'Sabtu',
-            'minggu' => 'Minggu',
-        ];
+        $daftarHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
 
         if ($user->role === 'pembimbing') {
-            if (is_null($user->perusahaan_id)) {
-                $settings = [];
-            } else {
-                $settings = Setting::where('perusahaan_id', $user->perusahaan_id)
-                                   ->pluck('value', 'key')->toArray();
-            }
+            $settings = is_null($user->perusahaan_id) ? [] : Setting::where('perusahaan_id', $user->perusahaan_id)->pluck('value', 'key')->toArray();
         } else {
-            $settings = Setting::whereNull('perusahaan_id')
-                               ->pluck('value', 'key')->toArray();
+            $settings = Setting::whereNull('perusahaan_id')->pluck('value', 'key')->toArray();
         }
 
-        $default = [
-            'masuk'  => '07:00',
-            'telat'  => '07:15',
-            'pulang' => '15:00',
-        ];
-
+        $default = ['masuk' => '07:00', 'telat' => '07:15', 'pulang' => '15:00'];
         $jadwal = [];
 
-        foreach ($daftarHari as $hari => $namaHari) {
+        foreach ($daftarHari as $hari) {
             foreach ($default as $jenis => $jamDefault) {
-                $jenisDatabase = [
-                    'masuk'  => 'waktu_masuk',
-                    'telat'  => 'batas_jam_telat',
-                    'pulang' => 'jam_pulang',
-                ][$jenis];
-
-                $key = $jenisDatabase . '_' . $hari;
-
-                $jadwal[$hari][$jenis] = isset($settings[$key])
-                    ? substr($settings[$key], 0, 5)
-                    : $jamDefault;
+                $jenisDb = ['masuk' => 'waktu_masuk', 'telat' => 'batas_jam_telat', 'pulang' => 'jam_pulang'][$jenis];
+                $key = $jenisDb . '_' . $hari;
+                $jadwal[$hari][$jenis] = isset($settings[$key]) ? substr($settings[$key], 0, 5) : $jamDefault;
             }
         }
 
         foreach (['sabtu', 'minggu'] as $hari) {
-            $jadwal[$hari]['aktif'] = (string) (
-                $settings[$hari . '_aktif']
-                ?? ($hari === 'sabtu' ? '1' : '0')
-            );
+            $jadwal[$hari]['aktif'] = (string) ($settings[$hari . '_aktif'] ?? ($hari === 'sabtu' ? '1' : '0'));
         }
 
         return view('dashboard.pengaturan', compact('daftarHari', 'jadwal'));
     }
 
     // =========================================================
-    // 2. MENYIMPAN JADWAL TUJUH HARI (DIPERBAIKI)
+    // 2. MENYIMPAN JADWAL TUJUH HARI (VERSI ANTI-GAGAL)
     // =========================================================
     public function update(Request $request)
     {
         $user = Auth::user();
         $daftarHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
 
-        // 1. Validasi menggunakan format array yang sesuai dengan form HTML
-        $request->validate([
-            'jadwal.*.masuk' => 'required|date_format:H:i',
-            'jadwal.*.telat' => 'required|date_format:H:i',
-            'jadwal.*.pulang' => 'required|date_format:H:i',
-            'jadwal.sabtu.aktif' => 'nullable|boolean',
-            'jadwal.minggu.aktif' => 'nullable|boolean',
-        ]);
+        // 1. Validasi menggunakan nama input yang datar (flat)
+        $rules = [];
+        foreach ($daftarHari as $hari) {
+            $rules["jam_masuk_$hari"] = 'required|date_format:H:i';
+            $rules["jam_telat_$hari"] = 'required|date_format:H:i';
+            $rules["jam_pulang_$hari"] = 'required|date_format:H:i';
+        }
+        $rules['status_sabtu'] = 'nullable|boolean';
+        $rules['status_minggu'] = 'nullable|boolean';
 
-        $data = $request->input('jadwal');
+        $request->validate($rules);
 
         // 2. Validasi logika waktu
         foreach ($daftarHari as $hari) {
-            if (in_array($hari, ['sabtu', 'minggu']) && !((int) ($data[$hari]['aktif'] ?? 0))) {
+            // Jika sabtu/minggu tidak dicentang aktif, lewati pengecekan
+            if (in_array($hari, ['sabtu', 'minggu']) && !$request->has("status_$hari")) {
                 continue;
             }
 
-            $jadwalHari = $data[$hari];
+            $masuk = $request->input("jam_masuk_$hari");
+            $telat = $request->input("jam_telat_$hari");
+            $pulang = $request->input("jam_pulang_$hari");
 
-            if ($jadwalHari['telat'] < $jadwalHari['masuk']) {
-                return back()->withErrors([
-                    'jadwal' => 'Batas jam telat hari ' . ucfirst($hari) . ' tidak boleh lebih awal dari waktu masuk.',
-                ])->withInput();
+            if ($telat < $masuk) {
+                return back()->withErrors(['error' => 'Batas jam telat hari ' . ucfirst($hari) . ' tidak boleh lebih awal dari waktu masuk.'])->withInput();
             }
-
-            if ($jadwalHari['pulang'] < $jadwalHari['telat']) {
-                return back()->withErrors([
-                    'jadwal' => 'Jam pulang hari ' . ucfirst($hari) . ' tidak boleh lebih awal dari batas jam telat.',
-                ])->withInput();
+            if ($pulang < $telat) {
+                return back()->withErrors(['error' => 'Jam pulang hari ' . ucfirst($hari) . ' tidak boleh lebih awal dari batas jam telat.'])->withInput();
             }
         }
 
@@ -117,37 +86,22 @@ class SettingController extends Controller
         $perusahaanId = $user->role === 'pembimbing' ? $user->perusahaan_id : null;
 
         if ($user->role === 'pembimbing' && is_null($perusahaanId)) {
-            return back()->withErrors(['jadwal' => 'Akun Anda belum terhubung ke perusahaan manapun.'])->withInput();
+            return back()->withErrors(['error' => 'Akun Anda belum terhubung ke perusahaan manapun.'])->withInput();
         }
 
         // 4. Simpan ke Database
-        DB::transaction(function () use ($data, $daftarHari, $perusahaanId) {
+        DB::transaction(function () use ($request, $daftarHari, $perusahaanId) {
             foreach ($daftarHari as $hari) {
-                if (in_array($hari, ['sabtu', 'minggu']) && !((int) ($data[$hari]['aktif'] ?? 0))) {
-                    continue;
+                // Simpan Jam
+                Setting::updateOrCreate(['key' => 'waktu_masuk_' . $hari, 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_masuk_$hari")]);
+                Setting::updateOrCreate(['key' => 'batas_jam_telat_' . $hari, 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_telat_$hari")]);
+                Setting::updateOrCreate(['key' => 'jam_pulang_' . $hari, 'perusahaan_id' => $perusahaanId], ['value' => $request->input("jam_pulang_$hari")]);
+
+                // Simpan Status Sabtu/Minggu
+                if (in_array($hari, ['sabtu', 'minggu'])) {
+                    $status = $request->has("status_$hari") ? '1' : '0';
+                    Setting::updateOrCreate(['key' => $hari . '_aktif', 'perusahaan_id' => $perusahaanId], ['value' => $status]);
                 }
-
-                $jadwalHari = $data[$hari];
-
-                $pengaturan = [
-                    'waktu_masuk_' . $hari => $jadwalHari['masuk'],
-                    'batas_jam_telat_' . $hari => $jadwalHari['telat'],
-                    'jam_pulang_' . $hari => $jadwalHari['pulang'],
-                ];
-
-                foreach ($pengaturan as $key => $value) {
-                    Setting::updateOrCreate(
-                        ['key' => $key, 'perusahaan_id' => $perusahaanId],
-                        ['value' => $value]
-                    );
-                }
-            }
-
-            foreach (['sabtu', 'minggu'] as $hari) {
-                Setting::updateOrCreate(
-                    ['key' => $hari . '_aktif', 'perusahaan_id' => $perusahaanId],
-                    ['value' => (string) ((int) ($data[$hari]['aktif'] ?? 0))]
-                );
             }
         });
 
@@ -169,10 +123,7 @@ class SettingController extends Controller
     public function updateProfil(Request $request)
     {
         $user = Auth::user();
-
-        if (! $user || ! method_exists($user, 'save')) {
-            $user = \App\Models\User::findOrFail(Auth::id());
-        }
+        if (! $user || ! method_exists($user, 'save')) $user = \App\Models\User::findOrFail(Auth::id());
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -184,22 +135,16 @@ class SettingController extends Controller
         $user->name = $request->name;
 
         if ($request->hasFile('foto_profil')) {
-            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
-                Storage::disk('public')->delete($user->foto_profil);
-            }
-            $path = $request->file('foto_profil')->store('foto_profil', 'public');
-            $user->foto_profil = $path;
+            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) Storage::disk('public')->delete($user->foto_profil);
+            $user->foto_profil = $request->file('foto_profil')->store('foto_profil', 'public');
         }
 
         if ($request->filled('password_baru')) {
-            if (!Hash::check($request->password_lama, $user->password)) {
-                return back()->withErrors(['password_lama' => 'Password lama tidak sesuai.']);
-            }
+            if (!Hash::check($request->password_lama, $user->password)) return back()->withErrors(['password_lama' => 'Password lama tidak sesuai.']);
             $user->password = Hash::make($request->password_baru);
         }
 
         $user->save();
-
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
 }
