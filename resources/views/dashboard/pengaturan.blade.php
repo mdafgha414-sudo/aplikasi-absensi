@@ -251,20 +251,24 @@
         };
     });
 
+    // FUNGSI TERAPKAN JAM MASSAL (TANPA SYARAT CENTANG)
     function terapkanSatuJam(jenis) {
         const idMap = { masuk: 'serentakMasuk', telat: 'serentakTelat', pulang: 'serentakPulang' };
         const waktu = document.getElementById(idMap[jenis]).value;
         if (!waktu) return alert('Pilih waktu terlebih dahulu.');
 
-        const hariDipilih = document.querySelectorAll('.pilih-hari-jadwal:checked');
-        if (hariDipilih.length === 0) return alert('Centang minimal satu hari.');
-
-        hariDipilih.forEach(cb => {
-            const hari = cb.value;
+        // Ubah semua hari tanpa perlu dicentang
+        const semuaHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+        
+        semuaHari.forEach(hari => {
             const input = document.querySelector(`input[name="jam_${jenis}_${hari}"]`);
-            if (input) input.value = waktu;
+            if (input) {
+                input.value = waktu;
+                input.readOnly = false;
+            }
         });
-        alert('Waktu berhasil diterapkan ke hari yang dipilih. Klik Simpan untuk menyimpan.');
+
+        alert('Waktu berhasil diterapkan ke SEMUA HARI. Klik Simpan Pengaturan untuk menyimpan.');
     }
 </script>
 @endsection
