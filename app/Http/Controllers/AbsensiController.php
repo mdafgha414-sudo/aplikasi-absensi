@@ -10,11 +10,12 @@ use App\Models\QrToken;
 use App\Models\Perusahaan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\DB; // <-- TAMBAHAN UNTUK DB::table
 
 class AbsensiController extends Controller
 {
     // =====================================================
-    // FUNGSI BANTU: MENGAMBIL JADWAL HARI INI (DIPERBAIKI)
+    // FUNGSI BANTU: MENGAMBIL JADWAL HARI INI (FINAL)
     // =====================================================
     private function jadwalHariIni()
     {
@@ -25,10 +26,33 @@ class AbsensiController extends Controller
 
         $namaHari = $hari[Carbon::now()->dayOfWeekIso];
 
-        // PAKSA AMBIL DARI KANTONG GLOBAL (ADMIN), TANPA PEDULI PERUSAHAAN
-        $masuk = Setting::whereNull('perusahaan_id')->where('key', 'waktu_masuk_' . $namaHari)->value('value') ?? '09:00';
-        $batasTelat = Setting::whereNull('perusahaan_id')->where('key', 'batas_jam_telat_' . $namaHari)->value('value') ?? '09:00';
-        $pulang = Setting::whereNull('perusahaan_id')->where('key', 'jam_pulang_' . $namaHari)->value('value') ?? '16:00';
+        // DAPATKAN PERUSAHAAN DARI USER YANG SEDANG LOGIN (SISWA)
+        $user = Auth::user();
+        $perusahaanId = $user->perusahaan_id ?? null;
+
+        // Cari setting berdasarkan perusahaan_id user (Jika ada)
+        $query = DB::table('settings')->where(function($q) use ($perusahaanId) {
+            if ($perusahaanId) {
+                $q->where('perusahaan_id', $perusahaanId);
+            } else {
+                $q->whereNull('perusahaan_id');
+            }
+        });
+
+        $masuk = (clone $query)->where('key', 'waktu_masuk_' . $namaHari)->value('value');
+        $batasTelat = (clone $query)->where('key', 'batas_jam_telat_' . $namaHari)->value('value');
+        $pulang = (clone $query)->where('key', 'jam_pulang_' . $namaHari)->value('value');
+
+        // Jika perusahaan belum punya setting, ambil setting global (Admin)
+        if (!$masuk) {
+            $masuk = DB::table('settings')->whereNull('perusahaan_id')->where('key', 'waktu_masuk_' . $namaHari)->value('value') ?? '09:00';
+        }
+        if (!$batasTelat) {
+            $batasTelat = DB::table('settings')->whereNull('perusahaan_id')->where('key', 'batas_jam_telat_' . $namaHari)->value('value') ?? '09:00';
+        }
+        if (!$pulang) {
+            $pulang = DB::table('settings')->whereNull('perusahaan_id')->where('key', 'jam_pulang_' . $namaHari)->value('value') ?? '16:00';
+        }
 
         return [
             'masuk' => substr($masuk, 0, 5),
@@ -45,7 +69,22 @@ class AbsensiController extends Controller
         $hariIni = strtolower(Carbon::now()->locale('id')->dayName);
 
         if (in_array($hariIni, ['sabtu', 'minggu'])) {
-            $status = Setting::whereNull('perusahaan_id')->where('key', $hariIni . '_aktif')->value('value');
+            // Cek status aktif untuk sabtu/minggu (prioritaskan perusahaan, lalu global)
+            $user = Auth::user();
+            $perusahaanId = $user->perusahaan_id ?? null;
+            
+            $query = DB::table('settings')->where('key', $hariIni . '_aktif');
+            if ($perusahaanId) {
+                $status = (clone $query)->where('perusahaan_id', $perusahaanId)->value('value');
+            } else {
+                $status = (clone $query)->whereNull('perusahaan_id')->value('value');
+            }
+
+            // Jika tidak ada setting di perusahaan, ambil global
+            if (is_null($status)) {
+                $status = DB::table('settings')->whereNull('perusahaan_id')->where('key', $hariIni . '_aktif')->value('value');
+            }
+
             $default = $hariIni === 'sabtu' ? '1' : '0';
             return (string) ($status ?? $default) === '1';
         }
@@ -73,6 +112,9 @@ class AbsensiController extends Controller
         return $angle * $earthRadius;
     }
 
+    // =====================================================
+    // 1. HALAMAN UTAMA ABSENSI
+    // =====================================================
     public function index()
     {
         $hariIni = Carbon::today()->toDateString();
@@ -83,6 +125,9 @@ class AbsensiController extends Controller
         return view('absensi.index', compact('absenHariIni', 'jamMasukHariIni'));
     }
 
+    // =====================================================
+    // 2. PROSES ABSEN MASUK (DENGAN FOTO & LOKASI)
+    // =====================================================
     public function masuk(Request $request)
     {
         if (!$this->absensiDiizinkan()) {
@@ -129,6 +174,7 @@ class AbsensiController extends Controller
         $waktuSekarang = Carbon::now();
         $batasTelat = Carbon::today()->setTimeFromTimeString($jadwal['telat']);
         
+        // Status: Hadir atau Telat
         $statusAbsen = $waktuSekarang->lte($batasTelat) ? 'Hadir' : 'Telat';
 
         Absensi::create([
@@ -142,6 +188,9 @@ class AbsensiController extends Controller
         return back()->with('success', 'Absen masuk berhasil! Status: ' . $statusAbsen);
     }
 
+    // =====================================================
+    // 3. PROSES ABSEN PULANG (DENGAN FOTO & LOKASI)
+    // =====================================================
     public function pulang(Request $request)
     {
         if (!$this->absensiDiizinkan()) {
@@ -201,18 +250,27 @@ class AbsensiController extends Controller
         return back()->with('success', 'Absen pulang berhasil dicatat. Hati-hati di jalan!');
     }
 
+    // =====================================================
+    // 4. RIWAYAT ABSENSI SISWA
+    // =====================================================
     public function riwayat()
     {
         $riwayat = Absensi::where('user_id', Auth::id())->orderBy('tanggal', 'desc')->get();
         return view('absensi.riwayat', compact('riwayat'));
     }
 
+    // =====================================================
+    // 5. LAPORAN ABSENSI KHUSUS PEMBIMBING
+    // =====================================================
     public function laporanAbsensi()
     {
         $laporanAbsensi = Absensi::with('user')->latest()->get();
         return view('pembimbing.laporan-absensi', compact('laporanAbsensi'));
     }
 
+    // =====================================================
+    // 6. PROSES SCAN QR & VALIDASI LOKASI
+    // =====================================================
     public function prosesScan(Request $request)
     {
         $request->validate([
