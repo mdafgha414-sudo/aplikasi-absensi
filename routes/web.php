@@ -108,7 +108,7 @@ Route::middleware('auth')->group(function () {
     
     // --- PENGATURAN JAM (Bisa diakses Admin & Pembimbing) ---
     Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
-    Route::put('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
+   Route::post('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
 }); 
 
 // ==========================================

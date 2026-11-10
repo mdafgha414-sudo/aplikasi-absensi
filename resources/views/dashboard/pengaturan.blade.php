@@ -106,9 +106,9 @@
         </div>
     @endif
 
+    <!-- PERHATIKAN: TIDAK ADA @method('PUT') DI SINI, HANYA POST BIASA -->
     <form action="{{ url('/admin/setting') }}" method="POST">
         @csrf
-        @method('PUT')
 
         <div class="schedule-panel">
             <div class="panel-heading">
@@ -257,7 +257,6 @@
         const waktu = document.getElementById(idMap[jenis]).value;
         if (!waktu) return alert('Pilih waktu terlebih dahulu.');
 
-        // Ubah semua hari tanpa perlu dicentang
         const semuaHari = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
         
         semuaHari.forEach(hari => {
