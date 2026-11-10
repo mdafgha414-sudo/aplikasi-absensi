@@ -36,11 +36,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/cetak-qr', [QrController::class, 'index'])->name('qr.index');
     Route::get('/cetak-qr/{id}', [QrController::class, 'show'])->name('qr.show');
 
-    // --- PENGATURAN PROFIL & JAM (Akses Admin & Pembimbing) ---
+    // --- PENGATURAN PROFIL ---
     Route::get('/pengaturan', [SettingController::class, 'profil'])->name('pengaturan');
     Route::put('/pengaturan/update', [SettingController::class, 'updateProfil'])->name('pengaturan.update');
     
-    // PINDAHKAN ROUTE INI KE SINI AGAR PEMBIMBING BISA AKSES
+    // --- PENGATURAN JAM (Akses Admin & Pembimbing) ---
     Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting');
     Route::put('/admin/setting', [SettingController::class, 'update'])->name('admin.setting.update');
 
