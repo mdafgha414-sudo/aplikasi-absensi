@@ -1155,7 +1155,7 @@
             <!-- FOOTER -->
             <div class="panel-footer">
 
-                <a href="{{ url('/admin/dashboard') }}" class="btn btn-back">
+                <a href="{{ url('/pembimbing/dashboard') }}" class="btn btn-back">
                     <i class="fa-solid fa-arrow-left"></i>
                     Kembali
                 </a>
