@@ -4,23 +4,20 @@
 @section('content')
 
 <style>
-/* =====================================================
-   PENGATURAN DASAR
-===================================================== */
+/* ==================================================
+   DESAIN UTAMA - DESKTOP TETAP
+================================================== */
 
 body {
     background-color: #f8fafc;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
 }
 
 .inbox-container {
     max-width: 1200px;
     margin: 0 auto;
 }
-
-/* =====================================================
-   HEADER
-===================================================== */
 
 .inbox-header {
     background: white;
@@ -44,9 +41,7 @@ body {
     margin: 0;
 }
 
-/* =====================================================
-   TOOLBAR PENCARIAN DAN FILTER
-===================================================== */
+/* PENCARIAN */
 
 .inbox-toolbar {
     display: flex;
@@ -79,7 +74,7 @@ body {
     outline: none;
     font-size: 13px;
     background: #f8fafc;
-    transition: all 0.2s;
+    transition: 0.2s;
 }
 
 .inbox-search input:focus {
@@ -98,7 +93,6 @@ body {
     color: #475569;
     cursor: pointer;
     font-weight: 500;
-    transition: all 0.2s;
 }
 
 .filter-group select:focus {
@@ -106,9 +100,7 @@ body {
     background: white;
 }
 
-/* =====================================================
-   TOMBOL TOOLBAR
-===================================================== */
+/* TOMBOL */
 
 .btn-toolbar-primary {
     background: #0f172a;
@@ -120,7 +112,6 @@ body {
     border: none;
     transition: 0.2s;
     text-decoration: none;
-    text-align: center;
 }
 
 .btn-toolbar-primary:hover {
@@ -138,7 +129,6 @@ body {
     padding: 10px 16px;
     transition: 0.2s;
     text-decoration: none;
-    text-align: center;
 }
 
 .btn-toolbar-secondary:hover {
@@ -146,9 +136,7 @@ body {
     color: #1e293b;
 }
 
-/* =====================================================
-   FILTER TANGGAL
-===================================================== */
+/* FILTER TANGGAL */
 
 .quick-filter {
     display: inline-flex;
@@ -161,7 +149,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: 0.2s;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
@@ -187,9 +175,9 @@ body {
     outline: none;
 }
 
-/* =====================================================
+/* ==================================================
    KARTU PENGAJUAN IZIN
-===================================================== */
+================================================== */
 
 .approval-card {
     background: white;
@@ -213,8 +201,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* GARIS AKSEN */
-
 .approval-card::before {
     content: '';
     position: absolute;
@@ -236,9 +222,7 @@ body {
     background: #ef4444;
 }
 
-/* =====================================================
-   INFORMASI SISWA
-===================================================== */
+/* INFORMASI SISWA */
 
 .student-info {
     display: flex;
@@ -300,9 +284,7 @@ body {
     overflow-wrap: anywhere;
 }
 
-/* =====================================================
-   BADGE JENIS IZIN
-===================================================== */
+/* BADGE */
 
 .badge-jenis {
     display: inline-block;
@@ -325,9 +307,7 @@ body {
     color: #1e40af;
 }
 
-/* =====================================================
-   TOMBOL AKSI
-===================================================== */
+/* TOMBOL AKSI */
 
 .action-buttons {
     display: flex;
@@ -352,7 +332,6 @@ body {
     transition: 0.2s;
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 6px;
     white-space: nowrap;
 }
@@ -374,7 +353,6 @@ body {
     transition: 0.2s;
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 6px;
     white-space: nowrap;
 }
@@ -384,9 +362,7 @@ body {
     border-color: #f43f5e;
 }
 
-/* =====================================================
-   STATUS AKHIR
-===================================================== */
+/* STATUS */
 
 .status-badge {
     padding: 6px 14px;
@@ -395,7 +371,6 @@ body {
     font-weight: 700;
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 6px;
     white-space: nowrap;
 }
@@ -413,9 +388,9 @@ body {
 }
 
 
-/* =====================================================
-   RESPONSIVE TABLET
-===================================================== */
+/* ==================================================
+   TABLET
+================================================== */
 
 @media (max-width: 992px) {
 
@@ -434,17 +409,20 @@ body {
 }
 
 
-/* =====================================================
-   RESPONSIVE HP
-===================================================== */
+/* ==================================================
+   MOBILE - TAMPILAN COMPACT
+================================================== */
 
 @media (max-width: 768px) {
 
-    /* CONTAINER UTAMA */
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
 
     .container-fluid {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
+        padding: 12px !important;
     }
 
     .inbox-container {
@@ -456,35 +434,38 @@ body {
     /* HEADER */
 
     .inbox-header {
-        padding: 18px;
-        border-radius: 16px;
-        margin-bottom: 18px;
+        padding: 16px;
+        border-radius: 14px;
+        margin-bottom: 16px;
     }
 
     .inbox-title {
-        font-size: 19px;
+        font-size: 17px;
         line-height: 1.4;
+        margin-bottom: 3px;
     }
 
     .inbox-subtitle {
-        font-size: 12px;
-        line-height: 1.6;
+        font-size: 11px;
+        line-height: 1.5;
     }
-
-    /* BADGE MENUNGGU */
 
     .inbox-header > .d-flex {
-        align-items: flex-start !important;
-        gap: 12px !important;
+        gap: 9px !important;
     }
 
-    /* PENCARIAN */
+    .inbox-header > .d-flex > span {
+        font-size: 10px !important;
+        padding: 7px 10px !important;
+    }
+
+    /* TOOLBAR: TIGA KOLOM RINGKAS */
 
     .inbox-toolbar {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 10px;
-        margin-top: 18px;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 7px;
+        margin-top: 14px;
         align-items: stretch;
     }
 
@@ -494,136 +475,162 @@ body {
         min-width: 0;
     }
 
-    .inbox-search input {
-        width: 100%;
-        height: 46px;
+    .inbox-search i {
+        left: 12px;
         font-size: 13px;
     }
 
-    /* DROPDOWN STATUS */
+    .inbox-search input {
+        height: 40px;
+        padding: 8px 10px 8px 36px;
+        font-size: 12px;
+        border-radius: 9px;
+        box-sizing: border-box;
+    }
 
     .filter-group {
-        width: 100%;
         min-width: 0;
+        width: 100%;
     }
 
     .filter-group select {
         width: 100%;
-        height: 46px;
-        padding: 8px 10px;
-        font-size: 12px;
+        height: 40px;
+        padding: 7px 7px;
+        font-size: 11px;
+        border-radius: 9px;
     }
-
-    /* TOMBOL CARI DAN RESET */
 
     .btn-toolbar-primary,
     .btn-toolbar-secondary {
-        min-height: 46px;
+        height: 40px;
+        min-width: 0;
+        padding: 7px 12px;
+        font-size: 11px;
+        border-radius: 9px;
         display: flex;
-        align-items: center;
         justify-content: center;
-        padding: 10px 16px;
-        font-size: 12px;
+        align-items: center;
+        white-space: nowrap;
+        box-sizing: border-box;
     }
 
-    /* FILTER WAKTU */
+    /* FILTER TANGGAL */
 
     .inbox-header > .mt-3 {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px !important;
-        align-items: center;
+        gap: 5px !important;
+        padding-top: 12px !important;
+        margin-top: 13px !important;
     }
 
     .quick-filter {
-        padding: 9px 11px;
-        font-size: 11px;
-        min-height: 36px;
+        padding: 7px 9px;
+        font-size: 10px;
+        min-height: 31px;
     }
 
-    /* FORM PILIH BULAN */
+    /* FORM BULAN */
 
     .inbox-header > .mt-3 > form {
         width: 100%;
-        margin: 8px 0 0 !important;
         display: flex;
-        gap: 8px;
+        gap: 7px;
+        margin: 5px 0 0 !important;
     }
 
     .input-month-custom {
         flex: 1;
         min-width: 0;
         width: 100%;
-        height: 40px;
+        height: 36px;
+        padding: 5px 9px;
+        font-size: 11px;
     }
 
     .inbox-header > .mt-3 > form button {
-        min-width: 75px;
-        height: 40px;
+        height: 36px;
+        min-width: 65px;
+        font-size: 11px !important;
+        padding: 5px 12px !important;
     }
 
-    /* KARTU PENGAJUAN */
+    /* KARTU IZIN */
 
     .approval-card {
         width: 100%;
         min-width: 0;
-        padding: 18px 14px 16px 18px;
-        margin-bottom: 12px;
-        border-radius: 15px;
+        padding: 13px 12px 12px 15px;
+        margin-bottom: 10px;
+        border-radius: 13px;
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        gap: 15px;
+        gap: 11px;
+        box-sizing: border-box;
         overflow: hidden;
+    }
+
+    .approval-card::before {
+        width: 4px;
+    }
+
+    .approval-card:hover {
+        transform: none;
     }
 
     /* INFORMASI SISWA */
 
     .student-info {
-        width: 100%;
-        min-width: 0;
         display: flex;
         align-items: flex-start;
-        gap: 12px;
+        gap: 10px;
+        width: 100%;
+        min-width: 0;
     }
 
     .student-avatar {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        font-size: 16px;
-        border-radius: 11px;
-        margin-top: 2px;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        font-size: 15px;
+        border-radius: 9px;
+        margin-top: 1px;
     }
 
     .student-details {
-        width: 100%;
-        min-width: 0;
         flex: 1;
+        min-width: 0;
+        width: 100%;
     }
 
     .student-details h5 {
-        font-size: 14px;
-        line-height: 1.5;
-        gap: 7px;
-        margin-bottom: 8px;
-        overflow-wrap: anywhere;
+        font-size: 13px;
+        line-height: 1.4;
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .badge-jenis {
+        font-size: 9px;
+        padding: 3px 6px;
     }
 
     /* TANGGAL DAN WAKTU */
 
     .student-details .meta {
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-        font-size: 11px;
-        line-height: 1.6;
-        margin-bottom: 10px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 5px 9px;
+        font-size: 10px;
+        line-height: 1.5;
+        margin-bottom: 7px;
     }
 
     .student-details .meta > span {
-        display: block;
         max-width: 100%;
         overflow-wrap: anywhere;
     }
@@ -632,32 +639,33 @@ body {
         display: none;
     }
 
-    /* ALASAN IZIN */
+    /* ALASAN */
 
     .student-details .reason {
         width: 100%;
-        font-size: 12px;
-        line-height: 1.6;
-        padding: 10px 12px;
+        font-size: 11px;
+        line-height: 1.5;
+        padding: 8px 10px;
+        border-radius: 7px;
         overflow-wrap: anywhere;
-        word-break: normal;
+        box-sizing: border-box;
     }
 
     /* LAMPIRAN */
 
     .student-details > a {
-        font-size: 11px !important;
-        margin-top: 10px !important;
+        font-size: 10px !important;
+        margin-top: 7px !important;
     }
 
-    /* TOMBOL SETUJUI DAN TOLAK */
+    /* TOMBOL AKSI */
 
     .action-buttons {
         width: 100%;
         display: flex;
-        gap: 10px;
-        flex-shrink: 1;
-        padding-left: 56px;
+        gap: 8px;
+        padding-left: 48px;
+        box-sizing: border-box;
         align-items: center;
     }
 
@@ -670,130 +678,98 @@ body {
     .btn-approve,
     .btn-reject {
         width: 100%;
-        min-height: 42px;
-        padding: 9px 8px;
-        font-size: 12px;
-        justify-content: center;
-    }
-
-    /* STATUS YANG SUDAH DIPROSES */
-
-    .action-buttons > .status-badge {
         min-height: 36px;
+        padding: 7px 5px;
         font-size: 11px;
+        border-radius: 8px;
+        justify-content: center;
+        box-sizing: border-box;
     }
 
-    /* NOTIFIKASI */
+    .status-badge {
+        font-size: 10px;
+        padding: 6px 10px;
+    }
+
+    /* ALERT */
 
     .alert {
-        font-size: 12px !important;
-        line-height: 1.5;
+        font-size: 11px !important;
+        padding: 10px !important;
     }
 
 }
 
 
-/* =====================================================
-   RESPONSIVE HP KECIL
-===================================================== */
+/* ==================================================
+   HP KECIL
+================================================== */
 
-@media (max-width: 400px) {
+@media (max-width: 380px) {
 
     .inbox-header {
-        padding: 15px;
+        padding: 13px;
     }
 
     .inbox-title {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .inbox-subtitle {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .inbox-toolbar {
-        gap: 8px;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 5px;
     }
 
     .filter-group select {
-        font-size: 11px;
-        padding-left: 8px;
-        padding-right: 5px;
+        font-size: 10px;
+        padding-left: 5px;
     }
 
     .btn-toolbar-primary,
     .btn-toolbar-secondary {
-        padding: 9px 12px;
-        font-size: 11px;
-    }
-
-    .approval-card {
-        padding: 16px 11px 14px 15px;
-    }
-
-    .student-info {
-        gap: 10px;
-    }
-
-    .student-avatar {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-    }
-
-    .student-details h5 {
-        font-size: 13px;
-    }
-
-    .student-details .meta {
+        padding: 6px 9px;
         font-size: 10px;
     }
 
+    .quick-filter {
+        font-size: 9px;
+        padding: 6px 7px;
+    }
+
+    .approval-card {
+        padding: 12px 10px 11px 13px;
+    }
+
+    .student-info {
+        gap: 8px;
+    }
+
+    .student-avatar {
+        width: 35px;
+        height: 35px;
+        min-width: 35px;
+    }
+
+    .student-details h5 {
+        font-size: 12px;
+    }
+
+    .student-details .meta {
+        font-size: 9px;
+    }
+
     .action-buttons {
-        padding-left: 50px;
-        gap: 7px;
+        padding-left: 43px;
+        gap: 6px;
     }
 
     .btn-approve,
     .btn-reject {
-        font-size: 11px;
-        padding: 8px 5px;
-    }
-
-    .quick-filter {
         font-size: 10px;
-        padding: 8px 9px;
-    }
-
-}
-
-
-/* =====================================================
-   MENCEGAH HALAMAN MELEBAR DI HP
-===================================================== */
-
-@media (max-width: 768px) {
-
-    html,
-    body {
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-
-    .inbox-container,
-    .inbox-header,
-    .approval-card {
-        box-sizing: border-box;
-    }
-
-    .student-info,
-    .student-details,
-    .inbox-search {
-        box-sizing: border-box;
-    }
-
-    .approval-card:hover {
-        transform: none;
     }
 
 }
@@ -944,7 +920,7 @@ body {
         </div>
 
 
-        {{-- NOTIFIKASI BERHASIL --}}
+        {{-- NOTIFIKASI --}}
 
         @if(session('success'))
 
@@ -959,7 +935,7 @@ body {
         @endif
 
 
-        {{-- DAFTAR PENGAJUAN IZIN --}}
+        {{-- DAFTAR PENGAJUAN --}}
 
         @forelse($semuaIzin as $izin)
 
@@ -985,9 +961,7 @@ body {
                 <div class="student-info">
 
                     <div class="student-avatar">
-
                         {{ strtoupper(substr($izin->user->name ?? '?', 0, 1)) }}
-
                     </div>
 
 
@@ -1025,7 +999,7 @@ body {
                         </div>
 
 
-                        {{-- ALASAN IZIN --}}
+                        {{-- ALASAN --}}
 
                         <p class="reason">
                             "{{ $izin->alasan }}"
