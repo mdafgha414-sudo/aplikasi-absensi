@@ -1,18 +1,28 @@
+
 @extends('layouts.app')
 
 @section('content')
 
-{{-- Bootstrap Icons --}}
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
     .user-dashboard {
+        width: 100%;
         max-width: 1150px;
         margin: 15px auto;
+        padding: 0 14px;
         color: #243454;
         font-family: Arial, sans-serif;
+        box-sizing: border-box;
     }
+
+    .user-dashboard *,
+    .user-dashboard *::before,
+    .user-dashboard *::after {
+        box-sizing: border-box;
+    }
+
+    /* BANNER */
 
     .ud-welcome {
         position: relative;
@@ -50,13 +60,13 @@
 
     .ud-welcome-content {
         position: relative;
-        z-index: 1;
+        z-index: 2;
     }
 
     .ud-eyebrow {
         display: inline-block;
         padding: 7px 13px;
-        background: #ffffff;
+        background: #fff;
         border: 1px solid #bae6fd;
         border-radius: 30px;
         font-size: 12px;
@@ -70,6 +80,7 @@
         font-weight: 800;
         margin-bottom: 12px;
         color: #0f172a;
+        line-height: 1.3;
     }
 
     .ud-welcome p {
@@ -77,16 +88,18 @@
         color: #334155;
         line-height: 1.8;
         margin-bottom: 22px;
+        font-size: 14px;
     }
 
     .ud-primary-btn {
         display: inline-block;
         padding: 12px 20px;
-        background: #ffffff;
+        background: #fff;
         color: #0284c7;
         border-radius: 10px;
         text-decoration: none;
         font-weight: bold;
+        font-size: 14px;
         transition: .2s;
         border: 1px solid #bae6fd;
     }
@@ -107,7 +120,10 @@
         opacity: .15;
         z-index: 1;
         color: #0284c7;
+        pointer-events: none;
     }
+
+    /* JUDUL MENU */
 
     .ud-section-title {
         font-size: 20px;
@@ -121,6 +137,8 @@
         font-size: 14px;
         margin-bottom: 19px;
     }
+
+    /* MENU CARD */
 
     .ud-menu-grid {
         display: grid;
@@ -140,6 +158,7 @@
         color: #243454;
         box-shadow: 0 5px 18px rgba(34, 53, 92, .05);
         transition: .25s;
+        min-width: 0;
     }
 
     .ud-menu-card:hover {
@@ -196,6 +215,8 @@
         color: #7186d8;
     }
 
+    /* INFORMASI TAMBAHAN */
+
     .ud-bottom-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -209,11 +230,13 @@
         border-radius: 18px;
         padding: 23px;
         box-shadow: 0 5px 18px rgba(34, 53, 92, .04);
+        min-width: 0;
     }
 
     .ud-panel h5 {
         font-weight: 800;
         margin-bottom: 20px;
+        font-size: 17px;
     }
 
     .ud-step {
@@ -289,33 +312,203 @@
         vertical-align: middle;
     }
 
-    @media (max-width: 700px) {
-        .user-dashboard {
-            margin: 8px auto;
-        }
+    /* TABLET */
 
+    @media (max-width: 991px) {
         .ud-welcome {
-            padding: 25px 21px;
+            padding: 28px;
         }
 
         .ud-hero-icon {
-            right: 15px;
-            font-size: 65px;
-            opacity: .1;
+            right: 25px;
+            font-size: 85px;
+        }
+
+        .ud-menu-grid,
+        .ud-bottom-grid {
+            gap: 15px;
+        }
+    }
+
+    /* ==========================
+       KHUSUS HP
+    ========================== */
+
+    @media (max-width: 700px) {
+
+        .user-dashboard {
+            width: 100%;
+            max-width: 100%;
+            margin: 5px auto;
+            padding: 0 10px;
+        }
+
+        .ud-welcome {
+            padding: 17px 15px;
+            border-radius: 15px;
+            margin-bottom: 17px;
+        }
+
+        .ud-eyebrow {
+            font-size: 9px;
+            padding: 5px 9px;
+            margin-bottom: 9px;
+        }
+
+        .ud-welcome h2 {
+            font-size: 19px;
+            line-height: 1.35;
+            margin-bottom: 7px;
+        }
+
+        .ud-welcome p {
+            font-size: 11px;
+            line-height: 1.55;
+            margin-bottom: 12px;
+            max-width: 88%;
+        }
+
+        .ud-primary-btn {
+            padding: 8px 11px;
+            font-size: 10px;
+            border-radius: 8px;
+        }
+
+        .ud-hero-icon {
+            right: 8px;
+            font-size: 43px;
+            opacity: .08;
+        }
+
+        .ud-section-title {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .ud-section-subtitle {
+            font-size: 11px;
+            margin-bottom: 11px;
         }
 
         .ud-menu-grid,
         .ud-bottom-grid {
             grid-template-columns: 1fr;
-            gap: 14px;
+            gap: 10px;
         }
 
         .ud-menu-card {
-            padding: 20px;
+            padding: 14px;
+            border-radius: 13px;
+        }
+
+        .ud-menu-icon {
+            width: 37px;
+            height: 37px;
+            font-size: 18px;
+            border-radius: 10px;
+            margin-bottom: 9px;
+        }
+
+        .ud-menu-card h5 {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .ud-menu-card p {
+            font-size: 10px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .ud-menu-link {
+            font-size: 10px;
+        }
+
+        .ud-menu-arrow {
+            right: 13px;
+            bottom: 13px;
+            font-size: 16px;
         }
 
         .ud-panel {
-            padding: 19px;
+            padding: 14px;
+            border-radius: 13px;
+        }
+
+        .ud-panel h5 {
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .ud-step {
+            gap: 9px;
+            margin-bottom: 11px;
+        }
+
+        .ud-step-number {
+            width: 27px;
+            height: 27px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        .ud-step strong {
+            font-size: 10px;
+        }
+
+        .ud-step small {
+            font-size: 10px;
+            line-height: 1.45;
+        }
+
+        .ud-reminder-icon {
+            width: 37px;
+            height: 37px;
+            font-size: 19px;
+            margin-bottom: 9px;
+        }
+
+        .ud-reminder p {
+            font-size: 10px;
+            line-height: 1.55;
+        }
+
+        .ud-footer {
+            font-size: 9px;
+            padding: 8px 0 15px;
+        }
+    }
+
+    /* HP KECIL */
+
+    @media (max-width: 380px) {
+
+        .user-dashboard {
+            padding: 0 8px;
+        }
+
+        .ud-welcome {
+            padding: 15px 12px;
+        }
+
+        .ud-welcome h2 {
+            font-size: 17px;
+        }
+
+        .ud-welcome p {
+            font-size: 10px;
+        }
+
+        .ud-primary-btn {
+            font-size: 9px;
+        }
+
+        .ud-menu-card h5 {
+            font-size: 12px;
+        }
+
+        .ud-menu-card p {
+            font-size: 9px;
         }
     }
 </style>
@@ -324,7 +517,9 @@
 
     {{-- BANNER SAMBUTAN --}}
     <section class="ud-welcome">
+
         <div class="ud-welcome-content">
+
             <span class="ud-eyebrow">
                 <i class="bi bi-grid-1x2-fill ud-icon"></i>
                 PERSONAL DASHBOARD
@@ -340,19 +535,21 @@
                 kehadiranmu hari ini!
             </p>
 
-            <a href="{{ url('/absensi') }}"
-               class="ud-primary-btn">
+            <a href="{{ url('/absensi') }}" class="ud-primary-btn">
                 <i class="bi bi-pencil-square ud-icon"></i>
                 Isi Absen Sekarang
                 <i class="bi bi-arrow-right ud-icon"></i>
             </a>
+
         </div>
 
         <i class="bi bi-clipboard2-check ud-hero-icon"></i>
+
     </section>
 
     {{-- MENU UTAMA --}}
     <section>
+
         <h4 class="ud-section-title">Menu Utama</h4>
 
         <p class="ud-section-subtitle">
@@ -361,9 +558,8 @@
 
         <div class="ud-menu-grid">
 
-            {{-- MENU 1: ABSENSI --}}
-            <a href="{{ url('/absensi') }}"
-               class="ud-menu-card">
+            {{-- ABSENSI --}}
+            <a href="{{ url('/absensi') }}" class="ud-menu-card">
 
                 <div class="ud-menu-icon ud-blue">
                     <i class="bi bi-calendar2-check"></i>
@@ -382,11 +578,11 @@
                 </span>
 
                 <i class="bi bi-arrow-up-right ud-menu-arrow"></i>
+
             </a>
 
-            {{-- MENU 2: RIWAYAT ABSENSI --}}
-            <a href="{{ url('/absensi/riwayat') }}"
-               class="ud-menu-card">
+            {{-- RIWAYAT ABSENSI --}}
+            <a href="{{ url('/absensi/riwayat') }}" class="ud-menu-card">
 
                 <div class="ud-menu-icon ud-purple">
                     <i class="bi bi-clock-history"></i>
@@ -405,13 +601,13 @@
                 </span>
 
                 <i class="bi bi-arrow-up-right ud-menu-arrow"></i>
+
             </a>
 
-            {{-- MENU 3: JURNAL HARIAN --}}
-            <a href="{{ url('/jurnal') }}"
-               class="ud-menu-card">
+            {{-- JURNAL HARIAN --}}
+            <a href="{{ url('/jurnal') }}" class="ud-menu-card">
 
-                <div class="ud-menu-icon" style="background: #e6fcf5; color: #0ca678;">
+                <div class="ud-menu-icon" style="background:#e6fcf5;color:#0ca678;">
                     <i class="bi bi-journal-text"></i>
                 </div>
 
@@ -422,17 +618,19 @@
                     alami selama PKL hari ini.
                 </p>
 
-                <span class="ud-menu-link" style="color: #0ca678;">
+                <span class="ud-menu-link" style="color:#0ca678;">
                     Buka jurnal
                     <i class="bi bi-arrow-right"></i>
                 </span>
 
-                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #0ca678;"></i>
+                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color:#0ca678;"></i>
+
             </a>
 
-            {{-- MENU 4: PENGAJUAN IZIN --}}
+            {{-- PENGAJUAN IZIN --}}
             <a href="{{ url('/izin') }}" class="ud-menu-card">
-                <div class="ud-menu-icon" style="background: #fff1f2; color: #e11d48;">
+
+                <div class="ud-menu-icon" style="background:#fff1f2;color:#e11d48;">
                     <i class="bi bi-envelope-paper"></i>
                 </div>
 
@@ -443,72 +641,86 @@
                     atau sakit.
                 </p>
 
-                <span class="ud-menu-link" style="color: #e11d48;">
+                <span class="ud-menu-link" style="color:#e11d48;">
                     Buka form izin
                     <i class="bi bi-arrow-right"></i>
                 </span>
 
-                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color: #e11d48;"></i>
+                <i class="bi bi-arrow-up-right ud-menu-arrow" style="color:#e11d48;"></i>
+
             </a>
 
-        
-
         </div>
+
     </section>
 
     {{-- INFORMASI TAMBAHAN --}}
     <div class="ud-bottom-grid">
 
+        {{-- PANDUAN ABSENSI --}}
         <section class="ud-panel">
+
             <h5>
                 <i class="bi bi-list-check" style="color:#4965d6"></i>
                 Panduan Absensi
             </h5>
 
             <div class="ud-step">
+
                 <div class="ud-step-number">
                     <i class="bi bi-box-arrow-in-right"></i>
                 </div>
 
                 <div>
                     <strong>Isi absensi masuk</strong>
+
                     <small>
                         Buka menu Isi Absensi atau Scan QR untuk mencatat
                         waktu kedatanganmu.
                     </small>
                 </div>
+
             </div>
 
             <div class="ud-step">
+
                 <div class="ud-step-number">
                     <i class="bi bi-box-arrow-right"></i>
                 </div>
 
                 <div>
                     <strong>Isi absensi pulang</strong>
+
                     <small>
                         Catat waktu pulang setelah aktivitas
                         hari ini selesai.
                     </small>
                 </div>
+
             </div>
 
             <div class="ud-step">
+
                 <div class="ud-step-number">
                     <i class="bi bi-journal-check"></i>
                 </div>
 
                 <div>
                     <strong>Isi jurnal harian</strong>
+
                     <small>
                         Catat kegiatan dan kendalamu di menu
                         Jurnal Harian PKL.
                     </small>
                 </div>
+
             </div>
+
         </section>
 
+        {{-- PENGINGAT --}}
         <section class="ud-panel ud-reminder">
+
             <div class="ud-reminder-icon">
                 <i class="bi bi-lightbulb"></i>
             </div>
@@ -528,14 +740,19 @@
                 <i class="bi bi-calendar3"></i>
                 {{ now()->translatedFormat('l, d F Y') }}
             </p>
+
         </section>
 
     </div>
 
+    {{-- FOOTER --}}
     <div class="ud-footer">
+
         <i class="bi bi-shield-check"></i>
+
         © {{ now()->year }} Timetrix
         · Sistem Pencatatan Kehadiran
+
     </div>
 
 </div>
