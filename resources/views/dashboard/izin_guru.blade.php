@@ -1,643 +1,1543 @@
 @extends('layouts.app')
 
+
+
 @section('content')
 
+
+
 <style>
+
     /* CSS PENYESUAIAN LAPORAN ABSENSI & IZIN */
+
     .rekap-page {
+
         background: #f4f7fc;
+
         min-height: 100vh;
+
         padding: 30px;
+
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
     }
+
+
 
     .rekap-card {
+
         background: #fff;
+
         border-radius: 16px;
+
         box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+
         padding: 30px;
+
         border: 1px solid #eef2f9;
+
     }
+
+
 
     /* BANNER BIRU MUDA */
+
     .hero-banner {
+
         background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+
         border: 1px solid #7dd3fc;
+
         border-radius: 16px;
+
         padding: 30px;
+
         color: #0f172a;
+
         display: flex;
+
         justify-content: space-between;
+
         align-items: center;
+
         margin-bottom: 25px;
+
         box-shadow: 0 10px 25px rgba(56, 189, 248, 0.15);
+
         flex-wrap: wrap;
+
         gap: 20px;
+
     }
+
     .hero-left { display: flex; flex-direction: column; gap: 10px; }
-    
+
+
+
     .hero-badge {
+
         display: inline-flex; align-items: center; gap: 6px;
+
         background: #ffffff; color: #0284c7;
+
         padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+
         width: fit-content;
+
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
     }
+
     .hero-title { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #0f172a; }
+
     .hero-desc { font-size: 14px; color: #334155; margin: 0; max-width: 500px; line-height: 1.5; }
-    
+
+
+
     .hero-right {
+
         display: flex; align-items: center; gap: 15px;
+
         background: rgba(255, 255, 255, 0.6); padding: 15px 25px; border-radius: 12px;
+
         backdrop-filter: blur(5px);
+
         border: 1px solid #bae6fd;
+
     }
+
     .hero-icon-box {
+
         width: 45px; height: 45px; background: #ffffff; color: #0284c7;
+
         border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;
+
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
     }
+
     .hero-stat h5 { margin: 0 0 2px 0; font-size: 13px; color: #475569; font-weight: 600; }
+
     .hero-stat h3 { margin: 0; font-size: 22px; font-weight: 700; color: #0284c7; }
 
+
+
     /* HEADER & TOMBOL EXPORT */
+
     .rekap-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+
     .header-left { display: flex; align-items: flex-start; gap: 10px; flex-direction: column; }
+
     .header-title { font-size: 20px; font-weight: 700; color: #202124; margin: 0 0 5px 0; }
+
     .header-desc { font-size: 14px; color: #5f6368; margin: 0; }
 
+
+
     .filter-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
     .filter-group {
+
         display: flex; align-items: center; background: #fff; border: 1px solid #dadce0;
+
         border-radius: 8px; padding: 0 12px; height: 42px; color: #3c4043;
+
     }
+
     .filter-group select { border: none; outline: none; background: transparent; font-size: 14px; color: #3c4043; cursor: pointer; }
-    
+
+
+
     .btn-export {
+
         display: inline-flex; align-items: center; gap: 8px; padding: 0 18px;
+
         height: 42px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: 0.2s;
+
         cursor: pointer;
+
     }
+
     .btn-excel { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+
     .btn-export:hover { filter: brightness(0.95); }
+
     .btn-pdf { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
+
+
     /* SEARCH BAR */
+
     .search-bar-wrapper { margin-bottom: 25px; display: flex; }
+
     .search-input {
+
         width: 100%; max-width: 400px; height: 45px; border: 1px solid #dadce0;
+
         border-radius: 8px; padding: 0 15px 0 45px; font-size: 14px; color: #3c4043; outline: none;
-        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%235f6368' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 15px center;
+
+        background: url("data:image/svg+xml,%3Csvg xmlns='http\://www\.w3.org/2000/svg' width='18' height='18' fill='%235f6368' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 15px center;
+
     }
+
+
 
     /* TABEL MATRIKS */
+
     .table-responsive { overflow-x: auto; border: 1px solid #e0e0e0; border-radius: 8px; -webkit-overflow-scrolling: touch; }
+
     .matrix-table { width: 100%; border-collapse: collapse; min-width: 1000px; text-align: center; }
-    
+
+
+
     .matrix-table th, .matrix-table td { border: 1px solid #e0e0e0; padding: 16px 10px; vertical-align: middle; }
-    
+
+
+
     /* HEADER TANGGAL */
+
     .matrix-table thead th { background: #ffffff; font-weight: 600; color: #3c4043; font-size: 14px; border-bottom: 2px solid #e0e0e0; }
+
     .matrix-table thead th .day-name { display: block; font-size: 11px; color: #80868b; font-weight: 400; margin-top: 3px; text-transform: uppercase; }
 
+
+
     /* STICKY KOLOM NAMA */
+
     .matrix-table td:first-child, .matrix-table th:first-child { text-align: center; width: 60px; font-weight: 600; color: #3c4043; font-size: 14px; }
+
     .matrix-table .student-name { 
+
         text-align: left; padding-left: 15px; font-weight: 600; color: #202124; min-width: 220px; font-size: 15px;
+
         position: sticky; left: 0; background: white; z-index: 1; border-right: 1px solid #e0e0e0;
+
     }
+
     .matrix-table thead .student-name { z-index: 2; background: #ffffff; }
+
     .matrix-table tbody tr:hover td { background-color: #f8fafc; }
+
     .matrix-table tbody tr:hover .student-name { background-color: #f8fafc; }
 
+
+
     /* AVATAR */
+
     .student-info { display: flex; align-items: center; gap: 12px; }
+
     .avatar-circle {
+
         width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+
         font-size: 13px; font-weight: 700; color: #fff;
+
     }
+
     .bg-av-1 { background: #a8c0ff; color: #1a3b8b; }
+
     .bg-av-2 { background: #d4b4ff; color: #5b2c8b; }
+
     .bg-av-3 { background: #ffb4c0; color: #8b2c3d; }
+
     .bg-av-4 { background: #b4ffd4; color: #2c8b5b; }
 
+
+
     /* STATUS ICONS (PASTEL KOTAK) */
+
     .status-box {
+
         width: 34px; height: 34px; border-radius: 8px; display: inline-flex;
+
         align-items: center; justify-content: center; font-weight: 800; font-size: 15px;
+
         text-decoration: none; transition: transform 0.2s; position: relative;
+
     }
+
     .status-box.clickable:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); cursor: pointer; }
-    
+
+
+
     .status-hadir { background: #dcfce7; color: #16a34a; }
+
     .status-izin { background: #dbeafe; color: #2563eb; }
+
     .status-sakit { background: #fef9c3; color: #ca8a04; }
+
     .status-alpa { background: #fee2e2; color: #dc2626; }
+
     .status-telat { background: #ffedd5; color: #ea580c; }
-    
+
+
+
     /* KOSONG / LIBUR */
+
     .status-empty { 
+
         display: inline-flex; align-items: center; justify-content: center;
+
         width: 34px; height: 34px; color: #cbd5e1; font-size: 20px; font-weight: 600;
+
     }
+
+
 
     /* JAM PASIR MENUNGGU */
+
     .status-menunggu { 
+
         background: #fffbeb; 
+
         border: 1px solid #fde68a;
+
         color: #d97706; 
+
         animation: putarPelan 3s infinite ease-in-out;
+
     }
+
     .status-menunggu svg { width: 18px; height: 18px; fill: currentColor; }
 
+
+
     @keyframes putarPelan {
+
         0% { transform: rotate(0deg); }
+
         25% { transform: rotate(10deg); }
+
         75% { transform: rotate(-10deg); }
+
         100% { transform: rotate(0deg); }
+
     }
+
+
 
     /* KETERANGAN STATUS BAWAH */
+
     .legend-container {
+
         display: flex; justify-content: space-between; align-items: center;
+
         margin-top: 30px; flex-wrap: wrap; gap: 20px;
+
     }
+
     .legend-title h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 700; color: #202124; }
+
     .legend-title p { margin: 0; font-size: 13px; color: #80868b; }
-    
+
+
+
     .legend-items { display: flex; gap: 12px; flex-wrap: wrap; }
+
     .legend-box {
+
         display: flex; align-items: center; justify-content: center; gap: 8px;
+
         padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+
     }
+
     .legend-box.hadir { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+
     .legend-box.telat { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+
     .legend-box.izin  { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+
     .legend-box.sakit { background: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
+
     .legend-box.alpa  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
     .legend-box.empty { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+
     .legend-box span { font-weight: 800; font-size: 14px; }
 
+
+
     /* MODAL OVERLAY CUSTOM */
+
     .modal-custom-overlay {
+
         display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+
         background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); z-index: 9999; 
+
         align-items: center; justify-content: center;
+
     }
+
     .modal-custom-box {
+
         background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; 
+
         box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;
+
     }
+
+
+
+    /* =========================================
+       RESPONSIVE MOBILE - GURU IZIN
+       DESKTOP / LAPTOP TIDAK DIUBAH
+    ========================================= */
+    @media screen and (max-width: 767px) {
+        .rekap-page {
+            padding: 12px;
+            min-height: 100vh;
+        }
+
+        .rekap-card {
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .hero-banner {
+            padding: 18px;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .hero-title {
+            font-size: 21px;
+            line-height: 1.3;
+        }
+
+        .hero-desc {
+            font-size: 12px;
+        }
+
+        .hero-right {
+            width: 100%;
+            padding: 12px;
+        }
+
+        .rekap-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .header-title {
+            font-size: 18px;
+        }
+
+        .header-desc {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* Form filter menjadi isi grid agar filter dan export tersusun rapi. */
+        .filter-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            width: 100%;
+        }
+
+        .filter-actions form {
+            display: contents !important;
+        }
+
+        .filter-group {
+            width: 100%;
+            min-width: 0;
+            height: 40px;
+            padding: 0 8px;
+        }
+
+        /* Sekolah satu baris penuh; bulan dan tahun satu baris. */
+        .filter-actions form .filter-group:first-child {
+            grid-column: 1 / -1;
+        }
+
+        .filter-group select {
+            width: 100%;
+            max-width: 100%;
+            font-size: 12px;
+        }
+
+        .filter-actions > a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-width: 0;
+            height: 40px;
+            padding: 0 5px !important;
+            margin: 0 !important;
+            border-radius: 8px !important;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .search-bar-wrapper {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 100%;
+            height: 42px;
+            font-size: 13px;
+            padding-left: 40px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            border-radius: 8px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .matrix-table {
+            width: max-content;
+            min-width: 100%;
+            table-layout: auto;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 10px 8px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* Kolom nomor dan nama tetap terlihat saat tabel digeser. */
+        .matrix-table th:first-child,
+        .matrix-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 3;
+            width: 40px;
+            min-width: 40px;
+            background: #fff;
+        }
+
+        .matrix-table .student-name {
+            position: sticky;
+            left: 40px;
+            z-index: 2;
+            min-width: 145px;
+            width: 145px;
+            padding-left: 8px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .matrix-table thead .student-name {
+            z-index: 5;
+            background: #fff;
+        }
+
+        .matrix-table tbody tr:hover .student-name {
+            background: #f8fafc;
+        }
+
+        .matrix-table thead th {
+            min-width: 48px;
+            font-size: 12px;
+            padding: 10px 5px;
+        }
+
+        .matrix-table thead th .day-name {
+            font-size: 10px;
+        }
+
+        .student-info {
+            gap: 8px;
+        }
+
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            font-size: 11px;
+            border-radius: 9px;
+        }
+
+        .status-box,
+        .status-empty {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            font-size: 13px;
+        }
+
+        /* Baris kelompok sekolah tetap membentang selebar tabel. */
+        .matrix-table tbody tr:not(.student-row) td:first-child {
+            position: static;
+            left: auto;
+            background: #f0f4ff;
+            text-align: left;
+        }
+
+        .legend-container {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .legend-title h4 {
+            font-size: 15px;
+        }
+
+        .legend-title p {
+            font-size: 12px;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            width: 100%;
+            gap: 8px;
+        }
+
+        .legend-box {
+            justify-content: center;
+            padding: 9px 5px;
+            font-size: 12px;
+        }
+
+        .modal-custom-box {
+            width: 94%;
+            max-height: 85vh;
+            padding: 18px;
+            border-radius: 12px;
+        }
+    }
+
+    @media screen and (max-width: 380px) {
+        .rekap-page {
+            padding: 8px;
+        }
+
+        .rekap-card {
+            padding: 12px;
+        }
+
+        .matrix-table .student-name {
+            min-width: 125px;
+            width: 125px;
+        }
+
+        .filter-group select {
+            font-size: 11px;
+        }
+    }
+
 </style>
 
+
+
 <div class="rekap-page">
-    
+
+
+
     <!-- BANNER BIRU MUDA -->
+
     <div class="hero-banner">
+
         <div class="hero-left">
+
             <div class="hero-badge">
+
                 <i class="bi bi-calendar-check"></i> Laporan Kehadiran
+
             </div>
+
             <h1 class="hero-title">Laporan Absensi & Izin PKL</h1>
+
             <p class="hero-desc">Pantau riwayat kehadiran, keterlambatan, serta persetujuan izin siswa PKL secara praktis.</p>
+
         </div>
-        
+
+
+
         <div class="hero-right">
+
             <div class="hero-icon-box">
+
                 <i class="bi bi-people-fill"></i>
+
             </div>
+
             <div class="hero-stat">
+
                 <h5>Total Siswa</h5>
+
                 <h3>{{ count($siswa) }} Siswa</h3>
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <div class="rekap-card">
-        
+
+
+
         <!-- HEADER & FILTER -->
+
         <div class="rekap-header">
+
             <div class="header-left">
+
                 <div>
+
                     <h2 class="header-title">Detail Kehadiran Harian</h2>
+
                     <p class="header-desc">Filter berdasarkan sekolah, bulan, dan tahun untuk melihat data.</p>
+
                 </div>
+
             </div>
-            
+
+
+
             <div class="filter-actions">
+
                 <form action="{{ route('guru.izin') }}" method="GET" class="d-flex gap-2 flex-wrap">
+
                     <!-- Dropdown Filter Sekolah -->
+
                     <div class="filter-group">
+
                         <select name="sekolah" onchange="this.form.submit()">
+
                             <option value="Semua" {{ $sekolahFilter == 'Semua' || !$sekolahFilter ? 'selected' : '' }}>Semua Sekolah</option>
+
                             @foreach($daftarSekolah as $sklh)
+
                                 <option value="{{ $sklh->id }}" {{ $sekolahFilter == $sklh->id ? 'selected' : '' }}>
+
                                     {{ $sklh->nama_sekolah }}
+
                                 </option>
+
                             @endforeach
+
                         </select>
+
                     </div>
+
                     <!-- Filter Bulan -->
+
                     <div class="filter-group">
+
                         <select name="bulan" onchange="this.form.submit()">
+
                             @for ($i = 1; $i <= 12; $i++)
+
                                 <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == $i ? 'selected' : '' }}>
+
                                     {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+
                                 </option>
+
                             @endfor
+
                         </select>
+
                     </div>
+
                     <!-- Filter Tahun -->
+
                     <div class="filter-group">
+
                         <select name="tahun" onchange="this.form.submit()">
+
                             @for ($i = date('Y') - 2; $i <= date('Y') + 5; $i++)
+
                                 <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>
+
                                     {{ $i }}
+
                                 </option>
+
                             @endfor
+
                         </select>
+
                     </div>
+
                 </form>
 
+
+
                 <!-- TOMBOL EXPORT -->
+
                 <a href="{{ route('guru.export.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-success btn-sm px-3 rounded-3 fw-medium">
+
                     <i class="bi bi-file-earmark-excel"></i> Export Excel
+
                 </a>
+
                 <a href="{{ route('guru.export.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'sekolah' => $sekolahFilter]) }}" class="btn btn-outline-danger btn-sm px-3 rounded-3 fw-medium">
+
                     <i class="bi bi-file-earmark-pdf"></i> Export PDF
+
                 </a>
+
             </div>
+
         </div>
+
+
 
         <!-- PENCARIAN -->
+
         <div class="search-bar-wrapper">
+
             <input type="text" id="searchInput" class="search-input" placeholder="Cari nama siswa...">
+
         </div>
+
+
 
         <!-- TABEL MATRIKS -->
+
         <div class="table-responsive">
+
             <table class="matrix-table" id="rekapTable">
+
                 <thead>
+
                     <tr>
+
                         <th>No</th>
+
                         <th class="student-name">Nama Siswa</th>
+
                         @foreach($tanggalList as $tgl)
+
                             @php
+
                                 $isWeekend = $tgl->isWeekend();
+
                                 $bgStyle = $isWeekend ? 'background-color: #e0f2fe;' : 'background-color: #ffffff;'; 
+
                             @endphp
+
                             <th style="{{ $bgStyle }}">
+
                                 {{ $tgl->format('d') }}
+
                                 <span class="day-name">{{ $tgl->translatedFormat('D') }}</span>
+
                             </th>
+
                         @endforeach
+
                     </tr>
+
                 </thead>
+
                 <tbody>
+
                     @php
+
                         // Kelompokkan siswa berdasarkan sekolah
+
                         $siswaGrouped = $siswa->groupBy('sekolah_id');
+
                     @endphp
 
+
+
                     @foreach($siswaGrouped as $sekolahId => $listSiswa)
+
                         <!-- Baris Header Sekolah -->
+
                         <tr style="background-color: #f0f4ff;">
+
                             <td colspan="{{ count($tanggalList) + 2 }}" class="text-start fw-bold" style="color: #1e3a8a; padding: 10px 15px;">
+
                                 <i class="bi bi-building me-2"></i> {{ $listSiswa->first()->sekolah->nama_sekolah ?? 'Sekolah Tidak Disebutkan' }}
+
                             </td>
+
                         </tr>
 
+
+
                         @foreach($listSiswa as $index => $s)
+
                             <tr class="student-row">
+
                                 <td>{{ $loop->iteration }}</td>
+
                                 <td class="student-name">
+
                                     <div class="student-info">
+
                                         <div class="avatar-circle bg-av-{{ ($index % 4) + 1 }}">
+
                                             {{ strtoupper(substr($s->name, 0, 2)) }}
+
                                         </div>
+
                                         <span>{{ $s->name }}</span>
+
                                     </div>
+
                                 </td>
+
                                 @foreach($tanggalList as $tgl)
+
                                     @php
+
                                         $key = $s->id . '-' . $tgl->format('d');
+
                                         $statusAbsen = isset($absensi[$key]) ? $absensi[$key]->status : null;
+
                                         $dataIzin = isset($izin[$key]) ? $izin[$key] : null;
+
                                         // AMBIL DATA ALASAN KETERLAMBATAN
+
                                         $dataAlasan = isset($alasanKeterlambatan[$key]) ? $alasanKeterlambatan[$key] : null;
+
                                         $teksAlasan = $dataAlasan ? $dataAlasan->alasan : null;
-                                        
+
+
+
                                         $finalStatus = null;
 
+
+
                                         // CEK APAKAH HARI INI SUDAH LEWAT
+
                                         $isWeekend = $tgl->isWeekend();
+
                                         $isPastDay = $tgl->startOfDay()->lt(\Carbon\Carbon::today()->startOfDay());
 
+
+
                                         // LOGIKA PENENTUAN STATUS
+
                                         if ($dataIzin) {
+
                                             if ($dataIzin->status == 'Menunggu') {
+
                                                 $finalStatus = 'Menunggu';
+
                                             } else if ($dataIzin->status == 'Disetujui') {
+
                                                 $finalStatus = $dataIzin->jenis_izin; 
+
                                             } else {
+
                                                 // Jika izin ditolak, pakai status absen. Jika kosong, jadikan Alpa HANYA JIKA TANGGAL SUDAH LEWAT
+
                                                 $finalStatus = $statusAbsen ?? ($isPastDay ? 'Alpa' : null); 
+
                                             }
+
                                         } else {
+
                                             // Jika tidak ada izin, pakai status absen. Jika kosong, jadikan Alpa HANYA JIKA TANGGAL SUDAH LEWAT
+
                                             $finalStatus = $statusAbsen ?? ($isPastDay ? 'Alpa' : null);
+
                                         }
+
+
 
                                         // Jika Weekend dan tidak ada data, jadikan Libur
+
                                         if (!$statusAbsen && !$dataIzin && $isWeekend) {
+
                                             $finalStatus = 'Libur';
+
                                         }
-                                        
+
+
+
                                         // Siapkan JSON untuk Modal Izin
+
                                         $jsonIzin = '';
+
                                         if ($dataIzin) {
+
                                             $jsonIzin = json_encode([
+
                                                 'nama' => $s->name,
+
                                                 'tanggal' => $tgl->format('d M Y'),
+
                                                 'jenis' => $dataIzin->jenis_izin,
+
                                                 'status' => $dataIzin->status,
+
                                                 'alasan' => $dataIzin->alasan,
+
                                                 'lampiran' => $dataIzin->lampiran ? asset('storage/' . $dataIzin->lampiran) : null
+
                                             ]);
+
                                         }
+
+
 
                                         // Siapkan JSON untuk Modal Absensi (Foto, Jam, & ALASAN KETERLAMBATAN)
+
                                         $jsonAbsen = '';
+
                                         if ($statusAbsen) { 
+
                                             $absenDetail = $absensi[$key]; 
+
                                             $jsonAbsen = json_encode([
+
                                                 'nama' => $s->name,
+
                                                 'tanggal' => $tgl->format('d M Y'),
+
                                                 'status' => $absenDetail->status,
+
                                                 'jam_masuk' => $absenDetail->jam_masuk,
+
                                                 'jam_pulang' => $absenDetail->jam_pulang,
+
                                                 'foto_masuk' => $absenDetail->foto_masuk ? asset('storage/' . $absenDetail->foto_masuk) : null,
+
                                                 'foto_pulang' => $absenDetail->foto_pulang ? asset('storage/' . $absenDetail->foto_pulang) : null,
+
                                                 'alasan_terlambat' => $teksAlasan,
+
                                             ]);
+
                                         }
+
                                     @endphp
+
                                     <td>
+
                                         @if($finalStatus == 'Hadir' || $finalStatus == 'Tepat Waktu')
+
                                             @if($jsonAbsen)
+
                                                 <a href="javascript:void(0)" class="status-box status-hadir clickable" onclick="showDetailAbsensi({{ $jsonAbsen }})">
+
                                                     <i class="bi bi-check-lg"></i>
+
                                                 </a>
+
                                             @else
+
                                                 <span class="status-box status-hadir"><i class="bi bi-check-lg"></i></span>
+
                                             @endif
-                                        
+
+
+
                                         @elseif($finalStatus == 'Telat' || $finalStatus == 'Terlambat')
+
                                             @if($jsonAbsen)
+
                                                 <a href="javascript:void(0)" class="status-box status-telat clickable" onclick="showDetailAbsensi({{ $jsonAbsen }})">
+
                                                     T
+
                                                     @if($teksAlasan)
+
                                                         <i class="bi bi-chat-left-text" style="font-size: 10px; position: absolute; top: 2px; right: 2px;"></i>
+
                                                     @endif
+
                                                 </a>
+
                                             @else
+
                                                 <span class="status-box status-telat">T</span>
+
                                             @endif
+
+
 
                                         @elseif($finalStatus == 'Izin')
+
                                             <a href="javascript:void(0)" class="status-box status-izin clickable" onclick="showDetailIzin({{ $jsonIzin }})">I</a>
-                                        
+
+
+
                                         @elseif($finalStatus == 'Sakit')
+
                                             <a href="javascript:void(0)" class="status-box status-sakit clickable" onclick="showDetailIzin({{ $jsonIzin }})">S</a>
-                                        
+
+
+
                                         @elseif($finalStatus == 'Menunggu')
+
                                             <a href="javascript:void(0)" class="status-box status-menunggu clickable" title="Menunggu Persetujuan" onclick="showDetailIzin({{ $jsonIzin }})">
-                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+
+                                                <svg viewBox="0 0 24 24" xmlns="http\://www\.w3.org/2000/svg">
+
                                                     <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"/>
+
                                                 </svg>
+
                                             </a>
-                                        
+
+
+
                                         @elseif($finalStatus == 'Alpa')
+
                                             @if($jsonAbsen)
+
                                                 <a href="javascript:void(0)" class="status-box status-alpa clickable" onclick="showDetailAbsensi({{ $jsonAbsen }})">A</a>
+
                                             @else
+
                                                 <span class="status-box status-alpa">A</span>
+
                                             @endif
-                                        
+
+
+
                                         @else
+
                                             <span class="status-empty">&minus;</span>
+
                                         @endif
+
                                     </td>
+
                                 @endforeach
+
                             </tr>
+
                         @endforeach
+
                     @endforeach
+
                 </tbody>
+
             </table>
+
         </div>
+
+
 
         <!-- KETERANGAN STATUS -->
+
         <div class="legend-container">
+
             <div class="legend-title">
+
                 <h4>Keterangan Status</h4>
+
                 <p>Indikator warna matriks kehadiran</p>
+
             </div>
+
             <div class="legend-items">
+
                 <div class="legend-box hadir"><span>H</span> Hadir</div>
+
                 <div class="legend-box telat"><span>T</span> Telat</div>
+
                 <div class="legend-box izin"><span>I</span> Izin</div>
+
                 <div class="legend-box sakit"><span>S</span> Sakit</div>
+
                 <div class="legend-box alpa"><span>A</span> Alpa</div>
+
                 <div class="legend-box empty">- Libur/Belum</div>
+
             </div>
+
         </div>
 
+
+
     </div>
+
 </div>
+
+
 
 <!-- MODAL 1: DETAIL IZIN -->
+
 <div id="modalIzin" class="modal-custom-overlay">
+
     <div class="modal-custom-box">
+
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px;">
+
             <h3 style="margin: 0; font-size: 20px; color: #1e293b; font-weight: 700;">Detail Pengajuan Izin</h3>
+
             <button onclick="closeModalIzin()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #94a3b8;">&times;</button>
+
         </div>
-        
+
+
+
         <div style="font-size: 15px; color: #334155; line-height: 1.8;">
+
             <p style="margin: 0 0 10px 0;"><strong>Nama:</strong> <span id="modalNama"></span></p>
+
             <p style="margin: 0 0 10px 0;"><strong>Tanggal:</strong> <span id="modalTanggal"></span></p>
+
             <p style="margin: 0 0 10px 0;"><strong>Jenis:</strong> <span id="modalJenis"></span></p>
+
             <p style="margin: 0 0 10px 0;"><strong>Status:</strong> <span id="modalStatus" style="font-weight: bold;"></span></p>
+
             <p style="margin: 0 0 15px 0;"><strong>Alasan:</strong> <span id="modalAlasan"></span></p>
-            
+
+
+
             <div id="modalLampiranContainer" style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed #e2e8f0;">
+
                 <strong>Lampiran Bukti:</strong><br>
-                <a id="modalLampiranLink" href="#" target="_blank" style="display: inline-block; margin-top: 10px; padding: 12px 24px; background: #eff6ff; color: #2563eb; border-radius: 8px; text-decoration: none; font-weight: 600;">
+
+                <a id="modalLampiranLink" href="#" target="\_blank" style="display: inline-block; margin-top: 10px; padding: 12px 24px; background: #eff6ff; color: #2563eb; border-radius: 8px; text-decoration: none; font-weight: 600;">
+
                     <i class="bi bi-paperclip"></i> Lihat Surat/Foto
+
                 </a>
+
                 <span id="modalTidakAdaLampiran" style="display: none; color: #dc2626; font-weight: 600;">Tidak ada lampiran</span>
+
             </div>
+
         </div>
-        
+
+
+
         <div style="margin-top: 25px; text-align: right;">
+
             <button onclick="closeModalIzin()" style="padding: 12px 28px; background: #f1f5f9; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s;">Tutup</button>
+
         </div>
+
     </div>
+
 </div>
+
+
 
 <!-- MODAL 2: DETAIL ABSENSI -->
+
 <div id="modalAbsensi" class="modal-custom-overlay">
+
     <div class="modal-custom-box">
+
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px;">
+
             <h3 style="margin: 0; font-size: 20px; color: #1e293b; font-weight: 700;">Detail Absensi & Bukti Foto</h3>
+
             <button onclick="closeModalAbsensi()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #94a3b8;">&times;</button>
+
         </div>
-        
+
+
+
         <div style="font-size: 15px; color: #334155; line-height: 1.8;">
+
             <h4 id="modalNamaAbsen" style="font-weight: 700; margin: 0 0 5px 0;"></h4>
+
             <p style="margin: 0 0 15px 0; color: #64748b;"><i class="bi bi-calendar3 me-1"></i> <span id="modalTanggalAbsen"></span></p>
-            
+
+
+
             <div class="row text-center mb-4">
+
                 <div class="col-6">
+
                     <div style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+
                         <small style="color: #64748b;">Jam Masuk</small><br>
+
                         <strong style="font-size: 18px; color: #16a34a;" id="modalJamMasuk">--:--</strong>
+
                     </div>
+
                 </div>
+
                 <div class="col-6">
+
                     <div style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+
                         <small style="color: #64748b;">Jam Pulang</small><br>
+
                         <strong style="font-size: 18px; color: #dc2626;" id="modalJamPulang">--:--</strong>
+
                     </div>
+
                 </div>
+
             </div>
+
+
 
             <!-- BLOK ALASAN KETERLAMBATAN -->
+
             <div id="boxAlasanTerlambat" class="mb-4" style="display: none; background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 8px;">
+
                 <h6 style="font-weight: 700; color: #d97706; margin-bottom: 5px;"><i class="bi bi-info-circle me-1"></i> Alasan Keterlambatan:</h6>
+
                 <p id="teksAlasanTerlambat" style="margin: 0; color: #92400e; font-size: 14px;"></p>
+
             </div>
+
+
 
             <hr style="border-color: #e2e8f0;">
-            
+
+
+
             <h6 style="font-weight: 700; margin-bottom: 15px;"><i class="bi bi-camera me-2"></i>Bukti Foto Absensi</h6>
+
             <div class="row text-center">
+
                 <div class="col-6">
+
                     <p style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Foto Masuk</p>
+
                     <img id="imgFotoMasuk" src="" style="width: 100%; border-radius: 8px; object-fit: cover; max-height: 200px; display: none;">
+
                     <div id="noFotoMasuk" style="background: #f8fafc; padding: 30px 10px; border-radius: 8px; color: #94a3b8; font-size: 13px;">Tidak ada foto</div>
+
                 </div>
+
                 <div class="col-6">
+
                     <p style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Foto Pulang</p>
+
                     <img id="imgFotoPulang" src="" style="width: 100%; border-radius: 8px; object-fit: cover; max-height: 200px; display: none;">
+
                     <div id="noFotoPulang" style="background: #f8fafc; padding: 30px 10px; border-radius: 8px; color: #94a3b8; font-size: 13px;">Tidak ada foto</div>
+
                 </div>
+
             </div>
+
         </div>
-        
+
+
+
         <div style="margin-top: 25px; text-align: right;">
+
             <button onclick="closeModalAbsensi()" style="padding: 12px 28px; background: #f1f5f9; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s;">Tutup</button>
+
         </div>
+
     </div>
+
 </div>
 
+
+
 <!-- SCRIPT UNTUK MODAL DAN PENCARIAN -->
+
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
+
     const searchInput = document.getElementById('searchInput');
+
     const rows = document.querySelectorAll('.student-row');
 
+
+
     searchInput.addEventListener('keyup', function() {
+
         const keyword = this.value.toLowerCase();
-        
+
+
+
         rows.forEach(row => {
+
             const name = row.querySelector('.student-name').textContent.toLowerCase();
+
             if (name.includes(keyword)) {
+
                 row.style.display = '';
+
             } else {
+
                 row.style.display = 'none';
+
             }
+
         });
+
     });
+
 });
 
+
+
 function showDetailIzin(data) {
+
     document.getElementById('modalNama').innerText = data.nama;
+
     document.getElementById('modalTanggal').innerText = data.tanggal;
+
     document.getElementById('modalJenis').innerText = data.jenis;
+
     document.getElementById('modalAlasan').innerText = data.alasan;
 
+
+
     const statusEl = document.getElementById('modalStatus');
+
     statusEl.innerText = data.status;
-    
+
+
+
     if (data.status === 'Menunggu') statusEl.style.color = '#ea580c';
+
     else if (data.status === 'Disetujui') statusEl.style.color = '#16a34a';
+
     else statusEl.style.color = '#dc2626';
 
+
+
     const btnLampiran = document.getElementById('modalLampiranLink');
+
     const textNoLampiran = document.getElementById('modalTidakAdaLampiran');
 
+
+
     if (data.lampiran) {
+
         btnLampiran.href = data.lampiran;
+
         btnLampiran.style.display = 'inline-block';
+
         textNoLampiran.style.display = 'none';
+
     } else {
+
         btnLampiran.style.display = 'none';
+
         textNoLampiran.style.display = 'inline-block';
+
     }
+
+
 
     document.getElementById('modalIzin').style.display = 'flex';
+
 }
+
+
 
 function closeModalIzin() {
+
     document.getElementById('modalIzin').style.display = 'none';
+
 }
+
+
 
 function showDetailAbsensi(data) {
+
     document.getElementById('modalNamaAbsen').innerText = data.nama;
+
     document.getElementById('modalTanggalAbsen').innerText = data.tanggal;
+
     document.getElementById('modalJamMasuk').innerText = data.jam_masuk ? data.jam_masuk.substring(0,5) : '--:--';
+
     document.getElementById('modalJamPulang').innerText = data.jam_pulang ? data.jam_pulang.substring(0,5) : '--:--';
 
+
+
     // TAMPILKAN ALASAN KETERLAMBATAN
+
     const boxAlasan = document.getElementById('boxAlasanTerlambat');
+
     const teksAlasan = document.getElementById('teksAlasanTerlambat');
-    
+
+
+
     if (data.alasan_terlambat) {
+
         teksAlasan.innerText = data.alasan_terlambat;
+
         boxAlasan.style.display = 'block';
+
     } else {
+
         boxAlasan.style.display = 'none';
+
     }
+
+
 
     let imgM = document.getElementById('imgFotoMasuk');
+
     let noM = document.getElementById('noFotoMasuk');
+
     if (data.foto_masuk) { 
+
         imgM.src = data.foto_masuk; 
+
         imgM.style.display = 'block'; 
+
         noM.style.display = 'none'; 
+
     } else { 
+
         imgM.style.display = 'none'; 
+
         noM.style.display = 'block'; 
+
     }
-    
+
+
+
     let imgP = document.getElementById('imgFotoPulang');
+
     let noP = document.getElementById('noFotoPulang');
+
     if (data.foto_pulang) { 
+
         imgP.src = data.foto_pulang; 
+
         imgP.style.display = 'block'; 
+
         noP.style.display = 'none'; 
+
     } else { 
+
         imgP.style.display = 'none'; 
+
         noP.style.display = 'block'; 
+
     }
+
+
 
     document.getElementById('modalAbsensi').style.display = 'flex';
+
 }
 
+
+
 function closeModalAbsensi() {
+
     document.getElementById('modalAbsensi').style.display = 'none';
+
 }
+
 </script>
+
+
 
 @endsection
